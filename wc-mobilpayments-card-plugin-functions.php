@@ -1,16 +1,5 @@
 <?php
 /**
- * Plugin Name: WC MobilPayments Card
- * Author: Alexandru Boia
- * Author URI: http://alexboia.net
- * Version: 0.1.0
- * Description: Card WooCommerce Payment Gateway that uses the Romainan mobilPay payment processing gateway
- * License: New BSD License
- * Plugin URI: https://github.com/alexboia/WC-MobilPayments-Card
- * Text Domain: wc-mobilpayments-card
- */
-
-/**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -40,8 +29,42 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- require_once __DIR__ . '/wc-mobilpayments-card-plugin-header.php';
- require_once __DIR__ . '/wc-mobilpayments-card-plugin-functions.php';
+function lvd_wcmc_init_autoloader() {
+   require_once LVD_WCMC_LIB_DIR . '/Autoloader.php';
+   LvdWcMc\Autoloader::init(LVD_WCMC_LIB_DIR, array(
+      'LvdWcMc' => '\\',
+      'Mobilpay' => '_'
+   ));
+}
 
- lvd_wcmc_init_autoloader();
- lvd_wcmc_run();
+function lvdwcmc_plugin() {
+   static $plugin = null;
+   if ($plugin === null) {
+      $plugin = new LvdWcMc\Plugin(array(
+         'mediaIncludes' => array(
+            'refPluginsPath' => LVD_WCMC_MAIN,
+            'scriptsInFooter' => true
+         )
+      ));
+   }
+   return $plugin;
+}
+
+function lvdwcmc_append_error($message, $error) {
+	if (defined('WP_DEBUG') && WP_DEBUG) {
+		if ($error instanceof \Exception) {
+			$message .= sprintf(': %s (%s) in file %s line %d', $error->getMessage(), $error->getCode(), $error->getFile(), $error->getLine());
+		} else if (!empty($error)) {
+			$message .= ': ' . $error;
+		}
+	}
+	return $message;
+}
+
+function lvdwcmc_env() {
+   return lvdwcmc_plugin()->getEnv();
+}
+
+function lvd_wcmc_run() {
+   lvdwcmc_plugin()->run();
+}

@@ -1,16 +1,5 @@
 <?php
 /**
- * Plugin Name: WC MobilPayments Card
- * Author: Alexandru Boia
- * Author URI: http://alexboia.net
- * Version: 0.1.0
- * Description: Card WooCommerce Payment Gateway that uses the Romainan mobilPay payment processing gateway
- * License: New BSD License
- * Plugin URI: https://github.com/alexboia/WC-MobilPayments-Card
- * Text Domain: wc-mobilpayments-card
- */
-
-/**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -40,8 +29,5 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- require_once __DIR__ . '/wc-mobilpayments-card-plugin-header.php';
- require_once __DIR__ . '/wc-mobilpayments-card-plugin-functions.php';
-
- lvd_wcmc_init_autoloader();
- lvd_wcmc_run();
+header('Location: ../../../../index.php');
+exit;
