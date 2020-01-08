@@ -61,6 +61,33 @@ function lvdwcmc_append_error($message, $error) {
 	return $message;
 }
 
+function lvdwcmc_increase_limits($executionTimeMinutes = 10) {
+   if (function_exists('set_time_limit')) {
+		@set_time_limit($executionTimeMinutes * 60);
+	}
+	if (function_exists('ini_set')) {
+		@ini_set('memory_limit', WP_MAX_MEMORY_LIMIT);
+	}
+}
+
+function lvdwcmc_send_json(\stdClass $data, $die = true) {
+   $data = json_encode($data);
+	header('Content-Type: application/json');
+	if (extension_loaded('zlib') && function_exists('ini_set')) {
+		@ini_set('zlib.output_compression', false);
+		@ini_set('zlib.output_compression_level', 0);
+		if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) && stripos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false) {
+			header('Content-Encoding: gzip');
+			$data = gzencode($data, 8, FORCE_GZIP);
+		}
+   }
+
+   echo $data;
+   if ($die) {
+      exit;
+   }
+}
+
 function lvdwcmc_env() {
    return lvdwcmc_plugin()->getEnv();
 }

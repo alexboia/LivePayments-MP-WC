@@ -72,6 +72,28 @@ namespace LvdWcMc {
             );
         }
 
+        private function _loadTextDomain() {
+            load_plugin_textdomain($this->_textDomain, false, plugin_basename(LVD_WCMC_LANG_DIR));
+        }
+
+        private function __($text) {
+            return esc_html__($text, LVD_WCMC_TEXT_DOMAIN);
+        }
+
+        private function _getInstallationErrorTranslations() {
+            $this->_loadTextDomain();
+            return array(
+                Installer::INCOMPATIBLE_PHP_VERSION 
+                    => sprintf($this->__('Minimum required PHP version is %s.'), $this->_env->getRequiredPhpVersion()),
+                Installer::INCOMPATIBLE_WP_VERSION 
+                    => sprintf($this->__('Minimum required WordPress version is %s.'), $this->_env->getRequiredWpVersion()),
+                Installer::SUPPORT_MYSQLI_NOT_FOUND 
+                    => $this->__('Mysqli extension was not found on your system or is not fully compatible.'),
+                Installer::GENERIC_ERROR 
+                    => $this->__('The installation failed.')
+            );
+        }
+
         public function run() {
             register_activation_hook(LVD_WCMC_MAIN, array($this, 'onActivatePlugin'));
             register_deactivation_hook(LVD_WCMC_MAIN, array($this, 'onDeactivatePlugin'));
@@ -88,13 +110,16 @@ namespace LvdWcMc {
 
             $test = $this->_installer->canBeInstalled();
             if ($test !== Installer::INSTALL_OK) {
+                $errors = $this->_getInstallationErrorTranslations();
+                $message = isset($errors[$test]) 
+                    ? $errors[$test] 
+                    : $this->__('Could not activate plug-in: requirements not met.');
+
                 deactivate_plugins(plugin_basename(LVD_WCMC_MAIN));
-                wp_die(lvdwcmc_append_error('Could not activate plug-in: requirements not met.', $this->_installer->getLastError()), 
-                    'Activation error');
+                wp_die(lvdwcmc_append_error($message, $this->_installer->getLastError()),  $this->__('Activation error'));
             } else {
                 if (!$this->_installer->activate()) {
-                    wp_die(lvdwcmc_append_error('Could not activate plug-in: activation failure.', $this->_installer->getLastError()), 
-                        'Activation error');
+                    wp_die(lvdwcmc_append_error($this->__('Could not activate plug-in: activation failure.'), $this->_installer->getLastError()), $this->__('Activation error'));
                 }
             }
         }
@@ -127,7 +152,7 @@ namespace LvdWcMc {
         }
 
         public function onPluginsInit() {
-            load_plugin_textdomain($this->_textDomain, false, LVD_WCMC_LANG_DIR);
+            $this->_loadTextDomain();
             $this->_installer->updateIfNeeded();
         }
 

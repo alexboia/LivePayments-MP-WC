@@ -1,0 +1,16 @@
+.blockUI.blockOverlay:before {
+    content: none;
+}
+
+.lvdwcmc-please-wait-spinner {
+    width: 64px;
+    height: 64px;
+    line-height: normal;
+    image-rendering: optimizeQuality;
+    margin-top: 10px;
+}
+
+.lvdwcmc-stop-scrolling {
+    height: 100%;
+    overflow: hidden;
+}

@@ -30,7 +30,8 @@
  */
 
 namespace LvdWcMc {
-    class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
+
+class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
         const GATEWAY_PROCESS_RESPONSE_ERR_OK = 0x0000;
 
         const GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION = 0x1000;
@@ -76,6 +77,14 @@ namespace LvdWcMc {
          */
         private $_mobilpayAssetsDir = null;
 
+        private $_mobilpayAssetUploadApiDescriptor = null;
+
+        private $_mobilpayAssetUploadUrl = null;
+
+        private $_mobilpayAssetRemoveApiDescriptor = null;
+
+        private $_mobilpayAssetRemoveUrl = null;
+
         public static function matchesGatewayId($gatewayId) {
             return $gatewayId == self::GATEWAY_ID;
         }
@@ -96,19 +105,118 @@ namespace LvdWcMc {
 
             $this->_env = lvdwcmc_plugin()->getEnv();
 
-            $this->_apiDescriptor = strtolower(__NAMESPACE__ . '_' . __CLASS__);
+            $this->_apiDescriptor = strtolower(str_replace('\\', '_', __CLASS__));
             $this->_mobilpayNotifyUrl = WC()->api_request_url($this->_apiDescriptor);
             $this->_mobilpayAssetsDir = $this->_env->getPaymentAssetsStorageDir();
 
-            add_action('woocommerce_api_' . $this->_apiDescriptor, array( $this, 'process_gateway_response' ) );
-            add_action('woocommerce_receipt_' . $this->id, array($this, 'show_payment_initiation'));
+            $this->_mobilpayAssetUploadApiDescriptor = strtolower(self::GATEWAY_ID . '_payment_asset_upload');
+            $this->_mobilpayAssetUploadUrl = WC()->api_request_url($this->_mobilpayAssetUploadApiDescriptor);
 
-            if (is_admin()) {
-                add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-            }
+            $this->_mobilpayAssetRemoveApiDescriptor = strtolower(self::GATEWAY_ID . '_payment_asset_remove');
+            $this->_mobilpayAssetRemoveUrl = WC()->api_request_url($this->_mobilpayAssetRemoveApiDescriptor);
+
+            add_action('woocommerce_api_' . $this->_apiDescriptor, array($this, 'process_gateway_response'));
+            add_action('woocommerce_api_' . $this->_mobilpayAssetUploadApiDescriptor, array($this, 'process_payment_asset_upload'));
+            add_action('woocommerce_api_' . $this->_mobilpayAssetRemoveApiDescriptor, array($this, 'process_payment_asset_remove'));
+
+            add_action('woocommerce_receipt_' . $this->id, array($this, 'show_payment_initiation'));
+            add_action('admin_enqueue_scripts', array($this, 'enqueue_form_scripts'));
+            
+            add_action('woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options'));
 
             $this->init_form_fields();
             $this->init_settings();
+        }
+
+        public function enqueue_form_scripts() {
+            wp_enqueue_script('moxiejs');
+            wp_enqueue_script('plupload');
+            wp_enqueue_script('jquery');
+
+            wp_enqueue_script('kite-js', 
+                plugins_url('media/js/3rdParty/kite.js', LVD_WCMC_MAIN), 
+                array(), 
+                '1.0.0', 
+                true);
+
+            wp_enqueue_script('toastr-js', 
+                plugins_url('media/js/3rdParty/toastr/toastr.js', LVD_WCMC_MAIN), 
+                array(), 
+                '2.1.1', 
+                true);
+
+            wp_enqueue_script('jquery-blockui-js', 
+                plugins_url('media/js/3rdParty/jquery-blockui/jquery.blockUI.js', LVD_WCMC_MAIN), 
+                array(), 
+                '2.66.0', 
+                true);
+
+            wp_enqueue_style('lvdwcmc-common-css', 
+                plugins_url('media/css/lvdwcmc-common.css', LVD_WCMC_MAIN), 
+                array(), 
+                LVD_WCMC_VERSION, 
+                'all');
+
+            wp_enqueue_style('toastr-css', 
+                plugins_url('media/js/3rdParty/toastr/toastr.css', LVD_WCMC_MAIN), 
+                array(), 
+                '2.1.1', 
+                'all');
+
+            wp_enqueue_style('lvdwcmc-settings-css', 
+                plugins_url('media/css/lvdwcmc-settings.css', LVD_WCMC_MAIN), 
+                array('lvdwcmc-common-css', 'toastr-css'), 
+                LVD_WCMC_VERSION, 
+                'all');
+
+            wp_enqueue_script('lvdwcmc-common-js', 
+                plugins_url('media/js/lvdwcmc-common.js', LVD_WCMC_MAIN), 
+                array('jquery-blockui-js', 'jquery'), 
+                LVD_WCMC_VERSION, 
+                true);
+
+            wp_enqueue_script('lvdwcmc-mobilpay-cc-gateway-settings-js', 
+                plugins_url('media/js/lvdwcmc-mobilpay-cc-gateway-settings.js', LVD_WCMC_MAIN), 
+                array('lvdwcmc-common-js', 'moxiejs', 'plupload', 'jquery', 'toastr-js'), 
+                LVD_WCMC_VERSION, 
+                true);
+
+            wp_localize_script('lvdwcmc-mobilpay-cc-gateway-settings-js', 
+                'lvdwcmcSettingsL10n', 
+    			$this->_getSettingsScriptTranslations());
+        }
+
+        public function process_admin_options() {
+            if (!$this->_canManageWcSettings()) {
+                return false;
+            }
+
+            $renameOk = true;
+            $result = parent::process_admin_options();
+            $mobilpayAccountId = $this->get_option('mobilpay_account_id');
+
+            if ($this->_mobilpayAccountId != $mobilpayAccountId) {
+                foreach ($this->form_fields as $fieldId => $fieldInfo) {
+                    if ($this->_isPaymentAssetField($fieldInfo) ) {
+                        $oldFilePath = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
+                            $this->_mobilpayAccountId);
+                        $newFilePath = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
+                            $mobilpayAccountId);
+                        
+                            if (file_exists($oldFilePath)) {
+                            if (!@rename($oldFilePath, $newFilePath)) {
+                                $renameOk = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($result) {
+                $this->init_settings();
+            }
+
+            return $result && $renameOk;
         }
 
         public function init_settings() {
@@ -125,79 +233,203 @@ namespace LvdWcMc {
         public function init_form_fields() {
             $this->form_fields = array(
                 'enabled' => array(
-                    'title' => $this->__('Activare / Dezactivare'),
-                    'label' => $this->__('Activeaza acest gateway de plata'),
+                    'title' => $this->__('Enable / Disable'),
+                    'label' => $this->__('Enable this payment gateway'),
                     'type' => 'checkbox',
                     'default' => 'no'
                 ),
                 'mobilpay_environment' => array(
-                    'title' => $this->__('MobilPay Sandbox'),
-                    'label' => $this->__('Activeaza modul sandbox'),
+                    'title' => $this->__('MobilPay Sandbox / Test Mode'),
+                    'label' => $this->__('Enable Test Mode'),
                     'type' => 'checkbox',
-                    'description' => $this->__('Foloseste gateway-ul de plata in modul sandbox'),
+                    'description' => $this->__('Place the payment gateway in test mode.'),
                     'default' => 'no'
                 ),
                 'title' => array(
-                    'title' => $this->__('Titlu'),
+                    'title' => $this->__('Title'),
                     'type' => 'text',
-                    'desc_tip' => $this->__('Acest titlu va fi afisat clientului in timpul procesului de check-out.'),
+                    'desc_tip' => $this->__('Payment title the customer will see during the checkout process.'),
                     'default' => $this->__('MobilPay')
                 ),
                 'description' => array(
-                    'title' => $this->__('Descriere'),
+                    'title' => $this->__('Description'),
                     'type' => 'textarea',
-                    'desc_tip' => $this->__('Aceasta descriere va fi afisata clientului in timpul procesului de check-out.'),
+                    'desc_tip' => $this->__('Payment description the customer will see during the checkout process.'),
                     'css' => 'max-width:350px;'
                 ),
                 'mobilpay_account_id' => array(
-                    'title'	=> $this->__('ID Cont Comerciant'),
+                    'title'	=> $this->__('Seller Account ID'),
                     'type'	=> 'text',
-                    'description' => $this->__('Acesta este ID-ul unic al contului tau de comerciant, atribuit la inrolarea in sistemul nostru.')
+                    'description' => $this->__('This is Account ID provided by MobilPay when you signed up for an account. Unique key for your seller account for the payment process.')
                 ),
                 'mobilapy_return_url' => array(
-                    'title'	=> $this->__('URL pagina confirmare plata'),
+                    'title'	=> $this->__('Return URL'),
                     'type'	=> 'text',
-                    'description' => $this->__('URL-ul unei pagini din site-ul tau wordpress, la care clientul tau va fi redirectionat dupa finalizarea procesului de plata. Acest camp si existenta acestei pagini sunt obligatoriu.')
+                    'description' => $this->__('You must create a new page and in the content field enter the shortcode [lvdwcmc_thank_you] so that the user can see the message that is returned by the Mobilpay server regarding their transaction. Or any content you want to thank for buying.'),
+                    'desc_tip' => true
                 ),
                 'mobilpay_live_public_cert' => array(
-                    'title' => $this->__('Certificat digital mobilPay / mediu live'),
-                    'description' => $this->__('Cheie publica folosita pentru securizarea comunicarii catre mobilPay, in mediul live'),
+                    'title' => $this->__('mobilPay™ digital certificate for the live environment'),
+                    'description' => $this->__('The public key used for securing communication with the mobilPay™ gateway in the live environment.'),
                     'type' => 'mobilpay_asset_upload',
-                    'kind' => 'public_key_certificate',
                     'environment' => 'live',
-                    'desc_tip' => true
-                ),
-                'mobilpay_sandbox_public_cert' => array(
-                    'title' => $this->__('Certificat digital mobilPay / sandbox'),
-                    'description' => $this->__('Cheie publica folosita pentru securizarea comunicarii catre mobilPay, in mediul de testare'),
-                    'type' => 'mobilpay_asset_upload',
-                    'kind' => 'public_key_certificate',
-                    'environment' => 'sandbox',
-                    'desc_tip' => true
+                    'desc_tip' => true,
+                    'allowed_files_hints' => 'allowed file types: .cer',
+                    '_file_format' => 'live.%s.public.cer'
                 ),
                 'mobilpay_live_private_key' => array(
-                    'title' => $this->__('Certificat cont comerciant / mediu live'),
-                    'description' => $this->__('Cheia privata folosita pentru securizarea comunicarii dinspre mobilPay, in mediul live'),
+                    'title' => $this->__('The private key for the live environment'),
+                    'description' => $this->__('The private key used for securing communication with the mobilPay™ gateway in the live environment.'),
                     'type' => 'mobilpay_asset_upload',
-                    'kind' => 'private_key',
                     'environment' => 'live',
-                    'desc_tip' => true
+                    'desc_tip' => true,
+                    'allowed_files_hints' => 'allowed file types: .key',
+                    '_file_format' => 'live.%s.private.key'
+                ),
+                'mobilpay_sandbox_public_cert' => array(
+                    'title' => $this->__('mobilPay™ digital certificate for the sandbox environment'),
+                    'description' => $this->__('The public key used for securing communication with the mobilPay™ gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).'),
+                    'type' => 'mobilpay_asset_upload',
+                    'environment' => 'sandbox',
+                    'desc_tip' => true,
+                    'allowed_files_hints' => 'allowed file types: .cer',
+                    '_file_format' => 'sandbox.%s.public.cer'
                 ),
                 'mobilpay_sandbox_private_key' => array(
-                    'title' => $this->__('Certificat cont comerciant / sandbox'),
-                    'description' => $this->__('Cheia privata folosita pentru securizarea comunicarii dinspre mobilPay, in mediul de testare'),
+                    'title' => $this->__('The private key for the sandbox environment'),
+                    'description' => $this->__('The private key used for securing communication with the mobilPay™ gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).'),
                     'type' => 'mobilpay_asset_upload',
-                    'kind' => 'private_key',
                     'environment' => 'sandbox',
-                    'desc_tip' => true
+                    'desc_tip' => true,
+                    'allowed_files_hints' => 'allowed file types: .key',
+                    '_file_format' => 'sandbox.%s.private.key'
                 )
             );
         }
 
-        public function generate_mobilpay_asset_upload_html($fieldId, $fieldInfo) {
+        private function _renderAdminOptionsJSSettings() {
             ob_start();
-            require $this->_env->getViewFilePath('lvdwcmc-upload-asset-field.php');
+            $data = new \stdClass();
+            $data->uploadPaymentAssetUrl = $this->_mobilpayAssetUploadUrl;
+            $data->uploadPaymentAssetNonce = wp_create_nonce($this->_mobilpayAssetUploadApiDescriptor);
+
+            $data->removePaymentAssetUrl = $this->_mobilpayAssetRemoveUrl;
+            $data->removePaymentAssetNonce = wp_create_nonce($this->_mobilpayAssetRemoveApiDescriptor);
+            
+            $data->uploadMaxFileSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE;
+	        $data->uploadChunkSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE;
+	        $data->uploadKey = LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY;
+
+            require $this->_env->getViewFilePath('lvdwcmc-mobilpay-cc-gateway-settings-js.php');
             return ob_get_clean();
+        }
+
+        public function admin_options() {
+            parent::admin_options();
+            echo $this->_renderAdminOptionsJSSettings();
+        }
+
+        public function get_tooltip_html($fieldInfo) {
+            if (true === $fieldInfo['desc_tip']) {
+                $tip = $fieldInfo['description'] . (!empty($fieldInfo['allowed_files_hints']) 
+                    ? sprintf(' (%s)', $fieldInfo['allowed_files_hints']) 
+                    : '');
+            } elseif (!empty( $fieldInfo['desc_tip'])) {
+                $tip = $fieldInfo['desc_tip'];
+            } else {
+                $tip = '';
+            }
+    
+            return $tip ? wc_help_tip($tip, true) : '';
+        }
+
+        private function _renderPaymentAssetUploadField($fieldId, $fieldInfo) {
+            $assetFilePath = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, $this->_mobilpayAccountId);
+
+            $data = new \stdClass();
+            $data->hasAsset = is_readable($assetFilePath);
+            $data->fieldId = $fieldId;
+            $data->fieldInfo = $fieldInfo;
+
+            ob_start();
+            require $this->_env->getViewFilePath('lvdwcmc-mobilpay-cc-gateway-upload-asset-field.php');
+            return ob_get_clean();
+        }
+
+        public function generate_mobilpay_asset_upload_html($fieldId, $fieldInfo) {
+            return $this->_renderPaymentAssetUploadField($fieldId, $fieldInfo);
+        }
+
+        public function process_payment_asset_upload() {
+            if (!$this->_canManageWcSettings() || !$this->_validatePaymentAssetUploadNonce()) {
+                http_response_code(401);
+                die;
+            }
+
+            $assetId = $this->_getAssetIdFromRequest();
+            $fieldInfo = $this->_getFieldInfo($assetId);
+
+            if (!$this->_isPaymentAssetField($fieldInfo)) {
+                http_response_code(404);
+                die;
+            }
+
+            if (LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE > 0) {
+                $chunk = isset($_REQUEST['chunk']) 
+                    ? intval($_REQUEST['chunk']) 
+                    : 0;
+                $chunks = isset($_REQUEST['chunks']) 
+                    ? intval($_REQUEST['chunks']) 
+                    : 0;
+            } else {
+                $chunk = $chunks = 0;
+            }
+            
+            $destination = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
+                $this->_mobilpayAccountId);
+
+            $uploader = new Uploader(LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY, $destination, array(
+                'chunk' => $chunk, 
+                'chunks' => $chunks, 
+                'chunkSize' => LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE, 
+                'maxFileSize' => LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE, 
+                'allowedFileTypes' => array()));
+
+            $result = new \stdClass();
+            $result->status = $uploader->receive();
+            $result->ready = $uploader->isReady();
+
+            lvdwcmc_send_json($result);
+        }
+
+        public function process_payment_asset_remove() {
+            if (!$this->_canManageWcSettings() || !$this->_validatePaymentAssetRemoveNonce()) {
+                http_response_code(401);
+                die;
+            }
+
+            $assetId = $this->_getAssetIdFromRequest();
+            $fieldInfo = $this->_getFieldInfo($assetId);
+
+            if (!$this->_isPaymentAssetField($fieldInfo)) {
+                http_response_code(404);
+                die;
+            }
+
+            $destination = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
+                $this->_mobilpayAccountId);
+
+            if (file_exists($destination)) {
+                @unlink($destination);
+            }
+
+            $result = new \stdClass();
+            $result->success = !file_exists($destination);
+            $result->message = $result->success
+                ? $this->__('Payment asset file successfully removed.')
+                : $this->__('Payment asset file could not be removed.');
+
+            lvdwcmc_send_json($result);
         }
 
         public function needs_setup() {
@@ -206,20 +438,101 @@ namespace LvdWcMc {
                 || !$this->_hasMobilpayAssets();
         }
 
+        private function _getMobilpayPaymentMessageError($errorCode) {
+            static $standardErrors = array(
+                '16' => $this->__('Card has a risk (i.e. stolen card)'), 
+                '17' => $this->__('Card number is incorrect'), 
+                '18' => $this->__('Closed card'), 
+                '19' => $this->__('Card is expired'), 
+                '20' => $this->__('Insufficient funds'), 
+                '21' => $this->__('CVV2 code incorrect'), 
+                '22' => $this->__('Issuer is unavailable'), 
+                '32' => $this->__('Amount is incorrect'), 
+                '33' => $this->__('Currency is incorrect'), 
+                '34' => $this->__('Transaction not permitted to cardholder'), 
+                '35' => $this->__('Transaction declined'), 
+                '36' => $this->__('Transaction rejected by antifraud filters'), 
+                '37' => $this->__('Transaction declined (breaking the law)'), 
+                '38' => $this->__('Transaction declined'), 
+                '48' => $this->__('Invalid request'), 
+                '49' => $this->__('Duplicate PREAUTH'), 
+                '50' => $this->__('Duplicate AUTH'), 
+                '51' => $this->__('You can only CANCEL a preauth order'), 
+                '52' => $this->__('You can only CONFIRM a preauth order'), 
+                '53' => $this->__('You can only CREDIT a confirmed order'), 
+                '54' => $this->__('Credit amount is higher than auth amount'), 
+                '55' => $this->__('Capture amount is higher than preauth amount'), 
+                '56' => $this->__('Duplicate request'), 
+                '99' => $this->__('Generic error')
+            );
+    
+            return isset($standardErrors[$errorCode]) 
+                ? $standardErrors[$errorCode] 
+                : null;
+        }
+
+        private function _isDecryptedRequestValid($paymentRequest) {
+            return $paymentRequest instanceof \Mobilpay_Payment_Request_Card
+                && isset($paymentRequest->params['_lvdwcmc_order_id']) 
+                && isset($paymentRequest->params['_lvdwcmc_customer_id'])
+                && isset($paymentRequest->params['_lvdwcmc_customer_ip']);
+        }
+
+        private function _sendErrorResponse($type, $code, $message) {
+            header('Content-type: application/xml');
+            echo '<?xml version="1.0" encoding="utf-8"?>';
+            echo '<crc error_type="' . $type . '" error_code="' . $code . '">' . $message . '</crc>';
+            exit;
+        }
+    
+        private function _sendSuccessResponse($crc) {
+            header('Content-type: application/xml');
+            echo '<?xml version="1.0" encoding="utf-8"?>';
+            echo '<crc>' . $crc . '</crc>';
+            exit;
+        }
+
+        private function _getSettingsScriptTranslations() {
+            return array(
+                'errPluploadTooLarge' => $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
+                'errPluploadFileType' => $this->__('The selected file type is not valid.'), 
+                'errPluploadIoError' => $this->__('The file could not be read'), 
+                'errPluploadSecurityError' => $this->__('The file could not be read'), 
+                'errPluploadInitError' => $this->__('The uploader could not be initialized'), 
+                'errPluploadHttp' =>  $this->__('The file could not be uploaded'), 
+                'errServerUploadFileType' =>  $this->__('The selected file type is not valid.'), 
+                'errServerUploadTooLarge' =>  $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
+                'errServerUploadNoFile' =>  $this->__('No file was uploaded'), 
+                'errServerUploadInternal' =>  $this->__('The file could not be uploaded due to a possible internal server issue'), 
+                'errServerUploadFail' =>  $this->__('The file could not be uploaded'),
+                'warnRemoveAssetFile' => $this->__('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!'),
+                'errAssetFileCannotBeRemoved' => $this->__('The asset file could not be removed'),
+                'errAssetFileCannotBeRemovedNetwork' => $this->__('The asset file could not be removed due to a possible network issue'),
+                'assetUploadOk' => $this->__('The file has been successfully uploaded'),
+                'assetRemovalOk' => $this->__('The file has been successfulyl removed')
+            );
+        }
+
+        private function _validatePaymentAssetUploadNonce() {
+            return check_ajax_referer($this->_mobilpayAssetUploadApiDescriptor, 
+                'payment_asset_upload_nonce', 
+                false);
+        }
+
+        private function _validatePaymentAssetRemoveNonce() {
+            return check_ajax_referer($this->_mobilpayAssetRemoveApiDescriptor, 
+                'payment_asset_remove_nonce', 
+                false);
+        }
+
         private function _hasMobilpayAssets() {
             if (empty($this->_mobilpayAccountId)) {
                 return false;
             }
 
-            $files = array(
-                sprintf('live.%s.public.cer', $this->_mobilpayAccountId),
-                sprintf('sandbox.%s.public.cer', $this->_mobilpayAccountId),
-                sprintf('live.%s.private.key', $this->_mobilpayAccountId),
-                sprintf('sandbox.%s.private.key', $this->_mobilpayAccountId)
-            );
-
-            foreach ($files as $file) {
-                if (!is_readable($this->_getPaymentAssetFilePath($file))) {
+            foreach ($this->form_fields as $fieldId => $fieldInfo) {
+                if ($this->_isPaymentAssetField($fieldInfo) 
+                    && !is_readable($this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, $this->_mobilpayAccountId))) {
                     return false;
                 }
             }
@@ -227,10 +540,40 @@ namespace LvdWcMc {
             return true;
         }
 
+        private function _getPaymentAssetFilePathFromFieldInfo(array $fieldInfo, $accountId) {
+            $destinationFileName = sprintf($fieldInfo['_file_format'], !empty($accountId) 
+                ? $accountId 
+                : '__TEMP__');
+
+            return $this->_getPaymentAssetFilePath($destinationFileName);
+        }
+
+        private function _getAssetIdFromRequest() {
+            return isset($_POST['assetId']) 
+                ? sanitize_text_field($_POST['assetId']) 
+                : null;
+        }
+
         private function _getPaymentAssetFilePath($file) {
             return wp_normalize_path(sprintf('%s/%s', 
                 $this->_mobilpayAssetsDir, 
                 $file));
+        }
+
+        private function _isPaymentAssetField(array $fieldInfo) {
+            return !empty($fieldInfo) 
+                && !empty($fieldInfo['type']) 
+                && $fieldInfo['type'] == 'mobilpay_asset_upload';
+        }
+
+        private function _getFieldInfo($fieldId) {
+            return isset($this->form_fields[$fieldId]) 
+                ? $this->form_fields[$fieldId] 
+                : null;
+        }
+
+        private function _canManageWcSettings() {
+            return current_user_can('manage_woocommerce');
         }
 
         private function __($text) {
