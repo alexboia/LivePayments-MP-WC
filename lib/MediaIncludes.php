@@ -31,8 +31,180 @@
 
  namespace LvdWcMc {
     class MediaIncludes {
+        const JS_MOXIE = 'moxiejs';
+
+        const JS_PLUPLOAD = 'plupload';
+
+        const JS_JQUERY = 'jquery';
+
+        const JS_KITE_JS = 'kite-js';
+
+        const JS_JQUERY_BLOCKUI = 'jquery-blockui';
+
+        const JS_TOASTR = 'toastr';
+
+        const JS_LVDWCMC_COMMON = 'lvdwcmc-common-js';
+
+        const JS_LVDWCMC_SETTINGS = 'lvdwcmc-mobilpay-cc-gateway-settings-js';
+
+        const STYLE_TOASTR = 'toastr-css';
+
+        const STYLE_LVDWCMC_COMMON = 'lvdwcmc-common-css';
+
+        const STYLE_LVDWCMC_SETTINGS = 'lvdwcmc-settings-css';
+
+        private $_refPluginsPath;
+
+        private $_scriptsInFooter;
+
+        private $_styles = array(
+            self::STYLE_TOASTR => array(
+                'path' => 'media/js/3rdParty/toastr/toastr.css',
+                'version' => '2.1.1'
+            ),
+            self::STYLE_LVDWCMC_COMMON => array(
+                'path' => 'media/css/lvdwcmc-common.css',
+                'version' => LVD_WCMC_VERSION
+            ),
+            self::STYLE_LVDWCMC_SETTINGS => array(
+                'path' => 'media/css/lvdwcmc-mobilpay-cc-gateway-settings.css',
+                'version' => LVD_WCMC_VERSION,
+                'deps' => array(
+                    self::STYLE_TOASTR,
+                    self::STYLE_LVDWCMC_COMMON
+                )
+            )
+        );
+
+        private $_scripts = array(
+            self::JS_JQUERY_BLOCKUI => array(
+                'path' => 'media/js/3rdParty/jquery.blockUI.js', 
+                'version' => '2.66',
+                'deps' => array(
+                    self::JS_JQUERY
+                )
+            ), 
+            self::JS_KITE_JS => array(
+                'path' => 'media/js/3rdParty/kite.js', 
+                'version' => '1.0'
+            ), 
+            self::JS_TOASTR => array(
+                'path' => 'media/js/3rdParty/toastr/toastr.js', 
+                'version' => '2.1.1'
+            ), 
+            self::JS_LVDWCMC_COMMON => array(
+                'path' => 'media/js/lvdwcmc-common.js',
+                'version' => LVD_WCMC_VERSION,
+                'deps' => array(
+                    self::JS_JQUERY,
+                    self::JS_JQUERY_BLOCKUI
+                )
+            ),
+            self::JS_LVDWCMC_SETTINGS => array(
+                'path' => 'media/js/lvdwcmc-mobilpay-cc-gateway-settings.js',
+                'version' => LVD_WCMC_VERSION,
+                'deps' => array(
+                    self::JS_LVDWCMC_COMMON,
+                    self::JS_JQUERY,
+                    self::JS_MOXIE,
+                    self::JS_PLUPLOAD,
+                    self::JS_TOASTR
+                )
+            )
+        );
+
         public function __construct($refPluginsPath, $scriptsInFooter) {
-            
+            if (empty($refPluginsPath)) {
+                throw new \InvalidArgumentException('The $refPluginsPath parameter is required and may not be empty.');
+            }
+
+            $this->_refPluginsPath = $refPluginsPath;
+            $this->_scriptsInFooter = $scriptsInFooter;
+        }
+
+        private function _enqueueScript($handle) {
+            if (empty($handle)) {
+                return;
+            }
+            if (isset($this->_scripts[$handle])) {
+                if (!wp_script_is($handle, 'registered')) {
+                    $script = $this->_scripts[$handle];
+                    $deps = isset($script['deps']) && is_array($script['deps']) 
+                        ? $script['deps'] 
+                        : array();
+    
+                    wp_enqueue_script($handle, 
+                        plugins_url($script['path'], $this->_refPluginsPath), 
+                        $deps, 
+                        $script['version'], 
+                        $this->_scriptsInFooter);
+
+                    if (isset($script['inline-setup'])) {
+                        wp_add_inline_script($handle, $script['inline-setup']);
+                    }
+                } else {
+                    wp_enqueue_script($handle);
+                }
+            } else {
+                wp_enqueue_script($handle);
+            }
+        }
+
+        private function _enqueueStyle($handle) {
+            if (empty($handle)) {
+                return;
+            }
+            if (isset($this->_styles[$handle])) {
+                $style = $this->_styles[$handle];
+                $deps = isset($style['deps']) && is_array($style['deps']) 
+                    ? $style['deps'] 
+                    : array();
+
+                if (!isset($style['media']) || !$style['media']) {
+                    $style['media'] = 'all';
+                }
+
+                wp_enqueue_style($handle, 
+                    plugins_url($style['path'], $this->_refPluginsPath), 
+                    $deps, 
+                    $style['version'], 
+                    $style['media']);
+            } else {
+                wp_enqueue_style($handle);
+            }
+        }
+
+        public function includeScriptCommon() {
+            $this->_enqueueScript(self::JS_JQUERY);
+            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
+            $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
+        }
+
+        public function includeScriptSettings() {
+            $this->_enqueueScript(self::JS_JQUERY);
+            $this->_enqueueScript(self::JS_MOXIE);
+            $this->_enqueueScript(self::JS_PLUPLOAD);
+            $this->_enqueueScript(self::JS_TOASTR);
+            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
+            $this->_enqueueScript(self::JS_KITE_JS);
+            $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
+            $this->_enqueueScript(self::JS_LVDWCMC_SETTINGS);
+        }
+
+        public function includeStyleCommon() {
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
+        }
+
+        public function includeStyleSettings() {
+            $this->_enqueueStyle(self::STYLE_TOASTR);
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_SETTINGS);
+        }
+
+        public function localizeSettingsScript($translations) {
+            wp_localize_script(self::JS_LVDWCMC_SETTINGS, 
+                'lvdwcmcSettingsL10n', 
+    			$translations);
         }
     }
 }

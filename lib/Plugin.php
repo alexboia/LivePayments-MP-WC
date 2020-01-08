@@ -172,5 +172,9 @@ namespace LvdWcMc {
         public function getTextDomain() {
             return $this->_textDomain;
         }
+
+        public function getMediaIncludes() {
+            return $this->_mediaIncludes;
+        }
     }
 }

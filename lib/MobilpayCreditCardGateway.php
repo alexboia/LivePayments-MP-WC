@@ -48,6 +48,11 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
         private $_env;
 
         /**
+         * @var \LvdWcMc\MediaIncludes Reference to the media includes manager
+         */
+        private $_mediaIncludes = null;
+
+        /**
          * @var string The IPN url to which mobilpay will post the payment response
          */
         private $_mobilpayNotifyUrl = null;
@@ -104,6 +109,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
             );
 
             $this->_env = lvdwcmc_plugin()->getEnv();
+            $this->_mediaIncludes = lvdwcmc_plugin()->getMediaIncludes();
 
             $this->_apiDescriptor = strtolower(str_replace('\\', '_', __CLASS__));
             $this->_mobilpayNotifyUrl = WC()->api_request_url($this->_apiDescriptor);
@@ -129,61 +135,12 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
         }
 
         public function enqueue_form_scripts() {
-            wp_enqueue_script('moxiejs');
-            wp_enqueue_script('plupload');
-            wp_enqueue_script('jquery');
-
-            wp_enqueue_script('kite-js', 
-                plugins_url('media/js/3rdParty/kite.js', LVD_WCMC_MAIN), 
-                array(), 
-                '1.0.0', 
-                true);
-
-            wp_enqueue_script('toastr-js', 
-                plugins_url('media/js/3rdParty/toastr/toastr.js', LVD_WCMC_MAIN), 
-                array(), 
-                '2.1.1', 
-                true);
-
-            wp_enqueue_script('jquery-blockui-js', 
-                plugins_url('media/js/3rdParty/jquery-blockui/jquery.blockUI.js', LVD_WCMC_MAIN), 
-                array(), 
-                '2.66.0', 
-                true);
-
-            wp_enqueue_style('lvdwcmc-common-css', 
-                plugins_url('media/css/lvdwcmc-common.css', LVD_WCMC_MAIN), 
-                array(), 
-                LVD_WCMC_VERSION, 
-                'all');
-
-            wp_enqueue_style('toastr-css', 
-                plugins_url('media/js/3rdParty/toastr/toastr.css', LVD_WCMC_MAIN), 
-                array(), 
-                '2.1.1', 
-                'all');
-
-            wp_enqueue_style('lvdwcmc-settings-css', 
-                plugins_url('media/css/lvdwcmc-settings.css', LVD_WCMC_MAIN), 
-                array('lvdwcmc-common-css', 'toastr-css'), 
-                LVD_WCMC_VERSION, 
-                'all');
-
-            wp_enqueue_script('lvdwcmc-common-js', 
-                plugins_url('media/js/lvdwcmc-common.js', LVD_WCMC_MAIN), 
-                array('jquery-blockui-js', 'jquery'), 
-                LVD_WCMC_VERSION, 
-                true);
-
-            wp_enqueue_script('lvdwcmc-mobilpay-cc-gateway-settings-js', 
-                plugins_url('media/js/lvdwcmc-mobilpay-cc-gateway-settings.js', LVD_WCMC_MAIN), 
-                array('lvdwcmc-common-js', 'moxiejs', 'plupload', 'jquery', 'toastr-js'), 
-                LVD_WCMC_VERSION, 
-                true);
-
-            wp_localize_script('lvdwcmc-mobilpay-cc-gateway-settings-js', 
-                'lvdwcmcSettingsL10n', 
-    			$this->_getSettingsScriptTranslations());
+            $this->_mediaIncludes
+                ->includeStyleSettings();
+            $this->_mediaIncludes
+                ->includeScriptSettings();
+            $this->_mediaIncludes
+                ->localizeSettingsScript($this->_getSettingsScriptTranslations());
         }
 
         public function process_admin_options() {
@@ -196,17 +153,15 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
             $mobilpayAccountId = $this->get_option('mobilpay_account_id');
 
             if ($this->_mobilpayAccountId != $mobilpayAccountId) {
-                foreach ($this->form_fields as $fieldId => $fieldInfo) {
-                    if ($this->_isPaymentAssetField($fieldInfo) ) {
-                        $oldFilePath = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
-                            $this->_mobilpayAccountId);
-                        $newFilePath = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
-                            $mobilpayAccountId);
-                        
-                            if (file_exists($oldFilePath)) {
-                            if (!@rename($oldFilePath, $newFilePath)) {
-                                $renameOk = false;
-                            }
+                foreach ($this->_getPaymentAssetFields() as $fieldId => $fieldInfo) {
+                    $oldFilePath = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
+                        $this->_mobilpayAccountId);
+                    $newFilePath = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, 
+                        $mobilpayAccountId);
+
+                    if (file_exists($oldFilePath)) {
+                        if (!@rename($oldFilePath, $newFilePath)) {
+                            $renameOk = false;
                         }
                     }
                 }
@@ -272,7 +227,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
                     'title' => $this->__('mobilPay™ digital certificate for the live environment'),
                     'description' => $this->__('The public key used for securing communication with the mobilPay™ gateway in the live environment.'),
                     'type' => 'mobilpay_asset_upload',
-                    'environment' => 'live',
+                    'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .cer',
                     '_file_format' => 'live.%s.public.cer'
@@ -281,7 +236,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
                     'title' => $this->__('The private key for the live environment'),
                     'description' => $this->__('The private key used for securing communication with the mobilPay™ gateway in the live environment.'),
                     'type' => 'mobilpay_asset_upload',
-                    'environment' => 'live',
+                    'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .key',
                     '_file_format' => 'live.%s.private.key'
@@ -290,7 +245,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
                     'title' => $this->__('mobilPay™ digital certificate for the sandbox environment'),
                     'description' => $this->__('The public key used for securing communication with the mobilPay™ gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).'),
                     'type' => 'mobilpay_asset_upload',
-                    'environment' => 'sandbox',
+                    'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .cer',
                     '_file_format' => 'sandbox.%s.public.cer'
@@ -299,7 +254,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
                     'title' => $this->__('The private key for the sandbox environment'),
                     'description' => $this->__('The private key used for securing communication with the mobilPay™ gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).'),
                     'type' => 'mobilpay_asset_upload',
-                    'environment' => 'sandbox',
+                    'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .key',
                     '_file_format' => 'sandbox.%s.private.key'
@@ -315,10 +270,10 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
 
             $data->removePaymentAssetUrl = $this->_mobilpayAssetRemoveUrl;
             $data->removePaymentAssetNonce = wp_create_nonce($this->_mobilpayAssetRemoveApiDescriptor);
-            
+
             $data->uploadMaxFileSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE;
-	        $data->uploadChunkSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE;
-	        $data->uploadKey = LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY;
+            $data->uploadChunkSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE;
+            $data->uploadKey = LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY;
 
             require $this->_env->getViewFilePath('lvdwcmc-mobilpay-cc-gateway-settings-js.php');
             return ob_get_clean();
@@ -439,7 +394,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
         }
 
         private function _getMobilpayPaymentMessageError($errorCode) {
-            static $standardErrors = array(
+            $standardErrors = array(
                 '16' => $this->__('Card has a risk (i.e. stolen card)'), 
                 '17' => $this->__('Card number is incorrect'), 
                 '18' => $this->__('Closed card'), 
@@ -525,14 +480,26 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
                 false);
         }
 
+        private function _getPaymentAssetFields() {
+            static $paymentAssetFields = null;
+            if ($paymentAssetFields === null) {
+                $paymentAssetFields = array();
+                foreach ($this->form_fields as $fieldId => $fieldInfo) {
+                    if ($this->_isPaymentAssetField($fieldInfo)) {
+                        $paymentAssetFields[$fieldId] = &$fieldInfo;
+                    }
+                }
+            }
+            return $paymentAssetFields;
+        }
+
         private function _hasMobilpayAssets() {
             if (empty($this->_mobilpayAccountId)) {
                 return false;
             }
 
-            foreach ($this->form_fields as $fieldId => $fieldInfo) {
-                if ($this->_isPaymentAssetField($fieldInfo) 
-                    && !is_readable($this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, $this->_mobilpayAccountId))) {
+            foreach ($this->_getPaymentAssetFields() as $fieldId => $fieldInfo) {
+                if (!is_readable($this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, $this->_mobilpayAccountId))) {
                     return false;
                 }
             }

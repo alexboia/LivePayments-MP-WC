@@ -39,6 +39,8 @@ namespace LvdWcMc {
 
         const SUPPORT_MYSQLI_NOT_FOUND = 3;
 
+        const SUPPORT_OPENSSL_NOT_FOUND = 4;
+
         const GENERIC_ERROR = PHP_INT_MAX;
 
         const OPT_VERSION = LVD_WCMC_PLUGIN_ID . '_plugin_version';
