@@ -89,6 +89,8 @@ namespace LvdWcMc {
                     => sprintf($this->__('Minimum required WordPress version is %s.'), $this->_env->getRequiredWpVersion()),
                 Installer::SUPPORT_MYSQLI_NOT_FOUND 
                     => $this->__('Mysqli extension was not found on your system or is not fully compatible.'),
+                Installer::SUPPORT_OPENSSL_NOT_FOUND 
+                    => $this->__('Openssl extension was not found on your system or is not fully compatible.'),
                 Installer::GENERIC_ERROR 
                     => $this->__('The installation failed.')
             );

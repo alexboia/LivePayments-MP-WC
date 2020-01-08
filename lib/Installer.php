@@ -75,6 +75,9 @@ namespace LvdWcMc {
                 if (!$this->_hasMysqli()) {
                     return self::SUPPORT_MYSQLI_NOT_FOUND;
                 }
+                if (!$this->_hasOpenSsl()) {
+                    return self::SUPPORT_OPENSSL_NOT_FOUND;
+                }
             } catch (\Exception $e) {
                 $this->_lastError = $e;
             }
@@ -329,6 +332,12 @@ namespace LvdWcMc {
             return extension_loaded('mysqli') &&
                 class_exists('mysqli_driver') &&
                 class_exists('mysqli');
+        }
+
+        private function _hasOpenSsl() {
+            return extension_loaded('openssl') &&
+                function_exists('openssl_pkey_get_public') &&
+                function_exists('openssl_get_privatekey');
         }
 
         private function _getPaymentAssetsGuardHtaccessFileContents() {
