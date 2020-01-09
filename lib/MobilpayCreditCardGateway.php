@@ -449,22 +449,38 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
 
         private function _getSettingsScriptTranslations() {
             return array(
-                'errPluploadTooLarge' => $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
-                'errPluploadFileType' => $this->__('The selected file type is not valid.'), 
-                'errPluploadIoError' => $this->__('The file could not be read'), 
-                'errPluploadSecurityError' => $this->__('The file could not be read'), 
-                'errPluploadInitError' => $this->__('The uploader could not be initialized'), 
-                'errPluploadHttp' =>  $this->__('The file could not be uploaded'), 
-                'errServerUploadFileType' =>  $this->__('The selected file type is not valid.'), 
-                'errServerUploadTooLarge' =>  $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
-                'errServerUploadNoFile' =>  $this->__('No file was uploaded'), 
-                'errServerUploadInternal' =>  $this->__('The file could not be uploaded due to a possible internal server issue'), 
-                'errServerUploadFail' =>  $this->__('The file could not be uploaded'),
-                'warnRemoveAssetFile' => $this->__('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!'),
-                'errAssetFileCannotBeRemoved' => $this->__('The asset file could not be removed'),
-                'errAssetFileCannotBeRemovedNetwork' => $this->__('The asset file could not be removed due to a possible network issue'),
-                'assetUploadOk' => $this->__('The file has been successfully uploaded'),
-                'assetRemovalOk' => $this->__('The file has been successfulyl removed')
+                'errPluploadTooLarge' 
+                    => $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
+                'errPluploadFileType' 
+                    => $this->__('The selected file type is not valid.'), 
+                'errPluploadIoError' 
+                    => $this->__('The file could not be read'), 
+                'errPluploadSecurityError' 
+                    => $this->__('The file could not be read'), 
+                'errPluploadInitError' 
+                    => $this->__('The uploader could not be initialized'), 
+                'errPluploadHttp' 
+                    =>  $this->__('The file could not be uploaded'), 
+                'errServerUploadFileType' 
+                    =>  $this->__('The selected file type is not valid.'), 
+                'errServerUploadTooLarge' 
+                    =>  $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
+                'errServerUploadNoFile' 
+                    => $this->__('No file was uploaded'), 
+                'errServerUploadInternal' => 
+                    $this->__('The file could not be uploaded due to a possible internal server issue'), 
+                'errServerUploadFail' 
+                    => $this->__('The file could not be uploaded'),
+                'warnRemoveAssetFile' 
+                    => $this->__('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!'),
+                'errAssetFileCannotBeRemoved' 
+                    => $this->__('The asset file could not be removed'),
+                'errAssetFileCannotBeRemovedNetwork' 
+                    => $this->__('The asset file could not be removed due to a possible network issue'),
+                'assetUploadOk' 
+                    => $this->__('The file has been successfully uploaded'),
+                'assetRemovalOk' 
+                    => $this->__('The file has been successfulyl removed')
             );
         }
 

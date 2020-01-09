@@ -76,11 +76,7 @@
     };
 
     function _toastMessage(success, message) {
-        if (success) {
-            toastr.success(message);
-        } else {
-            toastr.error(message);
-        }
+        toastr[success ? 'success' : 'error'](message);
     }
 
     function _showProgress() {
@@ -166,18 +162,18 @@
         return message;
     }
 
-    function _renderFileExistsControl(assetId) {
+    function _renderFileRemovalControl(assetId) {
         if (_tplAssetFileExists == null) {
-            _tplAssetFileExists = kite('#lvdwcaf-tpl-asset-file-exists');
+            _tplAssetFileExists = kite('#lvdwcaf-tpl-asset-file-removal');
         }
         return _tplAssetFileExists({
             assetId: assetId
         });
     }
 
-    function _renderFileMissingControl(assetId) {
+    function _renderFileUploadControl(assetId) {
         if (_tplAssetFileMissing == null) {
-            _tplAssetFileMissing = kite('#lvdwcaf-tpl-asset-file-missing');
+            _tplAssetFileMissing = kite('#lvdwcaf-tpl-asset-file-upload');
         }
         return _tplAssetFileMissing({
             assetId: assetId
@@ -186,13 +182,13 @@
 
     function _setAssetFileUploaded(assetId) {
         _getAssetContainerElement(assetId)
-            .html(_renderFileExistsControl(assetId));
+            .html(_renderFileRemovalControl(assetId));
         _destroyAssetUploader(assetId);
     }
 
     function _setAssetFileRemoved(assetId) {
         _getAssetContainerElement(assetId)
-            .html(_renderFileMissingControl(assetId));
+            .html(_renderFileUploadControl(assetId));
         _initUploaderForElement(_getAssetBrowseButtonElement(assetId));
     }
 

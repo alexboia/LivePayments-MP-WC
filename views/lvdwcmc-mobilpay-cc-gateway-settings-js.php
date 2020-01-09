@@ -31,7 +31,7 @@
     defined('LVD_WCMC_LOADED') or die;
 ?>
 
-<script id="lvdwcaf-tpl-asset-file-exists" type="text/x-kite">
+<script id="lvdwcaf-tpl-asset-file-removal" type="text/x-kite">
     <span class="lvdwcmc-payment-asset-file-exists"><?php echo $this->__('The file has already been uploaded.'); ?></span>
     <a href="javascript:void(0);" 
         id="{{assetId}}_file_removal"
@@ -39,7 +39,7 @@
         class="lvdwcmc-payment-asset-file-removal"><?php echo $this->__('Remove') ?></a>
 </script>
 
-<script id="lvdwcaf-tpl-asset-file-missing" type="text/x-kite">
+<script id="lvdwcaf-tpl-asset-file-upload" type="text/x-kite">
     <a href="javascript:void(0);" 
         id="{{assetId}}_file_selector"
         data-asset-id="{{assetId}}"
