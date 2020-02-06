@@ -31,14 +31,14 @@
 
 namespace LvdWcMc {
     class Autoloader {
-        private static $_libDir;
+        private static $_defaultLibDir;
 
         private static $_initialized = false;
 
         private static $_prefixConfig = null;
 
-        public static function init($libDir, $prefixConfig) {
-            if (empty($libDir)) {
+        public static function init($defaultLibDir, $prefixConfig) {
+            if (empty($defaultLibDir)) {
                 throw new \InvalidArgumentException('The $libDir parameter is required and may not be empty.');
             }
 
@@ -47,7 +47,7 @@ namespace LvdWcMc {
             }
 
             if (!self::$_initialized) {
-                self::$_libDir = $libDir;
+                self::$_defaultLibDir = $defaultLibDir;
                 self::$_prefixConfig = $prefixConfig;
                 self::$_initialized = true;
                 spl_autoload_register(array(__CLASS__, 'autoload'));
@@ -57,20 +57,20 @@ namespace LvdWcMc {
         private static function autoload($className) {
             $classPath = null;
 
-            foreach (self::$_prefixConfig as $prefix => $separator) {
-                $fullPrefix = $prefix . $separator;
+            foreach (self::$_prefixConfig as $prefix => $config) {
+                $fullPrefix = $prefix . $config['separator'];
                 if (strpos($className, $fullPrefix) === 0) {
                     $classPath = str_replace($fullPrefix, '', $className);
-                    $classPath = self::_getRelativePath($classPath, $separator);
-                    $classPath = self::$_libDir . '/' . $classPath . '.php';
+                    $classPath = self::_getRelativePath($classPath, $config['separator']);
+                    $classPath = $config['libDir'] . '/' . $classPath . '.php';
                     break;
                 }
             }
 
             if (empty($classPath)) {
-                $classPath = self::$_libDir . '/3rdParty/' . $className . '.php';
+                $classPath = self::$_defaultLibDir . '/3rdParty/' . $className . '.php';
             }
-            
+
             if (!empty($classPath) && file_exists($classPath)) {
                 require_once $classPath;
             }

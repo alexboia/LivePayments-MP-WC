@@ -32,8 +32,14 @@
 function lvd_wcmc_init_autoloader() {
    require_once LVD_WCMC_LIB_DIR . '/Autoloader.php';
    LvdWcMc\Autoloader::init(LVD_WCMC_LIB_DIR, array(
-      'LvdWcMc' => '\\',
-      'Mobilpay' => '_'
+      'LvdWcMc' => array(
+         'separator' => '\\',
+         'libDir' => LVD_WCMC_LIB_DIR
+      ),
+      'Mobilpay' => array(
+         'separator' => '_',
+         'libDir' => LVD_WCMC_LIB_3RDPARTY_DIR . DIRECTORY_SEPARATOR . 'mobilpay'
+      )
    ));
 }
 

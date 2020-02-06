@@ -30,8 +30,9 @@
  */
 
 namespace LvdWcMc {
+    class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
+        use LoggingExtensions;
 
-class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
         const GATEWAY_PROCESS_RESPONSE_ERR_OK = 0x0000;
 
         const GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION = 0x1000;
@@ -90,6 +91,11 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
 
         private $_mobilpayAssetRemoveUrl = null;
 
+        /**
+         * @var WC_Logger The logger instance used by this gateway
+         */
+        private $_logger = null;
+
         public static function matchesGatewayId($gatewayId) {
             return $gatewayId == self::GATEWAY_ID;
         }
@@ -97,6 +103,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
         public function __construct() {
             $this->id = self::GATEWAY_ID;
             $this->plugin_id = LVD_WCMC_PLUGIN_ID;
+            $this->_logger = wc_get_logger();
 
             $this->method_title = $this->__('MobilPay Card Gateway');
             $this->method_description = $this->__('MobilPay Payment Gateway pentru WooCommerce');
@@ -122,13 +129,14 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
             $this->_mobilpayAssetRemoveUrl = WC()->api_request_url($this->_mobilpayAssetRemoveApiDescriptor);
 
             add_action('woocommerce_api_' . $this->_apiDescriptor, array($this, 'process_gateway_response'));
-            add_action('woocommerce_api_' . $this->_mobilpayAssetUploadApiDescriptor, array($this, 'process_payment_asset_upload'));
-            add_action('woocommerce_api_' . $this->_mobilpayAssetRemoveApiDescriptor, array($this, 'process_payment_asset_remove'));
-
             add_action('woocommerce_receipt_' . $this->id, array($this, 'show_payment_initiation'));
-            add_action('admin_enqueue_scripts', array($this, 'enqueue_form_scripts'));
-            
-            add_action('woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options'));
+
+            if (is_admin()) {
+                add_action('admin_enqueue_scripts', array($this, 'enqueue_form_scripts'));
+                add_action('woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options'));
+                add_action('woocommerce_api_' . $this->_mobilpayAssetUploadApiDescriptor, array($this, 'process_payment_asset_upload'));
+                add_action('woocommerce_api_' . $this->_mobilpayAssetRemoveApiDescriptor, array($this, 'process_payment_asset_remove'));
+            }
 
             $this->init_form_fields();
             $this->init_settings();
@@ -390,7 +398,392 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
         public function needs_setup() {
             return empty($this->_mobilpayAccountId) 
                 || empty($this->_mobilpayReturnUrl)
-                || !$this->_hasMobilpayAssets();
+                || !$this->_hasPaymentAssets();
+        }
+
+        public function process_payment($orderId) {
+            $context = array(
+                'orderId' => $orderId,
+                'source' => __METHOD__
+            );
+
+            $this->logDebug('Begin processing payment for order', $context);
+
+            try {
+                $customerOrder = wc_get_order($orderId);
+                //If the order total is greater than 0,
+                //  redirect to the payment page;
+                //Otherwise, redirect to the "thank you" page  
+                if ($customerOrder->get_total() > 0) {
+                    $this->logDebug('Order total is greater than 0. Will redirect to payment page', 
+                        $context);
+
+                    //Empty cart and create redirection info result
+                    $this->_emptyCart();
+
+                    $result = array(
+                        'result' => 'success', 
+                        'redirect' => 
+                            add_query_arg(
+                                'key', 
+                                $customerOrder->get_order_key(), 
+                                $customerOrder->get_checkout_payment_url(true)
+                            )
+                    );
+                } else {
+                    $this->logDebug('Order total is 0. Will complete order and redirect to thank-you page', 
+                        $context);
+
+                    //Mark order complete, empty cart and 
+                    //  create redirection info result
+                    $customerOrder->payment_complete();
+                    $this->_emptyCart();
+
+                    $result = array(
+                        'result' => 'success',
+                        'redirect' => $customerOrder->get_checkout_order_received_url()
+                    );
+                }
+
+                $this->logDebug('Done processing payment for order', $context);
+            } catch (\Exception $exc) {
+                wc_add_notice($this->__('Error initiating MobilPay card payment.'), 'error');
+                $this->logException('Error initiating MobilPay card payment', 
+                    $exc, 
+                    $context);
+            }
+
+            return $result;
+        }
+
+        public function show_payment_initiation($orderId) {
+            $context = array(
+                'orderId' => $orderId,
+                'source' => __METHOD__
+            );
+
+            $this->logDebug('Constructing payment form data', $context);
+
+            $data = new \stdClass();
+            $customerOrder = wc_get_order($orderId);
+
+            if ($customerOrder instanceof \WC_Order) {
+                try {
+                    $mobilpayRequest = $this->_createMobilpayRequest($customerOrder);
+
+                    $data->paymentUrl = $this->_getGatewayEndpointUrl();
+                    $data->envKey = $mobilpayRequest->getEnvKey();
+                    $data->encData = $mobilpayRequest->getEncData();
+                    $data->success = true;
+
+                    $this->logDebug('Successfully constructed payment form data', $context);
+                } catch (\Exception $exc) {
+                    var_dump($exc);
+                    $this->logException('Failed to construct payment form data', 
+                        $exc, 
+                        $context);
+                }
+            } else {
+                $this->logDebug('Failed to construct payment form data: order not found', $context);
+                $data->success = false;
+            }
+
+            require $this->_env->getViewFilePath('lvdwcmc-mobilpay-payment-form.php');
+        }
+
+        public function process_gateway_response() {
+            $paymentRequest = null;
+            $processErrorMessage = null;
+            $processErrorCode =  self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+
+            $context = array(
+                'source' => __METHOD__,
+                'remoteAddress' => $this->_env->getRemoteAddress()
+            );
+
+            $this->logDebug('Begin processing gateway callback response.', $context);
+
+            if (!$this->_env->isHttpPost()) {
+                $this->logDebug('Invalid HTTP method received from gateway.', $context);
+                $this->_sendErrorResponse(\Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT,
+                    \Mobilpay_Payment_Request_Abstract::ERROR_CONFIRM_INVALID_ACTION,
+                    'Invalid request received');
+            }
+
+            if (empty($_POST['env_key']) || empty($_POST['data'])) {
+                $this->logDebug('Invalid POST data received from gateway.', $context);
+                $this->_sendErrorResponse(\Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
+                    \Mobilpay_Payment_Request_Abstract::ERROR_CONFIRM_INVALID_POST_PARAMETERS, 
+                    'Invalid request parameters received');
+            }
+
+            try {
+                $paymentRequest = \Mobilpay_Payment_Request_Abstract::factoryFromEncrypted($_POST['env_key'],  
+                    $_POST['data'], 
+                    $this->_getPrivateKeyFilePath());
+
+                if (!$this->_isDecryptedRequestValid($paymentRequest)) {
+                    $this->logDebug('Invalid payment request data received from gateway.', $context);
+                    $this->_sendErrorResponse(\Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
+                        \Mobilpay_Payment_Request_Abstract::ERROR_CONFIRM_FAILED_DECODING_DATA, 
+                        'Invalid request parameters received');
+                    //die
+                }
+
+                $customerOrderId = isset($paymentRequest->params['_lvdwcmc_order_id']) 
+                    ? intval($paymentRequest->params['_lvdwcmc_order_id']) 
+                    : 0;
+
+                //Update context with the order id
+                $context = array_merge($context, array(
+                    'orderId' => $customerOrderId
+                ));
+
+                $customerOrder = wc_get_order($customerOrderId);
+                if (!($customerOrder instanceof \WC_Order)) {
+                    $this->logDebug('Order not found for ID in payment request', $context);
+
+                    $this->_sendErrorResponse(\Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
+                        \Mobilpay_Payment_Request_Abstract::ERROR_CONFIRM_FAILED_DECODING_DATA, 
+                        'Invalid request parameters received');
+                    //die
+                }
+
+                $gatewayErrorCode = $paymentRequest->objPmNotify->errorCode;
+                $this->logDebug(sprintf('Received error code="%s" from gateway', $gatewayErrorCode), $context);
+
+                if ($gatewayErrorCode == 0) {
+                    $gatewayAction = $paymentRequest->objPmNotify->action;
+                    $this->logDebug(sprintf('Received callback action="%s"  from gateway', $gatewayAction), $context);
+
+                    switch ($gatewayAction) {
+                        case 'confirmed':
+                            $processErrorCode = $this->_processConfirmedPaymentResponse($customerOrder, $paymentRequest);
+                        break;
+                        case 'confirmed_pending':
+                        case 'paid_pending':
+                            $processErrorCode = $this->_processPendingPaymentResponse($customerOrder, $paymentRequest);
+                        break;
+                        case 'canceled':
+                            $processErrorCode = $this->_processPaymentCancelledResponse($customerOrder, $paymentRequest);
+                        break;
+                        case 'credit':
+                            $processErrorCode = $this->_processCreditPaymentResponse($customerOrder, $paymentRequest);
+                        break;
+                    }
+
+                    if ($processErrorCode != self::GATEWAY_PROCESS_RESPONSE_ERR_OK) {
+                        $this->logDebug(sprintf('Order processing failed with error code="%s"', $processErrorCode), $context);
+                        $processErrorMessage = 'Error processing transaction';
+                    } else {
+                        $this->logDebug('Order processing succeeded', $context);
+                    }
+                } else {
+                    $processErrorCode = $this->_processFailedPaymentResponse($customerOrder, $paymentRequest);
+                }
+            } catch (\Exception $exc) {
+                $this->logException('Error processing gateway callback.', 
+                    $exc, 
+                    $context);
+
+                $processErrorCode = self::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
+                $processErrorMessage = sprintf('Internal error occured: %s (#%s)', 
+                    $exc->getMessage(), 
+                    $exc->getCode());
+            }
+
+            if ($processErrorCode != self::GATEWAY_PROCESS_RESPONSE_ERR_OK) {
+                $this->logDebug('Sending error response to gateway.', $context);
+                $this->_sendErrorResponse(\Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
+                    $processErrorCode,
+                    $processErrorMessage);
+            } else {
+                $this->logDebug('Sending success response to gateway.', $context);
+                $this->_sendSuccessResponse($paymentRequest->objPmNotify->getCrc());
+            }
+        }
+
+        private function _processConfirmedPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+            $context = array(
+                'source' => __METHOD__,
+                'orderId' => $customerOrder->get_id()
+            );
+
+            $this->logDebug('Begin processing confirmed payment response for order...', $context);
+
+            //If the order has already been processed, 
+            //  return successful result
+            if (!$this->_isGatewayResponseProcessableForOrder($customerOrder)) {
+                $this->logDebug('The order has already been processed', $context);
+                return self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            }
+
+            $transactionId = $request->objPmNotify->purchaseId;
+            $originalAmount = $request->objPmNotify->originalAmount;
+            $processedAmount = !empty($request->objPmNotify->processedAmount) 
+                ? $request->objPmNotify->processedAmount 
+                : 0;
+
+            $this->logDebug(sprintf('Processed amount is %s. Original amount is %s', $processedAmount, $originalAmount), $context);
+    
+            if ($processedAmount >= $originalAmount) {
+                $this->logDebug('Processed amount OK. Completing order...', $context);
+
+                if (!$customerOrder->needs_processing()) {
+                    $customerOrder->update_status('completed', $this->_getOrderCompletedOrderStatusNote());
+                    $customerOrder->add_order_note($this->_getGenericOrderCompletedCustomerNote($transactionId), 1);
+                    $customerOrder->add_order_note($this->_getGenericOrderCompletedAdminNote($transactionId), 0);
+                } else {
+                    $customerOrder->update_status('processing', $this->_getOrderProcessingStatusNote());
+                    $customerOrder->add_order_note($this->_getGenericOrderProcessingCustomerNote($transactionId), 1);
+                    $customerOrder->add_order_note($this->_getGenericOrderProcessingAdminNote($transactionId), 0);
+                }
+
+                wc_reduce_stock_levels($customerOrder->get_id());
+            } else {
+                $this->logDebug('Processed amount lower than original amount. Placing order on hold...', $context);
+
+                $customerOrder->update_status('on-hold', $this->_getDifferentAmountsOnHoldOrderStatusNote());
+
+                $customerOrder->add_order_note($this->_getDifferentAmountsOnHoldOrderCustomerNote($transactionId, 
+                    $originalAmount, 
+                    $processedAmount), 1);
+                $customerOrder->add_order_note($this->_getDifferentAmountsOnHoldOrderAdminNote($transactionId, 
+                    $originalAmount, 
+                    $processedAmount), 0);
+            }
+
+            $this->logDebug('Done processing confirmed payment response for order', $context);
+    
+            return self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+        }
+
+        private function _processFailedPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+            $context = array(
+                'source' => __METHOD__,
+                'orderId' => $customerOrder->get_id()
+            );
+
+            $this->logDebug('Begin processing failed payment response for order...', $context);
+
+            $transactionId = $request->objPmNotify->purchaseId;
+            $customerOrder->update_status('failed', $this->_getFailedPaymentOrderStatusNote());
+    
+            $errorCode = $request->objPmNotify->errorCode;
+            $errorMessage = $request->objPmNotify->errorMessage;
+
+            if (empty($errorMessage)) {
+                $errorMessage = $this->_getMobilpayPaymentMessageError($errorCode);
+            }
+    
+            $customerOrder->add_order_note($this->_getFailedPaymentOrderGenericNote($transactionId, 
+                $errorCode, 
+                $errorMessage), 1);
+    
+            $customerOrder->add_order_note($this->_getFailedPaymentOrderGenericNote($transactionId, 
+                $errorCode, 
+                $errorMessage), 0);
+
+            $this->logDebug('Done processing failed payment response for order', $context);
+    
+            return self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+        }
+
+        private function _processPaymentCancelledResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+            $context = array(
+                'source' => __METHOD__,
+                'orderId' => $customerOrder->get_id()
+            );
+
+            $this->logDebug('Begin processing canceled payment response for order...', $context);
+
+            $transactionId = $request->objPmNotify->purchaseId;
+
+            $customerOrder->update_status('cancelled', $this->_getGenericCancelledOrderStatusNote());
+            $customerOrder->add_order_note($this->_getGenericCancelledOrderCustomerNote($transactionId), 1);
+            $customerOrder->add_order_note($this->_getGenericCancelledOrderAdminNote($transactionId), 0);
+
+            $this->logDebug('Done processing canceled payment response for order', $context);
+
+            return self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+        }
+
+        private function _processPendingPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+            $context = array(
+                'source' => __METHOD__,
+                'orderId' => $customerOrder->get_id()
+            );
+
+            $this->logDebug('Begin processing pending payment response for order...', $context);
+            
+            $transactionId = $request->objPmNotify->purchaseId;
+
+            $customerOrder->update_status('on-hold', $this->_getGenericOnHoldOrderStatusNote());
+            $customerOrder->add_order_note($this->_getGenericOnHoldOrderCustomerNote($transactionId), 1);
+            $customerOrder->add_order_note($this->_getGenericOnHoldOrderAdminNote($transactionId), 0);
+
+            $this->logDebug('Done processing pending payment response for order', $context);
+
+            return self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+        }
+
+        private function _processCreditPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+            $context = array(
+                'source' => __METHOD__,
+                'orderId' => $customerOrder->get_id()
+            );
+
+            $this->logDebug('Begin processing credit payment response for order...', $context);
+
+            $transactionId = $request->objPmNotify->purchaseId;
+
+            $customerOrder->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
+            $customerOrder->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
+            $customerOrder->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+
+            $this->logDebug('Done processing credit payment response for order', $context);
+
+            return self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+        }
+
+        private function _createMobilpayRequest(\WC_Order $customerOrder) {
+            $cardPaymentRequest = new \Mobilpay_Payment_Request_Card();
+            $cardPaymentRequest->signature = $this->_mobilpayAccountId;
+            $cardPaymentRequest->orderId = md5(uniqid(rand()));
+    
+            $cardPaymentRequest->confirmUrl = $this->_mobilpayNotifyUrl;
+            $cardPaymentRequest->returnUrl = trim($this->_mobilpayReturnUrl) . '?order_id=' . $customerOrder->get_id();
+    
+            $cardPaymentRequest->invoice = new \Mobilpay_Payment_Invoice();
+            $cardPaymentRequest->invoice->currency = 
+                $customerOrder->get_currency();
+            $cardPaymentRequest->invoice->amount = 
+                sprintf('%.2f', $customerOrder->get_total());
+            $cardPaymentRequest->invoice->details = 
+                sprintf($this->__('Payment for order #%s.'), $customerOrder->get_order_key());
+            
+            $billingAndShipping = new \Mobilpay_Payment_Address();
+            $billingAndShipping->type = 'person';
+            $billingAndShipping->firstName = $customerOrder->get_billing_first_name();
+            $billingAndShipping->lastName = $customerOrder->get_billing_last_name();
+            $billingAndShipping->email = $customerOrder->get_billing_email();
+            $billingAndShipping->fiscalNumber = 'N/A';
+            $billingAndShipping->address = $customerOrder->get_formatted_billing_address();
+            $billingAndShipping->mobilePhone = $customerOrder->get_billing_phone();
+            
+            $cardPaymentRequest->invoice
+                ->setBillingAddress($billingAndShipping);
+            $cardPaymentRequest->invoice
+                ->setShippingAddress($billingAndShipping);
+    
+            $cardPaymentRequest->params = array(
+                '_lvdwcmc_order_id' => $customerOrder->get_id(),
+                '_lvdwcmc_customer_id' => $customerOrder->get_customer_id(),
+                '_lvdwcmc_customer_ip' => $customerOrder->get_customer_ip_address()
+            );
+
+            $cardPaymentRequest->encrypt($this->_getX509CertificateFilePath());
+            return $cardPaymentRequest;
         }
 
         private function _getMobilpayPaymentMessageError($errorCode) {
@@ -424,6 +817,12 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
             return isset($standardErrors[$errorCode]) 
                 ? $standardErrors[$errorCode] 
                 : null;
+        }
+
+        private function _isGatewayResponseProcessableForOrder(\WC_Order $customerOrder) {
+            $status = $customerOrder->get_status();
+            return $status != 'completed' 
+                && $status != 'processing';
         }
 
         private function _isDecryptedRequestValid($paymentRequest) {
@@ -496,6 +895,10 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
                 false);
         }
 
+        private function _emptyCart() {
+            WC()->cart->empty_cart();
+        }
+
         private function _getPaymentAssetFields() {
             static $paymentAssetFields = null;
             if ($paymentAssetFields === null) {
@@ -509,7 +912,7 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
             return $paymentAssetFields;
         }
 
-        private function _hasMobilpayAssets() {
+        private function _hasPaymentAssets() {
             if (empty($this->_mobilpayAccountId)) {
                 return false;
             }
@@ -521,6 +924,28 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
             }
 
             return true;
+        }
+
+        private function _getGatewayEndpointUrl() {
+            return $this->_isLiveMode() 
+                ? 'https://secure.mobilpay.ro' 
+                : 'http://sandboxsecure.mobilpay.ro';
+        }
+
+        private function _getX509CertificateFilePath() {
+            return $this->_getPaymentAssetFilePath(sprintf('%s.%s.public.cer', 
+                $this->_getPaymentAssetFilePrefix(), 
+                $this->_mobilpayAccountId));
+        }
+    
+        private function _getPrivateKeyFilePath() {
+            return $this->_getPaymentAssetFilePath(sprintf('%s.%s.private.key', 
+                $this->_getPaymentAssetFilePrefix(), 
+                $this->_mobilpayAccountId));
+        }
+
+        private function _getPaymentAssetFilePrefix() {
+            return $this->_isLiveMode() ? 'live' : 'sandbox';
         }
 
         private function _getPaymentAssetFilePathFromFieldInfo(array $fieldInfo, $accountId) {
@@ -559,8 +984,113 @@ class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
             return current_user_can('manage_woocommerce');
         }
 
+        private function _isLiveMode() {
+            return $this->_mobilpayEnvironment == 'no';
+        }
+
         private function __($text) {
             return __($text, lvdwcmc_plugin()->getTextDomain());
+        }
+
+        public function getLogger() {
+            return $this->_logger;
+        }
+
+        private function _getGenericRefundOrderAdminNote($transactionId) {
+            return sprintf($this->__('The amount you paid has been refuned. The order has been marked as refunded as well. Transaction id: %s'), 
+                $transactionId);
+        }
+
+        private function _getGenericRefundOrderCustomerNote($transactionId) {
+            return sprintf($this->__('The paid amount has been refuned. The order has been marked as refunded as well. Transaction id: %s'), 
+                $transactionId);
+        }
+
+        private function _getGenericRefundOrderStatusNote() {
+            return $this->__('The paid amount has been refuned. The order has been marked as refunded as well.');
+        }
+
+        private function _getGenericCancelledOrderAdminNote($transactionId) {
+            return sprintf($this->__('The payment has been cancelled. The order has been cancelled as well. Transaction id: %s'), 
+                $transactionId);
+        }
+
+        private function _getGenericCancelledOrderCustomerNote($transactionId) {
+            return sprintf($this->__('Your payment has been cancelled. The order has been cancelled as well. Transaction id: %s'), 
+                $transactionId);
+        }
+
+        private function _getGenericCancelledOrderStatusNote() {
+            return $this->__('Your payment has been cancelled. The order has been cancelled as well.');
+        }
+
+        private function _getGenericOnHoldOrderAdminNote($transactionId) {
+            return sprintf($this->__('Order payment is currently being processed. The order has been placed on-hold. Transaction id: %s'),
+                $transactionId);
+        }
+
+        private function _getGenericOnHoldOrderCustomerNote($transactionId) {
+            return sprintf($this->__('Your payment is currently being processed. Your order has been placed on-hold. Transaction id: %s'),
+                $transactionId);
+        }
+
+        public function _getGenericOnHoldOrderStatusNote() {
+            return $this->__('Your payment is currently being processed and the order has been placed on-hold');
+        }
+
+        private function _getDifferentAmountsOnHoldOrderAdminNote($transactionId, $originalAmount, $processedAmount) {
+            return sprintf($this->__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s vs. %s). Transaction id: %s'), 
+                $originalAmount, 
+                $processedAmount, 
+                $transactionId);
+        }
+    
+        private function _getDifferentAmountsOnHoldOrderCustomerNote($transactionId, $originalAmount, $processedAmount) {
+            return sprintf($this->__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s RON vs. %s RON). Transaction id: %s'), 
+                $originalAmount, 
+                $processedAmount, 
+                $transactionId);
+        }
+
+        private function _getDifferentAmountsOnHoldOrderStatusNote() {
+            return $this->__('The order has been placed on hold as the processed amount is smaller than the total order amount');
+        }
+    
+        private function _getFailedPaymentOrderGenericNote($transactionId, $errorCode, $errorMessage) {
+            return sprintf($this->__('Error processing payment: %s (code: %s). Transaction id: %s'), 
+                $errorMessage, 
+                $errorCode, 
+                $transactionId);
+        }
+    
+        private function _getFailedPaymentOrderStatusNote() {
+            return $this->__('The payment has failed. See order notes for additional details');
+        }
+
+        private function _getGenericOrderCompletedCustomerNote($transactionId) {
+            return sprintf($this->__('Your payment has been successfully received. Your order is now completed. Transaction id: %s'), $transactionId);
+        }
+
+        private function _getGenericOrderCompletedAdminNote($transactionId) {
+            return sprintf($this->__('The payment has been successfully received. The order is now completed. Transaction id: %s'), $transactionId);
+        }
+    
+        private function _getOrderCompletedOrderStatusNote() {
+            return $this->__('The payment has been successfully received. The order is now completed');
+        }
+
+        private function _getGenericOrderProcessingCustomerNote($transactionId) {
+            return sprintf($this->__('Your payment has been successfully received. Your order is currently being processed. Transaction id: %s'), 
+                $transactionId);
+        }
+
+        private function _getGenericOrderProcessingAdminNote($transactionId) {
+            return sprintf($this->__('The payment has been successfully received. The order is currently being processed. Transaction id: %s'), 
+                $transactionId);
+        }
+    
+        private function _getOrderProcessingStatusNote() {
+            return $this->__('The payment has been successfully received. The order is currently being processed.');
         }
     }
 }

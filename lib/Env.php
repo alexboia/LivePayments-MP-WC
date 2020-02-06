@@ -212,6 +212,18 @@ namespace LvdWcMc {
             return $this->_version;
         }
 
+        public function getRemoteAddress() {
+            return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        }
+        public function isHttpPost() {
+            return strtolower($_SERVER['REQUEST_METHOD']) === 'post';
+        }
+    
+        public function isHttpGet() {
+            return strtolower($_SERVER['REQUEST_METHOD']) === 'get';
+        }
+    
+
         public function getRequiredPhpVersion() {
             return '5.6.2';
         }
