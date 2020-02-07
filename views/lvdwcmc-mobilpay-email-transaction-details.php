@@ -28,33 +28,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+    defined('LVD_WCMC_LOADED') or die;
+?>
 
-namespace LvdWcMc {
-    class Shortcodes {
-        /**
-         * @var \LvdWcMc\Env Reference to the environment object
-         */
-        private $_env = null;
-
-        public function __construct(Env $env) {
-            $this->_env = $env;
-        }
-
-        public function displayMobilpayOrderStatus($attributes) {
-            if (isset($_GET['order_id'])) {
-                $orderId = intval($_GET['order_id']);
-                if ($orderId > 0 
-                    && ($order = wc_get_order($orderId)) instanceof \WC_Order 
-                    && MobilpayCreditCardGateway::matchesGatewayId($order->get_payment_method())) {
-
-                    $data = new \stdClass();
-                    $data->orderId = $orderId;
-                    $data->orderStatus = $order->get_status();
-                    $data->order = $order;
-        
-                    require $this->_env->getViewFilePath('lvdwcmc-mobilpay-payment-status.php');
-                }
-            }
-        }
-    }
-}
+<?php if ($data->success): ?>
+    <section class="woocommerce-mobilpay-transaction-details" style="margin-bottom: 40px;">
+        <h2 class="woocommerce-mobilpay-transaction-details-heading"><?php echo __('Card payment transaction details', LVD_WCMC_TEXT_DOMAIN); ?></h2>
+        <table class="td" cellspacing="0" cellpadding="6" style="width: 100%; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;" border="1">
+            <tr>
+                <td class="td" style="text-align:left; font-weight: bold;"><?php echo __('Transaction id', LVD_WCMC_TEXT_DOMAIN) ?></td>
+                <td class="td" style="text-align:left"><?php echo $data->mobilpayTransactionId ?></td>
+            </tr>
+        </table>
+    </section>
+<?php endif; ?>
