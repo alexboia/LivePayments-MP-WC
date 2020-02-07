@@ -47,6 +47,11 @@ namespace LvdWcMc {
         private $_installer;
 
         /**
+         * @var \LvdWcMc\Shortcodes Reference to the shortcodes manager object
+         */
+        private $_shortcodes;
+
+        /**
          * @var string The identifier of the plug-in text domain
          */
         private $_textDomain = LVD_WCMC_TEXT_DOMAIN;
@@ -65,6 +70,7 @@ namespace LvdWcMc {
 
             $this->_env = new Env();
             $this->_installer = new Installer($this->_env);
+            $this->_shortcodes = new Shortcodes($this->_env);
 
             $this->_mediaIncludes = new MediaIncludes(
                 $options['mediaIncludes']['refPluginsPath'], 
@@ -103,6 +109,8 @@ namespace LvdWcMc {
 
             add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
             add_action('init', array($this, 'onPluginsInit'));
+
+            add_shortcode('lvdwcmc_display_mobilpay_order_status', array($this->_shortcodes, 'displayMobilpayOrderStatus'));
         }
 
         public function onActivatePlugin() {
