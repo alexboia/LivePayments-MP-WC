@@ -55,8 +55,8 @@ namespace LvdWcMc {
          */
         private $_lastError = null;
 
-        public function __construct(Env $env) {
-            $this->_env = $env;
+        public function __construct() {
+            $this->_env = lvdwcmc_env();
         }
 
         public function updateIfNeeded() {
@@ -295,17 +295,21 @@ namespace LvdWcMc {
             return "CREATE TABLE IF NOT EXISTS `" . $this->_getPaymentTransactionsTableName() . "` (
                 `tx_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
                 `tx_order_id` BIGINT(20) NOT NULL,
+                `tx_order_user_id` BIGINT(20) NOT NULL,
                 `tx_provider` VARCHAR(50) NOT NULL,
                 `tx_transaction_id` VARCHAR(255) NOT NULL,
-                `tx_action` VARCHAR(255) NOT NULL,
-                `tx_error_code` INT(11) NOT NULL,
-                `tx_error_message` TEXT NOT NULL,
-                `tx_amount` DOUBLE NOT NULL,
-                `tx_timestamp` DATETIME NOT NULL,
+                `tx_provider_transaction_id` VARCHAR(255),
+                `tx_status` VARCHAR(255) NOT NULL,
+                `tx_error_code` INT(11),
+                `tx_error_message` TEXT,
+                `tx_amount` DOUBLE NOT NULL DEFAULT 0,
+                `tx_processed_amount` DOUBLE NOT NULL DEFAULT 0,
+                `tx_timestamp_initiated` DATETIME NOT NULL,
+                `tx_timestamp_last_updated` DATETIME,
                 `tx_ip_address` VARCHAR(255) NOT NULL,
                     PRIMARY KEY (`tx_id`),
-                    INDEX `tx_order_id` (`tx_order_id`),
-	                INDEX `tx_timestamp` (`tx_timestamp`)
+                    UNIQUE INDEX `tx_order_id` (`tx_order_id`),
+	                INDEX `tx_timestamp_initiated` (`tx_timestamp_initiated`)
             )";
         }
 

@@ -68,9 +68,9 @@ namespace LvdWcMc {
                 );
             }
 
-            $this->_env = new Env();
-            $this->_installer = new Installer($this->_env);
-            $this->_shortcodes = new Shortcodes($this->_env);
+            $this->_env = lvdwcmc_env();
+            $this->_installer = new Installer();
+            $this->_shortcodes = new Shortcodes();
 
             $this->_mediaIncludes = new MediaIncludes(
                 $options['mediaIncludes']['refPluginsPath'], 

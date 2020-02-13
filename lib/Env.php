@@ -166,7 +166,7 @@ namespace LvdWcMc {
                     'password' => $this->_dbPassword,
                     'db'=> $this->_dbName,
                     'port' => 3306,
-                    'prefix' => $this->_dbTablePrefix,
+                    'prefix' => '',
                     'charset' => 'utf8'
                 ));
 

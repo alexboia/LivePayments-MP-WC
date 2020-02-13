@@ -54,6 +54,11 @@ namespace LvdWcMc {
         private $_processor;
 
         /**
+         * @var \LvdWcMc\MobilpayTransactionFactory Reference to the transaction factory
+         */
+        private $_transactionFactory = null;
+
+        /**
          * @var \LvdWcMc\MediaIncludes Reference to the media includes manager
          */
         private $_mediaIncludes = null;
@@ -122,7 +127,8 @@ namespace LvdWcMc {
 
             $this->_env = lvdwcmc_plugin()->getEnv();
             $this->_mediaIncludes = lvdwcmc_plugin()->getMediaIncludes();
-            $this->_processor = new MobilpayCardPaymentProcessor($this->_env);
+            $this->_processor = new MobilpayCardPaymentProcessor();
+            $this->_transactionFactory = new MobilpayTransactionFactory();
 
             $this->_apiDescriptor = strtolower(str_replace('\\', '_', __CLASS__));
             $this->_mobilpayNotifyUrl = WC()->api_request_url($this->_apiDescriptor);
@@ -411,7 +417,7 @@ namespace LvdWcMc {
         public function process_payment($orderId) {
             $context = array(
                 'orderId' => $orderId,
-                'source' => __METHOD__
+                'source' => self::GATEWAY_ID
             );
 
             $this->logDebug('Begin processing payment for order', $context);
@@ -466,7 +472,7 @@ namespace LvdWcMc {
         public function show_payment_initiation($orderId) {
             $context = array(
                 'orderId' => $orderId,
-                'source' => __METHOD__
+                'source' => self::GATEWAY_ID
             );
 
             $this->logDebug('Constructing payment form data', $context);
@@ -477,6 +483,7 @@ namespace LvdWcMc {
             if ($customerOrder instanceof \WC_Order) {
                 try {
                     $mobilpayRequest = $this->_createMobilpayRequest($customerOrder);
+                    $this->_processor->processOrderInitialized($customerOrder, $mobilpayRequest);
 
                     $data->paymentUrl = $this->_getGatewayEndpointUrl();
                     $data->envKey = $mobilpayRequest->getEnvKey();
@@ -485,7 +492,6 @@ namespace LvdWcMc {
 
                     $this->logDebug('Successfully constructed payment form data', $context);
                 } catch (\Exception $exc) {
-                    var_dump($exc);
                     $this->logException('Failed to construct payment form data', 
                         $exc, 
                         $context);
@@ -504,7 +510,7 @@ namespace LvdWcMc {
             $processErrorCode =  self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
 
             $context = array(
-                'source' => __METHOD__,
+                'source' => self::GATEWAY_ID,
                 'remoteAddress' => $this->_env->getRemoteAddress()
             );
 
@@ -573,11 +579,15 @@ namespace LvdWcMc {
         public function add_transaction_details_to_email(\WC_Order $order, $sent_to_admin, $plain_text, $email) {
             if ($this->_canAddTransactionDetailsToEmail($order, $sent_to_admin, $plain_text, $email)) {
 
-                $data = new \stdClass();
-                $data->mobilpayTransactionId = 'xyz';
-                $data->success = true;
+                $transaction = $this->_transactionFactory->existingFromOrder($order);
+                if ($transaction != null) {
 
-                require $this->_env->getViewFilePath('lvdwcmc-mobilpay-email-transaction-details.php');
+                    $data = new \stdClass();
+                    $data->mobilpayTransactionId = $transaction->getProviderTransactionId();
+                    $data->success = true;
+
+                    require $this->_env->getViewFilePath('lvdwcmc-mobilpay-email-transaction-details.php');
+                }
             }
         }
 

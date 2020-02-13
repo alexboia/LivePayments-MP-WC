@@ -36,8 +36,8 @@ namespace LvdWcMc {
          */
         private $_env = null;
 
-        public function __construct(Env $env) {
-            $this->_env = $env;
+        public function __construct() {
+            $this->_env = lvdwcmc_env();
         }
 
         public function displayMobilpayOrderStatus($attributes) {

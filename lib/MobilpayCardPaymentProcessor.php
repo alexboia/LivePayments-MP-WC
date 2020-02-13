@@ -43,15 +43,25 @@ namespace LvdWcMc {
          */
         private $_logger = null;
 
-        public function __construct(Env $env) {
-            $this->_env = $env;
+        /**
+         * @var \LvdWcMc\MobilpayTransactionFactory Reference to the transaction factory
+         */
+        private $_transactionFactory = null;
+
+        public function __construct() {
+            $this->_env = lvdwcmc_env();
             $this->_logger = wc_get_logger();
+            $this->_transactionFactory = new MobilpayTransactionFactory();
         }
 
-        public function processConfirmedPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+        public function processOrderInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
+            $this->_transactionFactory->newFromOrder($order);
+        }
+
+        public function processConfirmedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
             $context = array(
-                'source' => __METHOD__,
-                'orderId' => $customerOrder->get_id()
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'orderId' => $order->get_id()
             );
 
             $this->logDebug('Begin processing confirmed payment response for order...', 
@@ -59,147 +69,280 @@ namespace LvdWcMc {
 
             //If the order has already been processed, 
             //  return successful result
-            if (!$this->_isGatewayResponseProcessableForOrder($customerOrder)) {
+            if (!$this->_isGatewayResponseProcessableForOrder($order)) {
                 $this->logDebug('The order has already been processed', $context);
                 return MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
             }
 
-            $transactionId = $request->objPmNotify->purchaseId;
-            $originalAmount = $request->objPmNotify->originalAmount;
-            $processedAmount = !empty($request->objPmNotify->processedAmount) 
-                ? $request->objPmNotify->processedAmount 
-                : 0;
+            $originalAmount = $this->_getOriginalAmount($request);
+            $processedAmount = $this->_getProcessedAmount($request);
 
-            $this->logDebug(sprintf('Processed amount is %s. Original amount is %s', $processedAmount, $originalAmount), 
-                $context);
-    
-            if ($processedAmount >= $originalAmount) {
-                $this->logDebug('Processed amount OK. Completing order...', $context);
-
-                if (!$customerOrder->needs_processing()) {
-                    $customerOrder->update_status('completed', $this->_getOrderCompletedOrderStatusNote());
-                    $customerOrder->add_order_note($this->_getGenericOrderCompletedCustomerNote($transactionId), 1);
-                    $customerOrder->add_order_note($this->_getGenericOrderCompletedAdminNote($transactionId), 0);
-                } else {
-                    $customerOrder->update_status('processing', $this->_getOrderProcessingStatusNote());
-                    $customerOrder->add_order_note($this->_getGenericOrderProcessingCustomerNote($transactionId), 1);
-                    $customerOrder->add_order_note($this->_getGenericOrderProcessingAdminNote($transactionId), 0);
-                }
-
-                wc_reduce_stock_levels($customerOrder->get_id());
-            } else {
-                $this->logDebug('Processed amount lower than original amount. Placing order on hold...', $context);
-
-                $customerOrder->update_status('on-hold', $this->_getDifferentAmountsOnHoldOrderStatusNote());
-
-                $customerOrder->add_order_note($this->_getDifferentAmountsOnHoldOrderCustomerNote($transactionId, 
-                    $originalAmount, 
-                    $processedAmount), 1);
-                $customerOrder->add_order_note($this->_getDifferentAmountsOnHoldOrderAdminNote($transactionId, 
-                    $originalAmount, 
-                    $processedAmount), 0);
+            if ($processedAmount <= 0) {
+                $processedAmount = $originalAmount;
             }
 
-            $this->logDebug('Done processing confirmed payment response for order', 
-                $context);
-    
-            return MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            $transactionId = $this->_getTransactionId($request);
+            $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
+
+            $transaction = $this->_transactionFactory->existingFromOrder($order);
+            if ($transaction != null) {
+                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                    $context);
+
+                $this->logDebug(sprintf('Processed amount is %s. Original amount is %s', $processedAmount, $originalAmount), 
+                    $context);
+
+                if ($transaction->canBeSetConfirmed()) {
+                    $transaction->setConfirmed($transactionId, $processedAmount);
+                    if ($transaction->isAmountCompletelyProcessed()) {
+                        $this->logDebug('Processed amount OK. Completing order...', $context);
+
+                        if (!$order->needs_processing()) {
+                            $order->update_status('completed', $this->_getOrderCompletedOrderStatusNote());
+                            $order->add_order_note($this->_getGenericOrderCompletedCustomerNote($transactionId), 1);
+                            $order->add_order_note($this->_getGenericOrderCompletedAdminNote($transactionId), 0);
+                        } else {
+                            $order->update_status('processing', $this->_getOrderProcessingStatusNote());
+                            $order->add_order_note($this->_getGenericOrderProcessingCustomerNote($transactionId), 1);
+                            $order->add_order_note($this->_getGenericOrderProcessingAdminNote($transactionId), 0);
+                        }
+        
+                        wc_reduce_stock_levels($order->get_id());
+                    } else {
+                        $this->logDebug('Processed amount lower than original amount. Placing order on hold...', $context);
+
+                        //Do not set status or add notes more than once
+                        if (!$order->has_status('on-hold')) {
+                            $order->update_status('on-hold', $this->_getDifferentAmountsOnHoldOrderStatusNote());
+                            $order->add_order_note($this->_getDifferentAmountsOnHoldOrderCustomerNote($transactionId, 
+                                $originalAmount, 
+                                $processedAmount), 1);
+                            $order->add_order_note($this->_getDifferentAmountsOnHoldOrderAdminNote($transactionId, 
+                                $originalAmount, 
+                                $processedAmount), 0);
+                        }
+                    }
+                } else {
+                    $this->logDebug('The local transaction could not be set as completed.', 
+                        $context);
+                }
+
+                $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            } else {
+                $this->logDebug('Could not find local transaction data from current order', 
+                    $context);
+            }
+
+            return $processResult;
         }
 
-        public function processFailedPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+        public function processFailedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
             $context = array(
-                'source' => __METHOD__,
-                'orderId' => $customerOrder->get_id()
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'orderId' => $order->get_id()
             );
 
             $this->logDebug('Begin processing failed payment response for order...', 
                 $context);
 
-            $transactionId = $request->objPmNotify->purchaseId;
-            $customerOrder->update_status('failed', $this->_getFailedPaymentOrderStatusNote());
-    
-            $errorCode = $request->objPmNotify->errorCode;
-            $errorMessage = $request->objPmNotify->errorMessage;
+            $errorCode = $this->_getErrorCode($request);
+            $errorMessage = $this->_getErrorMessage($request);
 
             if (empty($errorMessage)) {
                 $errorMessage = $this->_getMobilpayPaymentMessageError($errorCode);
             }
+
+            $transactionId = $this->_getTransactionId($request);
+            $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
+
+            $transaction = $this->_transactionFactory->existingFromOrder($order);
+            if ($transaction != null) {
+                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                    $context);
+
+                if ($transaction->canBeSetFailed()) {
+                    $transaction->setFailed($transactionId, $errorCode, $errorMessage);
+                    $order->update_status('failed', $this->_getFailedPaymentOrderStatusNote());
     
-            $customerOrder->add_order_note($this->_getFailedPaymentOrderGenericNote($transactionId, 
-                $errorCode, 
-                $errorMessage), 1);
-    
-            $customerOrder->add_order_note($this->_getFailedPaymentOrderGenericNote($transactionId, 
-                $errorCode, 
-                $errorMessage), 0);
+                    $order->add_order_note($this->_getFailedPaymentOrderGenericNote($transactionId, 
+                        $errorCode, 
+                        $errorMessage), 1);
+            
+                    $order->add_order_note($this->_getFailedPaymentOrderGenericNote($transactionId, 
+                        $errorCode, 
+                        $errorMessage), 0);
+                } else {
+                    $this->logDebug('The local transaction could not be set as failed.', 
+                        $context);
+                }
+
+                $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            } else {
+                $this->logDebug('Could not find local transaction data from current order', 
+                    $context);
+            }
 
             $this->logDebug('Done processing failed payment response for order', 
                 $context);
     
-            return MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            return $processResult;
         }
 
-        public function processPaymentCancelledResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+        public function processPaymentCancelledResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
             $context = array(
-                'source' => __METHOD__,
-                'orderId' => $customerOrder->get_id()
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'orderId' => $order->get_id()
             );
 
             $this->logDebug('Begin processing canceled payment response for order...', 
                 $context);
 
-            $transactionId = $request->objPmNotify->purchaseId;
+            $transactionId = $this->_getTransactionId($request);
+            $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
 
-            $customerOrder->update_status('cancelled', $this->_getGenericCancelledOrderStatusNote());
-            $customerOrder->add_order_note($this->_getGenericCancelledOrderCustomerNote($transactionId), 1);
-            $customerOrder->add_order_note($this->_getGenericCancelledOrderAdminNote($transactionId), 0);
+            $transaction = $this->_transactionFactory->existingFromOrder($order);
+            if ($transaction != null) {
+                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                    $context);
+
+                if ($transaction->canBeSetCancelled()) {
+                    $transaction->setCancelled($transactionId);
+                    $order->update_status('cancelled', $this->_getGenericCancelledOrderStatusNote());
+
+                    $order->add_order_note($this->_getGenericCancelledOrderCustomerNote($transactionId), 1);
+                    $order->add_order_note($this->_getGenericCancelledOrderAdminNote($transactionId), 0);
+                } else {
+                    $this->logDebug('The local transaction could not be set as cancelled.', 
+                        $context);
+                }
+
+                $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            } else {
+                $this->logDebug('Could not find local transaction data from current order', 
+                    $context);
+            }
 
             $this->logDebug('Done processing canceled payment response for order', 
                 $context);
 
-            return MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            return $processResult;
         }
 
-        public function processPendingPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+        public function processPendingPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
             $context = array(
-                'source' => __METHOD__,
-                'orderId' => $customerOrder->get_id()
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'orderId' => $order->get_id()
             );
 
             $this->logDebug('Begin processing pending payment response for order...', 
                 $context);
             
-            $transactionId = $request->objPmNotify->purchaseId;
+            $action = $this->_getAction($request);
+            $transactionId = $this->_getTransactionId($request);
+            $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
 
-            $customerOrder->update_status('on-hold', $this->_getGenericOnHoldOrderStatusNote());
-            $customerOrder->add_order_note($this->_getGenericOnHoldOrderCustomerNote($transactionId), 1);
-            $customerOrder->add_order_note($this->_getGenericOnHoldOrderAdminNote($transactionId), 0);
+            $transaction = $this->_transactionFactory->existingFromOrder($order);
+            if ($transaction != null) {
+                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                    $context);
+
+                if ($transaction->canBeSetPaymentPending()) {
+                    $transaction->setPaymentPending($action, $transactionId);
+                    $order->update_status('on-hold', $this->_getGenericOnHoldOrderStatusNote());
+                    
+                    $order->add_order_note($this->_getGenericOnHoldOrderCustomerNote($transactionId), 1);
+                    $order->add_order_note($this->_getGenericOnHoldOrderAdminNote($transactionId), 0);
+                } else {
+                    $this->logDebug('The local transaction could not be set as payment pending.', 
+                        $context);
+                }
+
+                $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            } else {
+                $this->logDebug('Could not find local transaction data from current order', 
+                    $context);
+            }
 
             $this->logDebug('Done processing pending payment response for order', 
                 $context);
 
-            return MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            return $processResult;
         }
 
-        public  function processCreditPaymentResponse(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $request) {
+        public  function processCreditPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
             $context = array(
-                'source' => __METHOD__,
-                'orderId' => $customerOrder->get_id()
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'orderId' => $order->get_id()
             );
 
             $this->logDebug('Begin processing credit payment response for order...', 
                 $context);
 
-            $transactionId = $request->objPmNotify->purchaseId;
+            $originalAmount = $this->_getOriginalAmount($request);
+            $processedAmount = $this->_getProcessedAmount($request);
 
-            $customerOrder->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
-            $customerOrder->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
-            $customerOrder->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+            if ($processedAmount <= 0) {
+                $processedAmount = $originalAmount;
+            }
+
+            //Extract transaction id from payment request
+            $transactionId = $this->_getTransactionId($request);
+            $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
+
+            $transaction = $this->_transactionFactory->existingFromOrder($order);
+            if ($transaction != null) {
+                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                    $context);
+
+                if ($transaction->canBeSetCredited()) {
+                    $transaction->setCredited($transactionId, $processedAmount);
+                    //Do not set status or add notes more than once
+                    if (!$order->has_status('refunded')) {
+                        $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
+                        $order->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
+                        $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+                    }
+                } else {
+                    $this->logDebug('Order refund already processed or local transaction could not be set as credited.', 
+                        $context);
+                }
+
+                $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            } else {
+                $this->logDebug('Could not find local transaction data from current order', 
+                    $context);
+            }
 
             $this->logDebug('Done processing credit payment response for order', 
                 $context);
 
-            return MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            return $processResult;
+        }
+
+        private function _getTransactionId(\Mobilpay_Payment_Request_Abstract $request) {
+            return $request->objPmNotify->purchaseId;
+        }
+
+        private function _getAction(\Mobilpay_Payment_Request_Abstract $request) {
+            return $request->objPmNotify->action;
+        }
+
+        private function _getOriginalAmount(\Mobilpay_Payment_Request_Abstract $request) {
+            return floatval($request->objPmNotify->originalAmount);
+        }
+
+        private function _getProcessedAmount(\Mobilpay_Payment_Request_Abstract $request) {
+            return !empty($request->objPmNotify->processedAmount) && is_numeric($request->objPmNotify->processedAmount)
+                ? floatval($request->objPmNotify->processedAmount)
+                : 0;
+        }
+
+        private function _getErrorCode(\Mobilpay_Payment_Request_Abstract $request) {
+            return $request->objPmNotify->errorCode;
+        }
+
+        private function _getErrorMessage(\Mobilpay_Payment_Request_Abstract $request) {
+            return $request->objPmNotify->errorMessage;
         }
 
         private function _getMobilpayPaymentMessageError($errorCode) {

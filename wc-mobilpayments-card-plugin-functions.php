@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -95,7 +96,13 @@ function lvdwcmc_send_json(\stdClass $data, $die = true) {
 }
 
 function lvdwcmc_env() {
-   return lvdwcmc_plugin()->getEnv();
+   static $env = null;
+   
+   if ($env === null) {
+      $env = new LvdWcMc\Env();
+   }
+
+   return $env;
 }
 
 function lvd_wcmc_run() {
