@@ -72,6 +72,8 @@ namespace LvdWcMc {
 
         private $_processedAmount;
 
+        private $_panMasked;
+
         private $_timestampInitiated;
 
         private $_timestampLastUpdated;
@@ -92,6 +94,7 @@ namespace LvdWcMc {
             $this->_errorMessage = $data['tx_error_message'];
             $this->_amount = $data['tx_amount'];
             $this->_processedAmount = $data['tx_processed_amount'];
+            $this->_panMasked = $data['tx_pan_masked'];
             $this->_timestampInitiated = $data['tx_timestamp_initiated'];
             $this->_timestampLastUpdated = $data['tx_timestamp_last_updated'];
             $this->_ipAddress = $data['tx_ip_address'];
@@ -110,6 +113,7 @@ namespace LvdWcMc {
                 'tx_error_message' => $this->_errorMessage,
                 'tx_amount' => $this->_amount,
                 'tx_processed_amount' => $this->_processedAmount,
+                'tx_pan_masked' => $this->_panMasked,
                 'tx_timestamp_initiated' => $this->_timestampInitiated,
                 'tx_timestamp_last_updated' => $this->_timestampLastUpdated,
                 'tx_ip_address' => $this->_ipAddress
@@ -141,7 +145,8 @@ namespace LvdWcMc {
         public function canBeSetFailed() {
             return $this->_status == self::STATUS_NEW
                 || $this->_status == self::STATUS_CONFIRMED_PENDING
-                || $this->_status == self::STATUS_PAID_PENDING;
+                || $this->_status == self::STATUS_PAID_PENDING
+                || $this->_status == self::STATUS_FAILED;
         }
 
         public function setFailed($transactionId, $errorCode, $errorMessage) {
@@ -186,19 +191,25 @@ namespace LvdWcMc {
             return $this->_status == self::STATUS_NEW 
                 || $this->_status == self::STATUS_PAID_PENDING
                 || $this->_status == self::STATUS_CONFIRMED_PENDING
+                || $this->_status == self::STATUS_FAILED
                 || $this->isPartiallyConfirmed();
         }
 
-        public function setConfirmed($transactionId, $processedAmount) {
+        public function setConfirmed($transactionId, $processedAmount, $panMasked) {
             if ($this->canBeSetConfirmed()) {
                 if ($this->_status != self::STATUS_CONFIRMED) {
                     $this->_status = self::STATUS_CONFIRMED;
                     $this->_processedAmount = 0;
                 }
 
+                $this->_errorCode = null;
+                $this->_errorMessage = null;
+
+                $this->_panMasked = $panMasked;
                 $this->_providerTransactionId = $transactionId;
+
                 $this->_increaseProcessedAmount($processedAmount);
-                
+               
                 $this->_setLastUpdated();
                 $this->save();
             }
@@ -240,14 +251,16 @@ namespace LvdWcMc {
                 || $this->isPartiallyCredited();
         }
 
-        public function setCredited($transactionId, $processedAmount) {
+        public function setCredited($transactionId, $processedAmount, $panMasked) {
             if ($this->canBeSetCredited()) {
                 if ($this->_status != self::STATUS_CREDIT) {
                     $this->_status = self::STATUS_CREDIT;
                     $this->_processedAmount = 0;
                 }
 
+                $this->_panMasked = $panMasked;
                 $this->_providerTransactionId = $transactionId;
+
                 $this->_increaseProcessedAmount($processedAmount);
 
                 $this->_setLastUpdated();
@@ -255,12 +268,52 @@ namespace LvdWcMc {
             }
         }
 
+        private function _increaseProcessedAmount($processedAmount) {
+            $this->_processedAmount = min($this->_amount, $this->_processedAmount + $processedAmount);
+        }
+
+        public function getId() {
+            return $this->_id;
+        }
+
+        public function getTransactionId() {
+            return $this->_transactionId;
+        }
+
         public function getProviderTransactionId() {
             return $this->_providerTransactionId;
         }
 
-        private function _increaseProcessedAmount($processedAmount) {
-            $this->_processedAmount = min($this->_amount, $this->_processedAmount + $processedAmount);
+        public function getStatus() {
+            return $this->_status;
+        }
+
+        public function getErrorCode() {
+            return $this->_errorCode;
+        }
+
+        public function getErrorMessage() {
+            return $this->_errorMessage;
+        }
+
+        public function getAmount() {
+            return $this->_amount;
+        }
+
+        public function getProcessedAmount() {
+            return $this->_processedAmount;
+        }
+
+        public function getPANMasked() {
+            return $this->_panMasked;
+        }
+
+        public function getTimestampInitiated() {
+            return $this->_timestampInitiated;
+        }
+
+        public function getTimestampLastUpdated() {
+            return $this->_timestampLastUpdated;
         }
     }
 }

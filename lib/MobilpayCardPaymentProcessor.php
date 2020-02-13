@@ -81,6 +81,7 @@ namespace LvdWcMc {
                 $processedAmount = $originalAmount;
             }
 
+            $panMasked = $this->_getPANMasked($request);
             $transactionId = $this->_getTransactionId($request);
             $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
 
@@ -93,7 +94,7 @@ namespace LvdWcMc {
                     $context);
 
                 if ($transaction->canBeSetConfirmed()) {
-                    $transaction->setConfirmed($transactionId, $processedAmount);
+                    $transaction->setConfirmed($transactionId, $processedAmount, $panMasked);
                     if ($transaction->isAmountCompletelyProcessed()) {
                         $this->logDebug('Processed amount OK. Completing order...', $context);
 
@@ -286,6 +287,7 @@ namespace LvdWcMc {
             }
 
             //Extract transaction id from payment request
+            $panMasked = $this->_getPANMasked($request);
             $transactionId = $this->_getTransactionId($request);
             $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
 
@@ -295,7 +297,7 @@ namespace LvdWcMc {
                     $context);
 
                 if ($transaction->canBeSetCredited()) {
-                    $transaction->setCredited($transactionId, $processedAmount);
+                    $transaction->setCredited($transactionId, $processedAmount, $panMasked);
                     //Do not set status or add notes more than once
                     if (!$order->has_status('refunded')) {
                         $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
@@ -335,6 +337,10 @@ namespace LvdWcMc {
             return !empty($request->objPmNotify->processedAmount) && is_numeric($request->objPmNotify->processedAmount)
                 ? floatval($request->objPmNotify->processedAmount)
                 : 0;
+        }
+
+        private function _getPANMasked(\Mobilpay_Payment_Request_Abstract $request) {
+            return $request->objPmNotify->pan_masked;
         }
 
         private function _getErrorCode(\Mobilpay_Payment_Request_Abstract $request) {

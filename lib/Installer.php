@@ -304,6 +304,7 @@ namespace LvdWcMc {
                 `tx_error_message` TEXT,
                 `tx_amount` DOUBLE NOT NULL DEFAULT 0,
                 `tx_processed_amount` DOUBLE NOT NULL DEFAULT 0,
+                `tx_pan_masked` VARCHAR(150) DEFAULT NULL,
                 `tx_timestamp_initiated` DATETIME NOT NULL,
                 `tx_timestamp_last_updated` DATETIME,
                 `tx_ip_address` VARCHAR(255) NOT NULL,

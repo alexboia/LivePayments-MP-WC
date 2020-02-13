@@ -36,11 +36,11 @@
         <p><?php echo __('Your payment could not be processed or has been cancelled.', LVD_WCMC_TEXT_DOMAIN); ?></p>
     <?php elseif ($data->orderStatus === 'on-hold'):  ?>
         <p><?php echo __('Your payment is currently being processed.', LVD_WCMC_TEXT_DOMAIN); ?></p>
-        <p><?php echo __('Order Id', LVD_WCMC_TEXT_DOMAIN) . ': ' . $data->orderId; ?></p>
+        <p><?php echo __('Order Id', LVD_WCMC_TEXT_DOMAIN); ?>: <strong><?php echo $data->orderId; ?></strong></p>
         <p><?php echo __('Detailed order status') ?>: <strong><?php echo wc_get_order_status_name($data->orderStatus); ?></strong></p>
     <?php else: ?>
         <p><?php echo __('We have successfully received your payment', LVD_WCMC_TEXT_DOMAIN); ?></p>
-        <p><?php echo __('Order Id', LVD_WCMC_TEXT_DOMAIN) . ': ' . $data->orderId; ?></p>
+        <p><?php echo __('Order Id', LVD_WCMC_TEXT_DOMAIN); ?>: <strong><?php echo $data->orderId; ?></strong></p>
         <p><?php echo __('Detailed order status') ?>: <strong><?php echo wc_get_order_status_name($data->orderStatus); ?></strong></p>
     <?php endif; ?>
 </div>

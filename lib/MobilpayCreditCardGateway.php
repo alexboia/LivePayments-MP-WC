@@ -423,11 +423,11 @@ namespace LvdWcMc {
             $this->logDebug('Begin processing payment for order', $context);
 
             try {
-                $customerOrder = wc_get_order($orderId);
+                $order = wc_get_order($orderId);
                 //If the order total is greater than 0,
                 //  redirect to the payment page;
                 //Otherwise, redirect to the "thank you" page  
-                if ($customerOrder->get_total() > 0) {
+                if ($order->get_total() > 0) {
                     $this->logDebug('Order total is greater than 0. Will redirect to payment page', 
                         $context);
 
@@ -439,8 +439,8 @@ namespace LvdWcMc {
                         'redirect' => 
                             add_query_arg(
                                 'key', 
-                                $customerOrder->get_order_key(), 
-                                $customerOrder->get_checkout_payment_url(true)
+                                $order->get_order_key(), 
+                                $order->get_checkout_payment_url(true)
                             )
                     );
                 } else {
@@ -449,12 +449,12 @@ namespace LvdWcMc {
 
                     //Mark order complete, empty cart and 
                     //  create redirection info result
-                    $customerOrder->payment_complete();
+                    $order->payment_complete();
                     $this->_emptyCart();
 
                     $result = array(
                         'result' => 'success',
-                        'redirect' => $customerOrder->get_checkout_order_received_url()
+                        'redirect' => $order->get_checkout_order_received_url()
                     );
                 }
 
@@ -478,12 +478,12 @@ namespace LvdWcMc {
             $this->logDebug('Constructing payment form data', $context);
 
             $data = new \stdClass();
-            $customerOrder = wc_get_order($orderId);
+            $order = wc_get_order($orderId);
 
-            if ($customerOrder instanceof \WC_Order) {
+            if ($order instanceof \WC_Order) {
                 try {
-                    $mobilpayRequest = $this->_createMobilpayRequest($customerOrder);
-                    $this->_processor->processOrderInitialized($customerOrder, $mobilpayRequest);
+                    $mobilpayRequest = $this->_createMobilpayRequest($order);
+                    $this->_processor->processOrderInitialized($order, $mobilpayRequest);
 
                     $data->paymentUrl = $this->_getGatewayEndpointUrl();
                     $data->envKey = $mobilpayRequest->getEnvKey();
@@ -533,22 +533,22 @@ namespace LvdWcMc {
                     $this->_sendFailedDecodingGatewayData(); //will exit
                 }
 
-                $customerOrderId = isset($paymentRequest->params['_lvdwcmc_order_id']) 
+                $orderId = isset($paymentRequest->params['_lvdwcmc_order_id']) 
                     ? intval($paymentRequest->params['_lvdwcmc_order_id']) 
                     : 0;
 
                 //Update context with the order id
                 $context = array_merge($context, array(
-                    'orderId' => $customerOrderId
+                    'orderId' => $orderId
                 ));
 
-                $customerOrder = wc_get_order($customerOrderId);
-                if (!($customerOrder instanceof \WC_Order)) {
+                $order = wc_get_order($orderId);
+                if (!($order instanceof \WC_Order)) {
                     $this->logDebug('Order not found for ID in payment request', $context);
                     $this->_sendFailedDecodingGatewayData(); //will exit
                 }
 
-                $result = $this->_processGatewayAction($customerOrder, 
+                $result = $this->_processGatewayAction($order, 
                     $paymentRequest, 
                     $context);
 
@@ -599,30 +599,30 @@ namespace LvdWcMc {
                 && !$plain_text;
         }
 
-        private function _createMobilpayRequest(\WC_Order $customerOrder) {
+        private function _createMobilpayRequest(\WC_Order $order) {
             $cardPaymentRequest = new \Mobilpay_Payment_Request_Card();
             $cardPaymentRequest->signature = $this->_mobilpayAccountId;
             $cardPaymentRequest->orderId = md5(uniqid(rand()));
     
             $cardPaymentRequest->confirmUrl = $this->_mobilpayNotifyUrl;
-            $cardPaymentRequest->returnUrl = trim($this->_mobilpayReturnUrl) . '?order_id=' . $customerOrder->get_id();
+            $cardPaymentRequest->returnUrl = trim($this->_mobilpayReturnUrl) . '?order_id=' . $order->get_id();
     
             $cardPaymentRequest->invoice = new \Mobilpay_Payment_Invoice();
             $cardPaymentRequest->invoice->currency = 
-                $customerOrder->get_currency();
+                $order->get_currency();
             $cardPaymentRequest->invoice->amount = 
-                sprintf('%.2f', $customerOrder->get_total());
+                sprintf('%.2f', $order->get_total());
             $cardPaymentRequest->invoice->details = 
-                sprintf($this->__('Payment for order #%s.'), $customerOrder->get_order_key());
+                sprintf($this->__('Payment for order #%s.'), $order->get_order_key());
             
             $billingAndShipping = new \Mobilpay_Payment_Address();
             $billingAndShipping->type = 'person';
-            $billingAndShipping->firstName = $customerOrder->get_billing_first_name();
-            $billingAndShipping->lastName = $customerOrder->get_billing_last_name();
-            $billingAndShipping->email = $customerOrder->get_billing_email();
+            $billingAndShipping->firstName = $order->get_billing_first_name();
+            $billingAndShipping->lastName = $order->get_billing_last_name();
+            $billingAndShipping->email = $order->get_billing_email();
             $billingAndShipping->fiscalNumber = 'N/A';
-            $billingAndShipping->address = $customerOrder->get_formatted_billing_address();
-            $billingAndShipping->mobilePhone = $customerOrder->get_billing_phone();
+            $billingAndShipping->address = $order->get_formatted_billing_address();
+            $billingAndShipping->mobilePhone = $order->get_billing_phone();
             
             $cardPaymentRequest->invoice
                 ->setBillingAddress($billingAndShipping);
@@ -630,18 +630,18 @@ namespace LvdWcMc {
                 ->setShippingAddress($billingAndShipping);
     
             $cardPaymentRequest->params = array(
-                '_lvdwcmc_order_id' => $customerOrder->get_id(),
-                '_lvdwcmc_customer_id' => $customerOrder->get_customer_id(),
-                '_lvdwcmc_customer_ip' => $customerOrder->get_customer_ip_address()
+                '_lvdwcmc_order_id' => $order->get_id(),
+                '_lvdwcmc_customer_id' => $order->get_customer_id(),
+                '_lvdwcmc_customer_ip' => $order->get_customer_ip_address()
             );
 
             $cardPaymentRequest->encrypt($this->_getX509CertificateFilePath());
             return $cardPaymentRequest;
         }
 
-        private function _processGatewayAction(\WC_Order $customerOrder, \Mobilpay_Payment_Request_Abstract $paymentRequest, $context) {
+        private function _processGatewayAction(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $paymentRequest, $context) {
             $processErrorMessage = null;
-            $processErrorCode = self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            $processResult = self::GATEWAY_PROCESS_RESPONSE_ERR_OK;
 
             $gatewayErrorCode = $paymentRequest->objPmNotify->errorCode;
 
@@ -654,31 +654,31 @@ namespace LvdWcMc {
 
                 switch ($gatewayAction) {
                     case 'confirmed':
-                        $processErrorCode = $this->_processor->processConfirmedPaymentResponse($customerOrder, $paymentRequest);
+                        $processResult = $this->_processor->processConfirmedPaymentResponse($order, $paymentRequest);
                     break;
                     case 'confirmed_pending':
                     case 'paid_pending':
-                        $processErrorCode = $this->_processor->processPendingPaymentResponse($customerOrder, $paymentRequest);
+                        $processResult = $this->_processor->processPendingPaymentResponse($order, $paymentRequest);
                     break;
                     case 'canceled':
-                        $processErrorCode = $this->_processor->processPaymentCancelledResponse($customerOrder, $paymentRequest);
+                        $processResult = $this->_processor->processPaymentCancelledResponse($order, $paymentRequest);
                     break;
                     case 'credit':
-                        $processErrorCode = $this->_processor->processCreditPaymentResponse($customerOrder, $paymentRequest);
+                        $processResult = $this->_processor->processCreditPaymentResponse($order, $paymentRequest);
                     break;
                 }
 
-                if ($processErrorCode != self::GATEWAY_PROCESS_RESPONSE_ERR_OK) {
-                    $this->logDebug(sprintf('Order processing failed with error code="%s"', $processErrorCode), $context);
+                if ($processResult != self::GATEWAY_PROCESS_RESPONSE_ERR_OK) {
+                    $this->logDebug(sprintf('Order processing failed with error code="%s"', $processResult), $context);
                 } else {
                     $this->logDebug('Order processing succeeded', $context);
                 }
             } else {
-                $processErrorCode = $this->_processor->processFailedPaymentResponse($customerOrder, $paymentRequest);
+                $processResult = $this->_processor->processFailedPaymentResponse($order, $paymentRequest);
             }
 
             return array(
-                'processErrorCode' => $processErrorCode,
+                'processErrorCode' => $processResult,
                 'processErrorMessage' => $processErrorMessage
             );
         }
