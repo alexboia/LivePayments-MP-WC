@@ -49,6 +49,7 @@
                 'tx_status' => MobilpayTransaction::STATUS_NEW,
                 'tx_amount' => $order->get_total(),
                 'tx_processed_amount' => 0,
+                'tx_currency' => $order->get_currency(),
                 'tx_timestamp_initiated' => date('Y-m-d H:i:s'),
                 'tx_timestamp_last_updated' => date('Y-m-d H:i:s'),
                 'tx_ip_address' => $order->get_customer_ip_address()

@@ -56,6 +56,11 @@ namespace LvdWcMc {
          */
         private $_textDomain = LVD_WCMC_TEXT_DOMAIN;
 
+        /**
+         * @var \LvdWcMc\MobilpayTransactionFactory Reference to the transaction factory
+         */
+        private $_transactionFactory = null;
+
         private $_requiredPlugins = array(
             'woocommerce/woocommerce.php'
         );
@@ -71,6 +76,7 @@ namespace LvdWcMc {
             $this->_env = lvdwcmc_env();
             $this->_installer = new Installer();
             $this->_shortcodes = new Shortcodes();
+            $this->_transactionFactory = new MobilpayTransactionFactory();
 
             $this->_mediaIncludes = new MediaIncludes(
                 $options['mediaIncludes']['refPluginsPath'], 
@@ -109,6 +115,11 @@ namespace LvdWcMc {
 
             add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
             add_action('init', array($this, 'onPluginsInit'));
+            
+            add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueStyles'));
+            add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'));
+
+            add_action('add_meta_boxes', array($this, 'onRegisterMetaboxes'), 10, 2);
 
             add_shortcode('lvdwcmc_display_mobilpay_order_status', array($this->_shortcodes, 'displayMobilpayOrderStatus'));
         }
@@ -159,6 +170,7 @@ namespace LvdWcMc {
             }
 
             add_filter('woocommerce_payment_gateways', array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
+            add_filter('woocommerce_order_details_after_order_table', array($this, 'addTransactionDetailsOnAccountOrderDetails'), -1, 1);
         }
 
         public function onPluginsInit() {
@@ -169,6 +181,48 @@ namespace LvdWcMc {
         public function onWooCommercePaymentGatewaysRequested($methods) {
             $methods[] = '\LvdWcMc\MobilpayCreditCardGateway';
             return $methods;
+        }
+
+        public function onFrontendEnqueueStyles() {
+            if (is_wc_endpoint_url('view-order')) {
+                $this->_mediaIncludes->includeStyleFrontendTransactionDetails();
+            }
+        }
+
+        public function onAdminEnqueueStyles() {
+            if ($this->_env->isEditingWcOrder()) {
+                $this->_mediaIncludes->includeStyleAdminTransactionDetails();
+            }
+        }
+
+        public function addTransactionDetailsOnAccountOrderDetails(\WC_Order $order) {
+            if (is_wc_endpoint_url('view-order')) {
+                $data = $this->_getDisplayableTransactionDetails($order);
+                if ($data != null) {
+                    require $this->_env->getViewFilePath('lvdwcmc-mobilpay-frontend-transaction-details.php');
+                }
+            }
+        }
+
+        public function onRegisterMetaboxes($postType, $post) {
+            if ($postType == 'shop_order') {
+                add_meta_box('lvdwcmc-transaction-details-metabox', 
+                    $this->__('Payment transaction details'), 
+                    array($this, 'addTransactionDetailsOnAdminOrderDetails'), 
+                    'shop_order', 
+                    'side', 
+                    'low');
+            }
+        }
+
+        public function addTransactionDetailsOnAdminOrderDetails() {
+            $order = $this->_env->getTheOrder();
+            if (!empty($order) && ($order instanceof \WC_Order)) {
+                $data = $this->_getDisplayableTransactionDetails($order);
+                if ($data != null) {
+                    require $this->_env->getViewFilePath('lvdwcmc-mobilpay-admin-transaction-details.php');
+                }
+            }
         }
 
         public function isActive() {
@@ -185,6 +239,57 @@ namespace LvdWcMc {
 
         public function getMediaIncludes() {
             return $this->_mediaIncludes;
+        }
+
+        private function _getDisplayableTransactionDetails(\WC_Order $order) {
+            $transaction = $this->_transactionFactory->existingFromOrder($order);
+            if ($transaction != null) {
+                $timestampLastUpdated = date_create_from_format('Y-m-d H:i:s', 
+                    $transaction->getTimestampLastUpdated());
+                
+                $data = new \stdClass();
+                $data->providerTransactionId = $transaction->getProviderTransactionId();
+                $data->status = $this->_getTransactionStatusLabel($transaction->getStatus());
+                $data->panMasked = $transaction->getPANMasked();
+                
+                $data->amount = number_format($transaction->getAmount(), 
+                    wc_get_price_decimals(), 
+                    wc_get_price_decimal_separator(), 
+                    wc_get_price_thousand_separator());
+
+                $data->processedAmount = number_format($transaction->getProcessedAmount(), 
+                    wc_get_price_decimals(), 
+                    wc_get_price_decimal_separator(), 
+                    wc_get_price_thousand_separator());
+
+                $data->currency = $transaction->getCurrency();
+                
+                $data->timestampLastUpdated = $timestampLastUpdated->format($this->_getFullDateTimeFormat());
+                $data->errorCode = $transaction->getErrorCode();
+                $data->errorMessage = $transaction->getErrorMessage();
+
+                return $data;
+            } else {
+                return null;
+            }
+        }
+
+        private function _getTransactionStatusLabel($status) {
+            $labelsForCodes = array(
+                MobilpayTransaction::STATUS_CANCELLED => $this->__('Cancelled'),
+                MobilpayTransaction::STATUS_CONFIRMED => $this->__('Confirmed. Payment successful'),
+                MobilpayTransaction::STATUS_CONFIRMED_PENDING => $this->__('Pending confirmation'),
+                MobilpayTransaction::STATUS_CREDIT => $this->__('Credited'),
+                MobilpayTransaction::STATUS_FAILED => $this->__('Failed'),
+                MobilpayTransaction::STATUS_NEW => $this->__('Started'),
+                MobilpayTransaction::STATUS_PAID_PENDING => $this->__('Pending payment')
+            );
+
+            return isset($labelsForCodes[$status]) ? $labelsForCodes[$status] : '-';
+        }
+
+        private function _getFullDateTimeFormat() {
+            return get_option('date_format') . ' ' . get_option('time_format');
         }
     }
 }

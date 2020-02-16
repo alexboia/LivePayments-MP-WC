@@ -130,6 +130,27 @@ namespace LvdWcMc {
             }
         }
 
+        public function isEditingWcOrder() {
+            if ($this->getCurrentPage() == 'post.php' && !empty($_GET['post'])) {
+                $order = wc_get_order(intval($_GET['post']));
+                return !empty($order) && ($order instanceof \WC_Order);
+            } else {
+                return false;
+            }
+        }
+
+        public function getCurrentPage() {
+            return isset($GLOBALS['pagenow']) 
+                ? strtolower($GLOBALS['pagenow']) 
+                : null;
+        }
+
+        public function getTheOrder() {
+            return isset($GLOBALS['theorder']) 
+                ? $GLOBALS['theorder'] 
+                : null;
+        }
+
         public function getDbHost() {
             return $this->_dbHost;
         }

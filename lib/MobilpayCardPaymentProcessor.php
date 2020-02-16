@@ -52,6 +52,29 @@ namespace LvdWcMc {
             $this->_env = lvdwcmc_env();
             $this->_logger = wc_get_logger();
             $this->_transactionFactory = new MobilpayTransactionFactory();
+
+            add_action('woocommerce_order_fully_refunded_status', 
+                array($this, 'onOrderFullyRefundedGetRefundedStatus'), 
+                PHP_INT_MAX, 
+                3);
+        }
+
+        public function onOrderFullyRefundedGetRefundedStatus($status, $orderId, $refundId) {
+            $context = array(
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'orderId' => $orderId
+            );
+
+            $transaction = $this->_transactionFactory->existingFromOrder($orderId);
+
+            if ($transaction != null 
+                && $transaction->isCredited() 
+                && $transaction->isAmountCompletelyProcessed()) {
+                $this->logDebug('Supressing order refund status update.', $context);
+                $status = null;
+            }
+
+            return $status;
         }
 
         public function processOrderInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
@@ -96,7 +119,8 @@ namespace LvdWcMc {
                 if ($transaction->canBeSetConfirmed()) {
                     $transaction->setConfirmed($transactionId, $processedAmount, $panMasked);
                     if ($transaction->isAmountCompletelyProcessed()) {
-                        $this->logDebug('Processed amount OK. Completing order...', $context);
+                        $this->logDebug('Processed amount OK. Completing order...', 
+                            $context);
 
                         if (!$order->needs_processing()) {
                             $order->update_status('completed', $this->_getOrderCompletedOrderStatusNote());
@@ -110,7 +134,8 @@ namespace LvdWcMc {
         
                         wc_reduce_stock_levels($order->get_id());
                     } else {
-                        $this->logDebug('Processed amount lower than original amount. Placing order on hold...', $context);
+                        $this->logDebug('Processed amount lower than original amount. Placing order on hold...', 
+                            $context);
 
                         //Do not set status or add notes more than once
                         if (!$order->has_status('on-hold')) {
@@ -270,7 +295,7 @@ namespace LvdWcMc {
             return $processResult;
         }
 
-        public  function processCreditPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
+        public function processCreditPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
             $context = array(
                 'source' => MobilpayCreditCardGateway::GATEWAY_ID,
                 'orderId' => $order->get_id()
@@ -298,11 +323,24 @@ namespace LvdWcMc {
 
                 if ($transaction->canBeSetCredited()) {
                     $transaction->setCredited($transactionId, $processedAmount, $panMasked);
-                    //Do not set status or add notes more than once
-                    if (!$order->has_status('refunded')) {
-                        $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
-                        $order->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
-                        $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+
+                    //Create partial refund record
+                    wc_create_refund(array(
+                        'order_id' => $order->get_id(),
+                        'amount' => $processedAmount,
+                        'reason' => $this->_getPartialRefundReason($transactionId),
+                        'line_items' => array(),
+                        'restock_items' => false,
+                        'refund_payment' => false
+                    ));
+
+                    if ($transaction->isAmountCompletelyProcessed()) {
+                        //Do not set status or add notes more than once
+                        if (!$order->has_status('refunded')) {
+                            $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
+                            $order->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
+                            $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+                        }
                     }
                 } else {
                     $this->logDebug('Order refund already processed or local transaction could not be set as credited.', 
@@ -420,6 +458,10 @@ namespace LvdWcMc {
 
         private function _getGenericRefundOrderStatusNote() {
             return $this->__('The paid amount has been refuned. The order has been marked as refunded as well.');
+        }
+
+        private function _getPartialRefundReason($transactionId) {
+            return sprintf($this->__('Partial refund notification received from MobilPay gateway. Transaction id: %s'), $transactionId);
         }
 
         private function _getGenericCancelledOrderAdminNote($transactionId) {

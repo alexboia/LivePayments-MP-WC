@@ -53,6 +53,10 @@
 
         const STYLE_LVDWCMC_SETTINGS = 'lvdwcmc-settings-css';
 
+        const STYLE_LVDWCMC_FRONTEND_TRANSACTION_DETAILS = 'lvdwcmc-frontend-transaction-details-css';
+
+        const STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc-admin-transaction-details-css';
+
         private $_refPluginsPath;
 
         private $_scriptsInFooter;
@@ -73,6 +77,14 @@
                     self::STYLE_TOASTR,
                     self::STYLE_LVDWCMC_COMMON
                 )
+            ),
+            self::STYLE_LVDWCMC_FRONTEND_TRANSACTION_DETAILS => array(
+                'path' => 'media/css/lvdwcmc-frontend-transaction-details.css',
+                'version' => LVD_WCMC_VERSION
+            ),
+            self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS => array(
+                'path' => 'media/css/lvdwcmc-admin-transaction-details.css',
+                'version' => LVD_WCMC_VERSION
             )
         );
 
@@ -199,6 +211,14 @@
             $this->_enqueueStyle(self::STYLE_TOASTR);
             $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
             $this->_enqueueStyle(self::STYLE_LVDWCMC_SETTINGS);
+        }
+
+        public function includeStyleFrontendTransactionDetails() {
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_FRONTEND_TRANSACTION_DETAILS);
+        }
+
+        public function includeStyleAdminTransactionDetails() {
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS);
         }
 
         public function localizeSettingsScript($translations) {

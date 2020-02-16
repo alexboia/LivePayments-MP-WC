@@ -72,6 +72,8 @@ namespace LvdWcMc {
 
         private $_processedAmount;
 
+        private $_currency;
+
         private $_panMasked;
 
         private $_timestampInitiated;
@@ -88,12 +90,13 @@ namespace LvdWcMc {
             $this->_orderUserId = $data['tx_order_user_id'];
             $this->_provider = $data['tx_provider'];
             $this->_transactionId = $data['tx_transaction_id'];
-            $this->_providerTransactionId = $data['tx_provided_transaction_id'];
+            $this->_providerTransactionId = $data['tx_provider_transaction_id'];
             $this->_status = $data['tx_status'];
             $this->_errorCode = $data['tx_error_code'];
             $this->_errorMessage = $data['tx_error_message'];
             $this->_amount = $data['tx_amount'];
             $this->_processedAmount = $data['tx_processed_amount'];
+            $this->_currency = $data['tx_currency'];
             $this->_panMasked = $data['tx_pan_masked'];
             $this->_timestampInitiated = $data['tx_timestamp_initiated'];
             $this->_timestampLastUpdated = $data['tx_timestamp_last_updated'];
@@ -113,6 +116,7 @@ namespace LvdWcMc {
                 'tx_error_message' => $this->_errorMessage,
                 'tx_amount' => $this->_amount,
                 'tx_processed_amount' => $this->_processedAmount,
+                'tx_currency' => $this->_currency,
                 'tx_pan_masked' => $this->_panMasked,
                 'tx_timestamp_initiated' => $this->_timestampInitiated,
                 'tx_timestamp_last_updated' => $this->_timestampLastUpdated,
@@ -302,6 +306,10 @@ namespace LvdWcMc {
 
         public function getProcessedAmount() {
             return $this->_processedAmount;
+        }
+
+        public function getCurrency() {
+            return $this->_currency;
         }
 
         public function getPANMasked() {
