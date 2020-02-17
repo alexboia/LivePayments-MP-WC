@@ -35,7 +35,7 @@
 <table class="lvdwcmc-admin-transaction-details-list">
     <tbody>
         <tr>
-            <th scope="row"><?php echo __('Transaction id', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+            <th scope="row"><?php echo __('Transaction Id', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
             <td><?php echo $data->providerTransactionId; ?></td>
         </tr>
         <tr>
@@ -53,6 +53,10 @@
         <tr>
             <th scope="row"><?php echo __('Actually processed amount', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
             <td><?php echo $data->processedAmount; ?> <?php echo $data->currency; ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?php echo __('Date initiated', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+            <td><?php echo $data->timestampInitiated; ?></td>
         </tr>
         <tr>
             <th scope="row"><?php echo __('Date of last activity', LVD_WCMC_TEXT_DOMAIN); ?>:</th>

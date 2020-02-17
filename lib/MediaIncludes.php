@@ -213,6 +213,11 @@
             $this->_enqueueStyle(self::STYLE_LVDWCMC_SETTINGS);
         }
 
+        public function includeStyleAdminTransactionListing() {
+            wp_enqueue_style('woocommerce_admin_styles');
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
+        }
+
         public function includeStyleFrontendTransactionDetails() {
             $this->_enqueueStyle(self::STYLE_LVDWCMC_FRONTEND_TRANSACTION_DETAILS);
         }

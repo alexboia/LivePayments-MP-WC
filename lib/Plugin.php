@@ -116,10 +116,11 @@ namespace LvdWcMc {
             add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
             add_action('init', array($this, 'onPluginsInit'));
             
-            add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueStyles'));
-            add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'));
+            add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueStyles'), 9999);
+            add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'), 9999);
 
             add_action('add_meta_boxes', array($this, 'onRegisterMetaboxes'), 10, 2);
+            add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
 
             add_shortcode('lvdwcmc_display_mobilpay_order_status', array($this->_shortcodes, 'displayMobilpayOrderStatus'));
         }
@@ -183,8 +184,19 @@ namespace LvdWcMc {
             return $methods;
         }
 
+        public function onAddAdminMenuEntries() {
+            if (current_user_can('manage_woocommerce')) {
+                add_submenu_page('woocommerce', 
+                    $this->__('Payment transactions'), 
+                    $this->__('Payment transactions'), 
+                    'manage_woocommerce', 
+                    'lvdwcmc-card-transactions-listing',
+                    array($this, 'showAdminTransactionsListing'));
+            }
+        }
+
         public function onFrontendEnqueueStyles() {
-            if (is_wc_endpoint_url('view-order')) {
+            if ($this->_env->isViewingFrontendWcOrder()) {
                 $this->_mediaIncludes->includeStyleFrontendTransactionDetails();
             }
         }
@@ -193,10 +205,14 @@ namespace LvdWcMc {
             if ($this->_env->isEditingWcOrder()) {
                 $this->_mediaIncludes->includeStyleAdminTransactionDetails();
             }
+
+            if ($this->_env->isViewingAdminTransactionListing()) {
+                $this->_mediaIncludes->includeStyleAdminTransactionListing();
+            }
         }
 
         public function addTransactionDetailsOnAccountOrderDetails(\WC_Order $order) {
-            if (is_wc_endpoint_url('view-order')) {
+            if ($this->_env->isViewingFrontendWcOrder()) {
                 $data = $this->_getDisplayableTransactionDetails($order);
                 if ($data != null) {
                     require $this->_env->getViewFilePath('lvdwcmc-mobilpay-frontend-transaction-details.php');
@@ -211,7 +227,7 @@ namespace LvdWcMc {
                     array($this, 'addTransactionDetailsOnAdminOrderDetails'), 
                     'shop_order', 
                     'side', 
-                    'low');
+                    'default');
             }
         }
 
@@ -223,6 +239,49 @@ namespace LvdWcMc {
                     require $this->_env->getViewFilePath('lvdwcmc-mobilpay-admin-transaction-details.php');
                 }
             }
+        }
+
+        public function showAdminTransactionsListing() {
+            if (!current_user_can('manage_woocommerce')) {
+                die;
+            }
+
+            $db = $this->_env->getDb();
+
+            $db->join($this->_env->getPostsTableName() . ' wp', 'wp.ID = tx.tx_order_id', 'LEFT');
+
+            $db->orderBy('tx_timestamp_last_updated', 'DESC');
+            $db->orderBy('tx_timestamp_initiated', 'DESC');
+
+            $transactions = $db->get($this->_env->getPaymentTransactionsTableName() . ' tx', 
+                null, 
+                'tx.*, wp.post_title tx_title') ;
+
+            foreach ($transactions as &$tx) {
+                $tx['tx_title_full'] = '#' 
+                    . $tx['tx_order_id'] . ' ' 
+                    . $tx['tx_title'];
+
+                $tx['tx_admin_details_link'] = get_edit_post_link($tx['tx_order_id']);
+
+                $tx['tx_timestamp_initiated_formatted'] = 
+                    $this->_formatTransactionTimestamp($tx['tx_timestamp_initiated']);
+                $tx['tx_timestamp_last_updated_formatted'] = 
+                    $this->_formatTransactionTimestamp($tx['tx_timestamp_last_updated']);
+                $tx['tx_amount_formatted'] = 
+                    $this->_formatTransactionAmount($tx['tx_amount']) . ' ' . $tx['tx_currency'];
+                $tx['tx_processed_amount_formatted'] = 
+                    $this->_formatTransactionAmount($tx['tx_processed_amount']) . ' ' . $tx['tx_currency'];
+                $tx['tx_status_formatted'] = 
+                    $this->_getTransactionStatusLabel($tx['tx_status']);
+            }
+
+            $data = new \stdClass();
+            $data->pageTitle = get_admin_page_title();
+            $data->transactions = $transactions;
+            $data->hasTransactions = !empty($transactions);
+
+            require $this->_env->getViewFilePath('lvdwcmc-mobilpay-admin-transactions-listing.php');
         }
 
         public function isActive() {
@@ -244,27 +303,17 @@ namespace LvdWcMc {
         private function _getDisplayableTransactionDetails(\WC_Order $order) {
             $transaction = $this->_transactionFactory->existingFromOrder($order);
             if ($transaction != null) {
-                $timestampLastUpdated = date_create_from_format('Y-m-d H:i:s', 
-                    $transaction->getTimestampLastUpdated());
-                
                 $data = new \stdClass();
                 $data->providerTransactionId = $transaction->getProviderTransactionId();
                 $data->status = $this->_getTransactionStatusLabel($transaction->getStatus());
                 $data->panMasked = $transaction->getPANMasked();
                 
-                $data->amount = number_format($transaction->getAmount(), 
-                    wc_get_price_decimals(), 
-                    wc_get_price_decimal_separator(), 
-                    wc_get_price_thousand_separator());
-
-                $data->processedAmount = number_format($transaction->getProcessedAmount(), 
-                    wc_get_price_decimals(), 
-                    wc_get_price_decimal_separator(), 
-                    wc_get_price_thousand_separator());
-
+                $data->amount = $this->_formatTransactionAmount($transaction->getAmount());
+                $data->processedAmount = $this->_formatTransactionAmount($transaction->getProcessedAmount());
                 $data->currency = $transaction->getCurrency();
                 
-                $data->timestampLastUpdated = $timestampLastUpdated->format($this->_getFullDateTimeFormat());
+                $data->timestampInitiated = $this->_formatTransactionTimestamp($transaction->getTimestampInitiated());
+                $data->timestampLastUpdated = $this->_formatTransactionTimestamp($transaction->getTimestampLastUpdated());
                 $data->errorCode = $transaction->getErrorCode();
                 $data->errorMessage = $transaction->getErrorMessage();
 
@@ -286,6 +335,20 @@ namespace LvdWcMc {
             );
 
             return isset($labelsForCodes[$status]) ? $labelsForCodes[$status] : '-';
+        }
+
+        private function _formatTransactionAmount($amount) {
+            return number_format($amount, 
+                    wc_get_price_decimals(), 
+                    wc_get_price_decimal_separator(), 
+                    wc_get_price_thousand_separator());
+        }
+
+        private function _formatTransactionTimestamp($strTimestamp) {
+            $timestamp = date_create_from_format('Y-m-d H:i:s', $strTimestamp);
+            return !empty($timestamp) 
+                ? $timestamp->format($this->_getFullDateTimeFormat()) 
+                : null;
         }
 
         private function _getFullDateTimeFormat() {

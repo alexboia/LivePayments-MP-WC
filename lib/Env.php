@@ -130,6 +130,10 @@ namespace LvdWcMc {
             }
         }
 
+        public function isViewingFrontendWcOrder() {
+            return is_wc_endpoint_url('view-order');
+        }
+
         public function isEditingWcOrder() {
             if ($this->getCurrentPage() == 'post.php' && !empty($_GET['post'])) {
                 $order = wc_get_order(intval($_GET['post']));
@@ -137,6 +141,12 @@ namespace LvdWcMc {
             } else {
                 return false;
             }
+        }
+
+        public function isViewingAdminTransactionListing() {
+            return $this->getCurrentPage() == 'admin.php' 
+                && isset($_GET['page']) 
+                && $_GET['page'] == 'lvdwcmc-card-transactions-listing';
         }
 
         public function getCurrentPage() {
@@ -199,6 +209,10 @@ namespace LvdWcMc {
 
         public function getPaymentTransactionsTableName() {
             return $this->_paymentTransactionsTable;
+        }
+
+        public function getPostsTableName() {
+            return $this->_dbTablePrefix . 'posts';
         }
 
         public function getViewFilePath($viewFile) {

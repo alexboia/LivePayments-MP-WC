@@ -38,9 +38,13 @@
  }
 
  table.lvdwcmc-admin-transaction-details-list th, td {
-    padding: 5px;
+    padding: 8px;
  }
 
  table.lvdwcmc-admin-transaction-details-list tr:nth-child(2n+1) {
     background-color: #f8f8f8;
+ }
+
+ table.lvdwcmc-admin-transaction-details-list tr:hover {
+    background-color: #a7cedc;
  }

@@ -44,3 +44,57 @@
     height: 100%;
     overflow: hidden;
 }
+
+.lvdwcmc-page-container {
+    margin-right: 20px;
+}
+
+.lvdwcmc-admin-notice {
+    display: block;
+    line-height: 19px;
+    padding: 11px 15px;
+    font-size: 14px;
+    text-align: left;
+    margin-top: 15px;
+    background-color:#fff;
+    border-left: 4px solid #ffba00;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+}
+
+table.lvdwcmc-tx-listing td,
+table.lvdwcmc-tx-listing th {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+td.lvdwcmc-order-id-column,
+th.lvdwcmc-order-id-column {
+    width: 15%;
+}
+
+.lvdwcmc-tx-status {
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.lvdwcmc-tx-status.credit,
+.lvdwcmc-tx-status.canceled {
+    background-color: #e5e5e5;
+}
+
+.lvdwcmc-tx-status.new,
+.lvdwcmc-tx-status.confirmed_pending,
+.lvdwcmc-tx-status.paid_pending {
+    background-color: #c6e1c6;
+    color: #5b841b;
+}
+
+.lvdwcmc-tx-status.confirmed {
+    background-color: #c8d7e1;
+    color: #2e4453;
+}
+
+.lvdwcmc-tx-status.failed {
+    background-color: #eba3a3;
+    color: #761919;
+}
