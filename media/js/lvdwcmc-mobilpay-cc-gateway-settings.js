@@ -164,7 +164,7 @@
 
     function _renderFileRemovalControl(assetId) {
         if (_tplAssetFileExists == null) {
-            _tplAssetFileExists = kite('#lvdwcaf-tpl-asset-file-removal');
+            _tplAssetFileExists = kite('#lvdwcmc-tpl-asset-file-removal');
         }
         return _tplAssetFileExists({
             assetId: assetId
@@ -173,7 +173,7 @@
 
     function _renderFileUploadControl(assetId) {
         if (_tplAssetFileMissing == null) {
-            _tplAssetFileMissing = kite('#lvdwcaf-tpl-asset-file-upload');
+            _tplAssetFileMissing = kite('#lvdwcmc-tpl-asset-file-upload');
         }
         return _tplAssetFileMissing({
             assetId: assetId

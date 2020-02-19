@@ -296,7 +296,7 @@ namespace LvdWcMc {
             $data->uploadChunkSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE;
             $data->uploadKey = LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY;
 
-            require $this->_env->getViewFilePath('lvdwcmc-mobilpay-cc-gateway-settings-js.php');
+            require $this->_env->getViewFilePath('lvdwcmc-gateway-settings-js.php');
             return ob_get_clean();
         }
 
@@ -328,7 +328,7 @@ namespace LvdWcMc {
             $data->fieldInfo = $fieldInfo;
 
             ob_start();
-            require $this->_env->getViewFilePath('lvdwcmc-mobilpay-cc-gateway-upload-asset-field.php');
+            require $this->_env->getViewFilePath('lvdwcmc-gateway-upload-asset-field.php');
             return ob_get_clean();
         }
 
@@ -501,7 +501,7 @@ namespace LvdWcMc {
                 $data->success = false;
             }
 
-            require $this->_env->getViewFilePath('lvdwcmc-mobilpay-payment-form.php');
+            require $this->_env->getViewFilePath('lvdwcmc-payment-form.php');
         }
 
         public function process_gateway_response() {
@@ -586,7 +586,7 @@ namespace LvdWcMc {
                     $data->mobilpayTransactionId = $transaction->getProviderTransactionId();
                     $data->success = true;
 
-                    require $this->_env->getViewFilePath('lvdwcmc-mobilpay-email-transaction-details.php');
+                    require $this->_env->getViewFilePath('lvdwcmc-email-transaction-details.php');
                 }
             }
         }

@@ -149,6 +149,10 @@ namespace LvdWcMc {
                 && $_GET['page'] == 'lvdwcmc-card-transactions-listing';
         }
 
+        public function isViewingWpDashboard() {
+            return is_admin() && $this->getCurrentPage() == 'index.php';
+        }
+
         public function getCurrentPage() {
             return isset($GLOBALS['pagenow']) 
                 ? strtolower($GLOBALS['pagenow']) 

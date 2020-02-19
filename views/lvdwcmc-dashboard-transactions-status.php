@@ -29,22 +29,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- define('LVD_WCMC_LOADED', true);
- define('LVD_WCMC_PLUGIN_ID', 'lvd_wc_mc');
- define('LVD_WCMC_VERSION', '0.1.0');
- define('LVD_WCMC_HEADER', __FILE__);
- define('LVD_WCMC_FUNCTIONS', __DIR__ . DIRECTORY_SEPARATOR . 'wc-mobilpayments-card-plugin-functions.php');
- define('LVD_WCMC_MAIN', __DIR__ . DIRECTORY_SEPARATOR .  'wc-mobilpayments-card-plugin-main.php');
- define('LVD_WCMC_ROOT_DIR', __DIR__);
- define('LVD_WCMC_LIB_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'lib');
- define('LVD_WCMC_LIB_3RDPARTY_DIR', LVD_WCMC_LIB_DIR . DIRECTORY_SEPARATOR . '3rdParty');
- define('LVD_WCMC_VIEWS_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'views');
- define('LVD_WCMC_LANG_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'lang');
- define('LVD_WCMC_DATA_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'data');
- define('LVD_WCMC_TEXT_DOMAIN', 'wc-mobilpayments-card');
-
-define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY', 'payment_asset_file');
-define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE', 102400);
-define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE', max(wp_max_upload_size(), 10485760));
-
-define('LVD_WCMC_RECORDS_PER_PAGE', 25);
+    defined('LVD_WCMC_LOADED') or die;
+?>
+<?php if ($data->success): ?>
+    <ul class="lvdwcmc-dashboard-transaction-status">
+        <?php foreach ($data->status as $status => $data): ?>
+            <li class="<?php echo $status; ?>">
+                <span class="lvdwcmc-status-count"><?php echo $data['count'] ?></span>
+                <h5 class="lvdwcmc-status-label"><?php echo $data['label'] ?></h5>
+                <div class="lvdwcmc-clear"></div>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>

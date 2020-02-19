@@ -323,5 +323,9 @@ namespace LvdWcMc {
         public function getTimestampLastUpdated() {
             return $this->_timestampLastUpdated;
         }
+
+        public function getIpAddress() {
+            return $this->_ipAddress;
+        }
     }
 }

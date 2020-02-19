@@ -52,7 +52,7 @@ namespace LvdWcMc {
                     $data->orderStatus = $order->get_status();
                     $data->order = $order;
         
-                    require $this->_env->getViewFilePath('lvdwcmc-mobilpay-payment-status.php');
+                    require $this->_env->getViewFilePath('lvdwcmc-payment-status.php');
                 }
             }
         }

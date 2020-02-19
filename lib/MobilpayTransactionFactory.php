@@ -98,7 +98,7 @@
 
         public function fromTransactionId($transactionId) {
             $db = $this->_getDb();
-            $db->where('tx_transaction_id', $transactionId);
+            $db->where('tx_id', $transactionId);
 
             $data = $db->getOne($this->_env->getPaymentTransactionsTableName());
 

@@ -33,6 +33,10 @@
     padding-right: 4px;
  }
 
+ table.lvdwcmc-admin-transaction-details-list {
+    width: 100%;
+ }
+
  table.lvdwcmc-admin-transaction-details-list th {
     text-align: left;
  }

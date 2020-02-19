@@ -72,5 +72,11 @@
                 <td><?php echo $data->errorMessage; ?></td>
             </tr>
         <?php endif; ?>
+        <?php if (!empty($data->clientIpAddress)): ?>
+            <tr>
+                <th scope="row"><?php echo __('Client IP Address', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                <td><?php echo $data->clientIpAddress; ?></td>
+            </tr>
+        <?php endif; ?>
     </tbody>
 </table>

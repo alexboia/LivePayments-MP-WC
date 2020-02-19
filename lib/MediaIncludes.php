@@ -43,9 +43,13 @@
 
         const JS_TOASTR = 'toastr';
 
+        const JS_URIJS = 'urijs';
+
         const JS_LVDWCMC_COMMON = 'lvdwcmc-common-js';
 
         const JS_LVDWCMC_SETTINGS = 'lvdwcmc-mobilpay-cc-gateway-settings-js';
+
+        const JS_LVDWCMC_TRANSACTION_LISTING = 'lvdwcmc-transaction-listing-js';
 
         const STYLE_TOASTR = 'toastr-css';
 
@@ -56,6 +60,8 @@
         const STYLE_LVDWCMC_FRONTEND_TRANSACTION_DETAILS = 'lvdwcmc-frontend-transaction-details-css';
 
         const STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc-admin-transaction-details-css';
+
+        const STYLE_LVDWCMC_DASHBOARD = 'lvdwcmc-dashboard-css';
 
         private $_refPluginsPath;
 
@@ -71,7 +77,7 @@
                 'version' => LVD_WCMC_VERSION
             ),
             self::STYLE_LVDWCMC_SETTINGS => array(
-                'path' => 'media/css/lvdwcmc-mobilpay-cc-gateway-settings.css',
+                'path' => 'media/css/lvdwcmc-cc-gateway-settings.css',
                 'version' => LVD_WCMC_VERSION,
                 'deps' => array(
                     self::STYLE_TOASTR,
@@ -85,10 +91,18 @@
             self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS => array(
                 'path' => 'media/css/lvdwcmc-admin-transaction-details.css',
                 'version' => LVD_WCMC_VERSION
+            ),
+            self::STYLE_LVDWCMC_DASHBOARD => array(
+                'path' => 'media/css/lvdwcmc-dashboards.css',
+                'version' => LVD_WCMC_VERSION
             )
         );
 
         private $_scripts = array(
+            self::JS_URIJS => array(
+                'path' => 'media/js/3rdParty/urijs/URI.js', 
+                'version' => '1.19.2'
+            ),
             self::JS_JQUERY_BLOCKUI => array(
                 'path' => 'media/js/3rdParty/jquery.blockUI.js', 
                 'version' => '2.66',
@@ -120,6 +134,16 @@
                     self::JS_JQUERY,
                     self::JS_MOXIE,
                     self::JS_PLUPLOAD,
+                    self::JS_TOASTR
+                )
+            ),
+            self::JS_LVDWCMC_TRANSACTION_LISTING => array(
+                'path' => 'media/js/lvdwcmc-transaction-listing.js',
+                'version' => LVD_WCMC_VERSION,
+                'deps' => array(
+                    self::JS_LVDWCMC_COMMON,
+                    self::JS_JQUERY,
+                    self::JS_URIJS,
                     self::JS_TOASTR
                 )
             )
@@ -203,6 +227,16 @@
             $this->_enqueueScript(self::JS_LVDWCMC_SETTINGS);
         }
 
+        public function includeScriptTransactionListing() {
+            $this->_enqueueScript(self::JS_JQUERY);
+            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
+            $this->_enqueueScript(self::JS_URIJS);
+            $this->_enqueueScript(self::JS_TOASTR);
+            $this->_enqueueScript(self::JS_KITE_JS);
+            $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
+            $this->_enqueueScript(self::JS_LVDWCMC_TRANSACTION_LISTING);
+        }
+
         public function includeStyleCommon() {
             $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
         }
@@ -216,6 +250,7 @@
         public function includeStyleAdminTransactionListing() {
             wp_enqueue_style('woocommerce_admin_styles');
             $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS);
         }
 
         public function includeStyleFrontendTransactionDetails() {
@@ -224,6 +259,11 @@
 
         public function includeStyleAdminTransactionDetails() {
             $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS);
+        }
+
+        public function includeStyleDashboard() {
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_DASHBOARD);
         }
 
         public function localizeSettingsScript($translations) {

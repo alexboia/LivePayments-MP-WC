@@ -57,6 +57,18 @@ function lvdwcmc_plugin() {
    return $plugin;
 }
 
+function lvdwcmc_get_ajax_response($additionalProps = array()) {
+	$response = new stdClass();
+	$response->success = false;
+	$response->message = null;
+
+	foreach ($additionalProps as $key => $value) {
+		$response->$key = $value;
+	}
+
+	return $response;
+}
+
 function lvdwcmc_append_error($message, $error) {
 	if (defined('WP_DEBUG') && WP_DEBUG) {
 		if ($error instanceof \Exception) {
