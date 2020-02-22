@@ -45,12 +45,12 @@
         <table id="lvdwcmc-tx-listing" class="wp-list-table widefat fixed striped posts lvdwcmc-tx-listing">
             <thead>
                 <tr>
-                    <th class="lvdwcmc-order-id-column"><?php echo __('Order Id', LVD_WCMC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Date initiated', LVD_WCMC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Status', LVD_WCMC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Amount', LVD_WCMC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Processed amount', LVD_WCMC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Actions', LVD_WCMC_TEXT_DOMAIN); ?></th>
+                    <th class="lvdwcmc-order-id-column"><?php echo esc_html__('Order Id', 'wc-mobilpayments-card'); ?></th>
+                    <th><?php echo esc_html__('Date initiated', 'wc-mobilpayments-card'); ?></th>
+                    <th><?php echo esc_html__('Status', 'wc-mobilpayments-card'); ?></th>
+                    <th><?php echo esc_html__('Amount', 'wc-mobilpayments-card'); ?></th>
+                    <th><?php echo esc_html__('Processed amount', 'wc-mobilpayments-card'); ?></th>
+                    <th><?php echo esc_html__('Actions', 'wc-mobilpayments-card'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -58,7 +58,7 @@
                     <tr>
                         <td class="lvdwcmc-order-id-column">
                             <a href="<?php echo esc_url($tx['tx_admin_details_link']); ?>" target="_blank">
-                                <?php echo $tx['tx_title_full']; ?>
+                                <?php echo esc_html($tx['tx_title_full']); ?>
                             </a>
                         </td>
                         <td><?php echo esc_html($tx['tx_timestamp_initiated_formatted']); ?></td>
@@ -68,7 +68,7 @@
                         <td><?php echo esc_html($tx['tx_amount_formatted']); ?></td>
                         <td><?php echo esc_html($tx['tx_processed_amount_formatted']); ?></td>
                         <td>
-                            <a href="javascript:void(0)" class="lvdwcmc-tx-action" data-transactionId="<?php echo esc_attr($tx['tx_id']); ?>">View details</a>
+                            <a href="javascript:void(0)" class="lvdwcmc-tx-action" data-transactionId="<?php echo esc_attr($tx['tx_id']); ?>"><?php echo esc_html__('Details', 'wc-mobilpayments-card'); ?></a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -79,15 +79,15 @@
             <?php echo paginate_links(array(
                 'base' => add_query_arg('page_num', '%#%'),
                 'format' => '',
-                'prev_text' => __('&laquo;', LVD_WCMC_TEXT_DOMAIN),
-                'next_text' => __('&raquo;', LVD_WCMC_TEXT_DOMAIN),
+                'prev_text' => __('&laquo;', 'wc-mobilpayments-card'),
+                'next_text' => __('&raquo;', 'wc-mobilpayments-card'),
                 'total' => $data->totalPages,
                 'current' => $data->currentPage
             )); ?>
         </div>
     <?php else: ?>
         <div class="lvdwcmc-admin-notice">
-            <?php echo __('There are no transactions matching your criteria', LVD_WCMC_TEXT_DOMAIN); ?>
+            <?php echo esc_html__('There are no transactions matching your criteria', 'wc-mobilpayments-card'); ?>
         </div>
     <?php endif; ?>
 </div>
@@ -95,52 +95,52 @@
 <script id="lvdwcmc-tpl-transaction-details" type="text/x-kite">
     <div class="lvdwcmc-admin-transaction-details-wnd">
         <div class="lvdwcmc-admin-transaction-details-wnd-header">
-            <h3><?php echo __('Transaction details', LVD_WCMC_TEXT_DOMAIN); ?></h3>
+            <h3><?php echo esc_html__('Transaction details', 'wc-mobilpayments-card'); ?></h3>
         </div>
         <div class="lvdwcmc-admin-transaction-details-wnd-content">
             <table class="lvdwcmc-admin-transaction-details-list">
                 <tbody>
                     <tr>
-                        <th scope="row"><?php echo __('Transaction Id', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card'); ?>:</th>
                         <td>{{transaction.providerTransactionId}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo __('Transaction status', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Transaction status', 'wc-mobilpayments-card'); ?>:</th>
                         <td>{{transaction.status}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo __('Card number', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Card number', 'wc-mobilpayments-card'); ?>:</th>
                         <td>{{transaction.panMasked}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo __('Original amount', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Original amount', 'wc-mobilpayments-card'); ?>:</th>
                         <td>{{transaction.amount}} {{transaction.currency}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo __('Actually processed amount', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Actually processed amount', 'wc-mobilpayments-card'); ?>:</th>
                         <td>{{transaction.processedAmount}} {{transaction.currency}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo __('Date initiated', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Date initiated', 'wc-mobilpayments-card'); ?>:</th>
                         <td>{{transaction.timestampInitiated}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo __('Date of last activity', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Date of last activity', 'wc-mobilpayments-card'); ?>:</th>
                         <td>{{transaction.timestampLastUpdated}}</td>
                     </tr>
                     {{? transaction.errorCode > 0 }}
                         <tr>
-                            <th scope="row"><?php echo __('Transaction error code', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                            <th scope="row"><?php echo esc_html__('Transaction error code', 'wc-mobilpayments-card'); ?>:</th>
                             <td>{{transaction.errorCode}}</td>
                         </tr>
                         <tr>
-                            <th scope="row"><?php echo __('Transaction error message', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                            <th scope="row"><?php echo esc_html__('Transaction error message', 'wc-mobilpayments-card'); ?>:</th>
                             <td>{{transaction.errorMessage}}</td>
                         </tr>
                     {{/?}}
                     {{? transaction.clientIpAddress }}
                         <tr>
-                            <th scope="row"><?php echo __('Client IP Address', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
+                            <th scope="row"><?php echo esc_html__('Client IP Address', 'wc-mobilpayments-card'); ?>:</th>
                             <td>{{transaction.clientIpAddress}}</td>
                         </tr>
                     {{/?}}
@@ -150,7 +150,7 @@
         <div class="lvdwcmc-admin-transaction-details-wnd-footer">
             <a href="javascript:void(0)" 
                 id="lvdwcmc-admin-transaction-details-close" 
-                class="lvdwcmc-generic-close-btn"><?php echo __('Close',LVD_WCMC_TEXT_DOMAIN); ?></a>
+                class="lvdwcmc-generic-close-btn"><?php echo esc_html__('Close', 'wc-mobilpayments-card'); ?></a>
             <div class="lvdwcmc-clear"></div>
         </div>
     </div>

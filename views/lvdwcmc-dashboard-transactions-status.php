@@ -34,9 +34,9 @@
 <?php if ($data->success): ?>
     <ul class="lvdwcmc-dashboard-transaction-status">
         <?php foreach ($data->status as $status => $data): ?>
-            <li class="<?php echo $status; ?>">
-                <span class="lvdwcmc-status-count"><?php echo $data['count'] ?></span>
-                <h5 class="lvdwcmc-status-label"><?php echo $data['label'] ?></h5>
+            <li class="<?php echo esc_attr($status); ?>">
+                <span class="lvdwcmc-status-count"><?php echo esc_html($data['count']); ?></span>
+                <h5 class="lvdwcmc-status-label"><?php echo esc_html($data['label']); ?></h5>
                 <div class="lvdwcmc-clear"></div>
             </li>
         <?php endforeach; ?>

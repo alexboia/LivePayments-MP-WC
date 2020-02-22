@@ -32,45 +32,45 @@
     defined('LVD_WCMC_LOADED') or die;
 ?>
 
-<h2 class="woocommerce-order-details__title"><?php echo __('Payment transaction details', LVD_WCMC_TEXT_DOMAIN); ?></h2>
+<h2 class="woocommerce-order-details__title"><?php echo esc_html__('Payment transaction details', 'wc-mobilpayments-card'); ?></h2>
 <table class="woocommerce-table woocommerce-table--mobilpay-transaction-details shop_table order_details transaction_details">
     <tbody>
         <tr>
-            <th scope="row"><?php echo __('Transaction Id', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-            <td><?php echo $data->providerTransactionId; ?></td>
+            <th scope="row"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card'); ?>:</th>
+            <td><?php echo esc_html($data->providerTransactionId); ?></td>
         </tr>
         <tr>
-            <th scope="row"><?php echo __('Transaction status', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-            <td><?php echo $data->status; ?></td>
+            <th scope="row"><?php echo esc_html__('Transaction status', 'wc-mobilpayments-card'); ?>:</th>
+            <td><?php echo esc_html($data->status); ?></td>
         </tr>
         <tr>
-            <th scope="row"><?php echo __('Card number', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-            <td><?php echo $data->panMasked; ?></td>
+            <th scope="row"><?php echo esc_html__('Card number', 'wc-mobilpayments-card'); ?>:</th>
+            <td><?php echo esc_html($data->panMasked); ?></td>
         </tr>
         <tr>
-            <th scope="row"><?php echo __('Original amount', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-            <td><?php echo $data->amount; ?> <?php echo $data->currency; ?></td>
+            <th scope="row"><?php echo esc_html__('Original amount', 'wc-mobilpayments-card'); ?>:</th>
+            <td><?php echo esc_html($data->amount); ?> <?php echo $data->currency; ?></td>
         </tr>
         <tr>
-            <th scope="row"><?php echo __('Actually processed amount', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-            <td><?php echo $data->processedAmount; ?> <?php echo $data->currency; ?></td>
+            <th scope="row"><?php echo esc_html__('Actually processed amount', 'wc-mobilpayments-card'); ?>:</th>
+            <td><?php echo esc_html($data->processedAmount); ?> <?php echo $data->currency; ?></td>
         </tr>
         <tr>
-            <th scope="row"><?php echo __('Date initiated', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-            <td><?php echo $data->timestampInitiated; ?></td>
+            <th scope="row"><?php echo esc_html__('Date initiated', 'wc-mobilpayments-card'); ?>:</th>
+            <td><?php echo esc_html($data->timestampInitiated); ?></td>
         </tr>
         <tr>
-            <th scope="row"><?php echo __('Date of last activity', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-            <td><?php echo $data->timestampLastUpdated; ?></td>
+            <th scope="row"><?php echo esc_html__('Date of last activity', 'wc-mobilpayments-card'); ?>:</th>
+            <td><?php echo esc_html($data->timestampLastUpdated); ?></td>
         </tr>
         <?php if (!empty($data->errorCode)): ?>
             <tr>
-                <th scope="row"><?php echo __('Transaction error code', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-                <td><?php echo $data->errorCode; ?></td>
+                <th scope="row"><?php echo esc_html__('Transaction error code', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->errorCode); ?></td>
             </tr>
             <tr>
-                <th scope="row"><?php echo __('Transaction error message', LVD_WCMC_TEXT_DOMAIN); ?>:</th>
-                <td><?php echo $data->errorMessage; ?></td>
+                <th scope="row"><?php echo esc_html__('Transaction error message', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->errorMessage); ?></td>
             </tr>
         <?php endif; ?>
     </tbody>

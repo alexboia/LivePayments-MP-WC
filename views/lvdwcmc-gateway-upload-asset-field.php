@@ -33,8 +33,8 @@
 
 <tr valign="top">
     <th scope="row" class="titledesc">
-        <label class="lvdwcmc-asset-label lvdwcmc-<?php echo $data->fieldInfo['environment'] ?>-asset-label">
-            <?php echo $data->fieldInfo['title']; ?>
+        <label class="lvdwcmc-asset-label lvdwcmc-<?php echo esc_attr($data->fieldInfo['environment']); ?>-asset-label">
+            <?php echo esc_html($data->fieldInfo['title']); ?>
             <?php if (!empty($data->fieldInfo['description'])): ?>
                 <?php echo $this->get_tooltip_html($data->fieldInfo); ?>
             <?php endif; ?>
@@ -42,16 +42,16 @@
     </th>
     <td class="forminp" id="<?php echo esc_attr($data->fieldId); ?>_asset_container">
         <?php if ($data->hasAsset): ?>
-            <span class="lvdwcmc-payment-asset-file-exists"><?php echo $this->__('The file has already been uploaded.'); ?></span>
+            <span class="lvdwcmc-payment-asset-file-exists"><?php echo esc_html__('The file has already been uploaded.', 'wc-mobilpayments-card'); ?></span>
             <a href="javascript:void(0);" 
                 id="<?php echo esc_attr($data->fieldId); ?>_file_removal"
                 data-asset-id="<?php echo esc_attr($data->fieldId); ?>"
-                class="lvdwcmc-payment-asset-file-removal"><?php echo $this->__('Remove') ?></a>
+                class="lvdwcmc-payment-asset-file-removal"><?php echo esc_html__('Remove', 'wc-mobilpayments-card'); ?></a>
         <?php else: ?>
             <a href="javascript:void(0);" 
                 id="<?php echo esc_attr($data->fieldId); ?>_file_selector"
                 data-asset-id="<?php echo esc_attr($data->fieldId); ?>"
-                class="lvdwcmc-payment-asset-file-selector"><?php echo $this->__('Chose a file from disk'); ?></a>
+                class="lvdwcmc-payment-asset-file-selector"><?php echo esc_html__('Chose a file from disk', 'wc-mobilpayments-card'); ?></a>
         <?php endif; ?>
     </td>
 </tr>

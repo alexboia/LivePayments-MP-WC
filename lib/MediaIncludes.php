@@ -130,21 +130,22 @@
                 'path' => 'media/js/lvdwcmc-mobilpay-cc-gateway-settings.js',
                 'version' => LVD_WCMC_VERSION,
                 'deps' => array(
-                    self::JS_LVDWCMC_COMMON,
                     self::JS_JQUERY,
                     self::JS_MOXIE,
                     self::JS_PLUPLOAD,
-                    self::JS_TOASTR
+                    self::JS_TOASTR,
+                    self::JS_URIJS,
+                    self::JS_LVDWCMC_COMMON
                 )
             ),
             self::JS_LVDWCMC_TRANSACTION_LISTING => array(
                 'path' => 'media/js/lvdwcmc-transaction-listing.js',
                 'version' => LVD_WCMC_VERSION,
                 'deps' => array(
-                    self::JS_LVDWCMC_COMMON,
                     self::JS_JQUERY,
                     self::JS_URIJS,
-                    self::JS_TOASTR
+                    self::JS_TOASTR,
+                    self::JS_LVDWCMC_COMMON
                 )
             )
         );
@@ -217,6 +218,7 @@
         }
 
         public function includeScriptSettings() {
+            $this->_enqueueScript(self::JS_URIJS);
             $this->_enqueueScript(self::JS_JQUERY);
             $this->_enqueueScript(self::JS_MOXIE);
             $this->_enqueueScript(self::JS_PLUPLOAD);
@@ -249,6 +251,7 @@
 
         public function includeStyleAdminTransactionListing() {
             wp_enqueue_style('woocommerce_admin_styles');
+            $this->_enqueueStyle(self::STYLE_TOASTR);
             $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
             $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS);
         }
@@ -269,6 +272,12 @@
         public function localizeSettingsScript($translations) {
             wp_localize_script(self::JS_LVDWCMC_SETTINGS, 
                 'lvdwcmcSettingsL10n', 
+    			$translations);
+        }
+
+        public function localizeTransactionListingScript($translations) {
+            wp_localize_script(self::JS_LVDWCMC_TRANSACTION_LISTING, 
+                'lvdwcmcTransactionsListL10n', 
     			$translations);
         }
     }

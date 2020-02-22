@@ -101,6 +101,10 @@ namespace LvdWcMc {
 
         private $_mobilpayAssetRemoveUrl = null;
 
+        private $_returnUrlGenerationApiDescriptor = null;
+
+        private $_returnUrlGenerationUrl = null;
+
         /**
          * @var WC_Logger The logger instance used by this gateway
          */
@@ -115,10 +119,10 @@ namespace LvdWcMc {
             $this->plugin_id = LVD_WCMC_PLUGIN_ID;
             $this->_logger = wc_get_logger();
 
-            $this->method_title = $this->__('MobilPay Card Gateway');
-            $this->method_description = $this->__('MobilPay Payment Gateway pentru WooCommerce');
+            $this->method_title = __('mobilPay&trade; Card Gateway', 'wc-mobilpayments-card');
+            $this->method_description = __('mobilPay&trade; Payment Gateway for WooCommerce', 'wc-mobilpayments-card');
             
-            $this->title = $this->__('MobilPay Card Gateway');
+            $this->title = __('mobilPay&trade; Card Gateway', 'wc-mobilpayments-card');
 
             $this->supports = array(
                 'products', 
@@ -140,6 +144,9 @@ namespace LvdWcMc {
             $this->_mobilpayAssetRemoveApiDescriptor = strtolower(self::GATEWAY_ID . '_payment_asset_remove');
             $this->_mobilpayAssetRemoveUrl = WC()->api_request_url($this->_mobilpayAssetRemoveApiDescriptor);
 
+            $this->_returnUrlGenerationApiDescriptor = strtolower(self::GATEWAY_ID . '_generate_return_url');
+            $this->_returnUrlGenerationUrl = WC()->api_request_url($this->_returnUrlGenerationApiDescriptor);
+
             add_action('woocommerce_api_' . $this->_apiDescriptor, array($this, 'process_gateway_response'), 10, 1);
             add_action('woocommerce_receipt_' . $this->id, array($this, 'show_payment_initiation'), 10, 1);
             add_action('woocommerce_email_after_order_table', array($this, 'add_transaction_details_to_email'), 10, 4);
@@ -147,9 +154,11 @@ namespace LvdWcMc {
             if (is_admin()) {
                 add_action('admin_enqueue_scripts', array($this, 'enqueue_form_scripts'));
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options'));
-                add_action('woocommerce_api_' . $this->_mobilpayAssetUploadApiDescriptor, array($this, 'process_payment_asset_upload'));
-                add_action('woocommerce_api_' . $this->_mobilpayAssetRemoveApiDescriptor, array($this, 'process_payment_asset_remove'));
             }
+
+            add_action('woocommerce_api_' . $this->_mobilpayAssetUploadApiDescriptor, array($this, 'process_payment_asset_upload'));
+            add_action('woocommerce_api_' . $this->_mobilpayAssetRemoveApiDescriptor, array($this, 'process_payment_asset_remove'));
+            add_action('woocommerce_api_' . $this->_returnUrlGenerationApiDescriptor, array($this, 'generate_return_url'));
 
             $this->init_form_fields();
             $this->init_settings();
@@ -203,50 +212,50 @@ namespace LvdWcMc {
 
             $this->_mobilpayEnvironment = $this->get_option('mobilpay_environment');
             $this->_mobilpayAccountId = $this->get_option('mobilpay_account_id');
-            $this->_mobilpayReturnUrl = $this->get_option('mobilapy_return_url');
+            $this->_mobilpayReturnUrl = $this->get_option('mobilpay_return_url');
         }
 
         public function init_form_fields() {
             $this->form_fields = array(
                 'enabled' => array(
-                    'title' => $this->__('Enable / Disable'),
-                    'label' => $this->__('Enable this payment gateway'),
+                    'title' => __('Enable / Disable', 'wc-mobilpayments-card'),
+                    'label' => __('Enable this payment gateway', 'wc-mobilpayments-card'),
                     'type' => 'checkbox',
                     'default' => 'no'
                 ),
                 'mobilpay_environment' => array(
-                    'title' => $this->__('MobilPay Sandbox / Test Mode'),
-                    'label' => $this->__('Enable Test Mode'),
+                    'title' => __('mobilPay&trade; Sandbox / Test Mode', 'wc-mobilpayments-card'),
+                    'label' => __('Enable Test Mode', 'wc-mobilpayments-card'),
                     'type' => 'checkbox',
-                    'description' => $this->__('Place the payment gateway in test mode.'),
+                    'description' => __('Place the payment gateway in test mode.', 'wc-mobilpayments-card'),
                     'default' => 'no'
                 ),
                 'title' => array(
-                    'title' => $this->__('Title'),
+                    'title' => __('Title', 'wc-mobilpayments-card'),
                     'type' => 'text',
-                    'desc_tip' => $this->__('Payment title the customer will see during the checkout process.'),
-                    'default' => $this->__('MobilPay')
+                    'desc_tip' => __('Payment title the customer will see during the checkout process.', 'wc-mobilpayments-card'),
+                    'default' => __('MobilPay', 'wc-mobilpayments-card')
                 ),
                 'description' => array(
-                    'title' => $this->__('Description'),
+                    'title' => __('Description', 'wc-mobilpayments-card'),
                     'type' => 'textarea',
-                    'desc_tip' => $this->__('Payment description the customer will see during the checkout process.'),
+                    'desc_tip' => __('Payment description the customer will see during the checkout process.', 'wc-mobilpayments-card'),
                     'css' => 'max-width:350px;'
                 ),
                 'mobilpay_account_id' => array(
-                    'title'	=> $this->__('Seller Account ID'),
+                    'title'	=> __('Seller Account ID', 'wc-mobilpayments-card'),
                     'type'	=> 'text',
-                    'description' => $this->__('This is Account ID provided by MobilPay when you signed up for an account. Unique key for your seller account for the payment process.')
+                    'description' => __('This is Account ID provided by MobilPay when you signed up for an account. Unique key for your seller account for the payment process.', 'wc-mobilpayments-card')
                 ),
-                'mobilapy_return_url' => array(
-                    'title'	=> $this->__('Return URL'),
-                    'type'	=> 'text',
-                    'description' => $this->__('You must create a new page and in the content field enter the shortcode [lvdwcmc_thank_you] so that the user can see the message that is returned by the Mobilpay server regarding their transaction. Or any content you want to thank for buying.'),
+                'mobilpay_return_url' => array(
+                    'title'	=> __('Return URL', 'wc-mobilpayments-card'),
+                    'type'	=> 'return_url',
+                    'description' => __('You must create a new page and in the content field enter the shortcode [lvdwcmc_display_mobilpay_order_status] so that the user can see the message that is returned by the Mobilpay server regarding their transaction. Or any content you want to thank for buying.', 'wc-mobilpayments-card'),
                     'desc_tip' => true
                 ),
                 'mobilpay_live_public_cert' => array(
-                    'title' => $this->__('mobilPay™ digital certificate for the live environment'),
-                    'description' => $this->__('The public key used for securing communication with the mobilPay™ gateway in the live environment.'),
+                    'title' => __('mobilPay&trade; digital certificate for the live environment', 'wc-mobilpayments-card'),
+                    'description' => __('The public key used for securing communication with the mobilPay&trade; gateway in the live environment.', 'wc-mobilpayments-card'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
@@ -254,8 +263,8 @@ namespace LvdWcMc {
                     '_file_format' => 'live.%s.public.cer'
                 ),
                 'mobilpay_live_private_key' => array(
-                    'title' => $this->__('The private key for the live environment'),
-                    'description' => $this->__('The private key used for securing communication with the mobilPay™ gateway in the live environment.'),
+                    'title' => __('The private key for the live environment', 'wc-mobilpayments-card'),
+                    'description' => __('The private key used for securing communication with the mobilPay&trade; gateway in the live environment.', 'wc-mobilpayments-card'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
@@ -263,8 +272,8 @@ namespace LvdWcMc {
                     '_file_format' => 'live.%s.private.key'
                 ),
                 'mobilpay_sandbox_public_cert' => array(
-                    'title' => $this->__('mobilPay™ digital certificate for the sandbox environment'),
-                    'description' => $this->__('The public key used for securing communication with the mobilPay™ gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).'),
+                    'title' => __('mobilPay&trade; digital certificate for the sandbox environment', 'wc-mobilpayments-card'),
+                    'description' => __('The public key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).', 'wc-mobilpayments-card'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
@@ -272,8 +281,8 @@ namespace LvdWcMc {
                     '_file_format' => 'sandbox.%s.public.cer'
                 ),
                 'mobilpay_sandbox_private_key' => array(
-                    'title' => $this->__('The private key for the sandbox environment'),
-                    'description' => $this->__('The private key used for securing communication with the mobilPay™ gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).'),
+                    'title' => __('The private key for the sandbox environment', 'wc-mobilpayments-card'),
+                    'description' => __('The private key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).', 'wc-mobilpayments-card'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
@@ -291,6 +300,9 @@ namespace LvdWcMc {
 
             $data->removePaymentAssetUrl = $this->_mobilpayAssetRemoveUrl;
             $data->removePaymentAssetNonce = wp_create_nonce($this->_mobilpayAssetRemoveApiDescriptor);
+
+            $data->returnUrlGenerationUrl = $this->_returnUrlGenerationUrl;
+            $data->returnUrlGenerationNonce = wp_create_nonce($this->_returnUrlGenerationApiDescriptor);
 
             $data->uploadMaxFileSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE;
             $data->uploadChunkSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE;
@@ -334,6 +346,31 @@ namespace LvdWcMc {
 
         public function generate_mobilpay_asset_upload_html($fieldId, $fieldInfo) {
             return $this->_renderPaymentAssetUploadField($fieldId, $fieldInfo);
+        }
+
+        private function _renderReturnUrlField($fieldId, $fieldInfo) {
+            $data = new \stdClass();
+            $data->fieldId = $fieldId;
+            $data->fieldInfo = $fieldInfo;
+            $data->returnUrl = $this->_mobilpayReturnUrl;
+
+            ob_start();
+            require $this->_env->getViewFilePath('lvdwcmc-gateway-return-url-field.php');
+            return ob_get_clean();
+        }
+
+        public function generate_return_url_html($fieldId, $fieldInfo) {
+            return $this->_renderReturnUrlField($fieldId, $fieldInfo);
+        }
+
+        public function validate_return_url_field($key, $value) {
+            $returnUrl = null;
+            if (isset($_POST['mobilpay_return_url'])) {
+                $returnUrl = filter_var($_POST['mobilpay_return_url'], FILTER_VALIDATE_URL) 
+                    ? $_POST['mobilpay_return_url'] 
+                    : null;
+            }
+            return $returnUrl;
         }
 
         public function process_payment_asset_upload() {
@@ -399,19 +436,65 @@ namespace LvdWcMc {
                 @unlink($destination);
             }
 
-            $result = new \stdClass();
+            $result = lvdwcmc_get_ajax_response();
             $result->success = !file_exists($destination);
             $result->message = $result->success
-                ? $this->__('Payment asset file successfully removed.')
-                : $this->__('Payment asset file could not be removed.');
+                ? __('Payment asset file successfully removed.', 'wc-mobilpayments-card')
+                : __('Payment asset file could not be removed.', 'wc-mobilpayments-card');
+
+            lvdwcmc_send_json($result);
+        }
+
+        public function generate_return_url() {
+            if (!$this->_canManageWcSettings()) {
+                http_response_code(401);
+                die;
+            }
+
+            $slug = 'lvdwcmc-thank-you';
+            $page = get_page_by_path($slug, OBJECT, 'page');
+
+            if ($page == null) {
+                $pageId = wp_insert_post(array(
+                    'post_author' => get_current_user_id(),
+                    'post_content' => '[lvdwcmc_display_mobilpay_order_status]',
+                    'post_title' => __('Thank you for your order', 'wc-mobilpayments-card'),
+                    'post_name' => $slug,
+                    'post_status' => 'publish',
+                    'post_type' => 'page',
+                    'comment_status' => 'closed',
+                    'ping_status' => 'closed'
+                ), true);
+
+                if (!is_wp_error($pageId)) {
+                    $page = get_post($pageId, OBJECT, 'raw');
+                }
+            }
+
+            $result = lvdwcmc_get_ajax_response(array(
+                'returnPageUrl' => null
+            ));
+
+            if ($page instanceof \WP_Post) {
+                $result->success = true;
+                $result->returnPageUrl = get_permalink($page);
+            }
 
             lvdwcmc_send_json($result);
         }
 
         public function needs_setup() {
+            //Used by WC when toggling gateway on or off via AJAX 
+            //  (see WC_Ajax::toggle_gateway_enabled())
             return empty($this->_mobilpayAccountId) 
                 || empty($this->_mobilpayReturnUrl)
                 || !$this->_hasPaymentAssets();
+        }
+
+        public function is_available() {
+            //Used by WC to determine what payment gateways are available on checkout 
+            //  (see WC_Payment_Gateways::get_available_payment_gateways())
+            return !$this->needs_setup() && parent::is_available();
         }
 
         public function process_payment($orderId) {
@@ -460,7 +543,7 @@ namespace LvdWcMc {
 
                 $this->logDebug('Done processing payment for order', $context);
             } catch (\Exception $exc) {
-                wc_add_notice($this->__('Error initiating MobilPay card payment.'), 'error');
+                wc_add_notice(__('Error initiating MobilPay card payment.', 'wc-mobilpayments-card'), 'error');
                 $this->logException('Error initiating MobilPay card payment', 
                     $exc, 
                     $context);
@@ -567,12 +650,12 @@ namespace LvdWcMc {
 
             if ($processErrorCode != self::GATEWAY_PROCESS_RESPONSE_ERR_OK) {
                 $this->logDebug('Sending error response to gateway.', $context);
-                $this->_processor->sendErrorResponse(\Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
+                $this->_sendErrorResponse(\Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
                     $processErrorCode,
                     $processErrorMessage);
             } else {
                 $this->logDebug('Sending success response to gateway.', $context);
-                $this->_processor->sendSuccessResponse($paymentRequest->objPmNotify->getCrc());
+                $this->_sendSuccessResponse($paymentRequest->objPmNotify->getCrc());
             }
         }
 
@@ -584,6 +667,14 @@ namespace LvdWcMc {
 
                     $data = new \stdClass();
                     $data->mobilpayTransactionId = $transaction->getProviderTransactionId();
+                    $data->panMasked = $transaction->getPANMasked();
+
+                    if ($sent_to_admin) {
+                        $data->clientIpAddress = $transaction->getIpAddress();
+                    } else {
+                        $data->clientIpAddress = null;
+                    }
+
                     $data->success = true;
 
                     require $this->_env->getViewFilePath('lvdwcmc-email-transaction-details.php');
@@ -613,7 +704,7 @@ namespace LvdWcMc {
             $cardPaymentRequest->invoice->amount = 
                 sprintf('%.2f', $order->get_total());
             $cardPaymentRequest->invoice->details = 
-                sprintf($this->__('Payment for order #%s.'), $order->get_order_key());
+                sprintf(__('Payment for order #%s.', 'wc-mobilpayments-card'), $order->get_order_key());
             
             $billingAndShipping = new \Mobilpay_Payment_Address();
             $billingAndShipping->type = 'person';
@@ -650,7 +741,9 @@ namespace LvdWcMc {
 
             if ($gatewayErrorCode == 0) {
                 $gatewayAction = $paymentRequest->objPmNotify->action;
-                $this->logDebug(sprintf('Received callback action="%s"  from gateway', $gatewayAction), $context);
+
+                $this->logDebug(sprintf('Received callback action="%s"  from gateway', $gatewayAction), 
+                    $context);
 
                 switch ($gatewayAction) {
                     case 'confirmed':
@@ -669,9 +762,11 @@ namespace LvdWcMc {
                 }
 
                 if ($processResult != self::GATEWAY_PROCESS_RESPONSE_ERR_OK) {
-                    $this->logDebug(sprintf('Order processing failed with error code="%s"', $processResult), $context);
+                    $this->logDebug(sprintf('Order processing failed with error code="%s"', $processResult), 
+                        $context);
                 } else {
-                    $this->logDebug('Order processing succeeded', $context);
+                    $this->logDebug('Order processing succeeded', 
+                        $context);
                 }
             } else {
                 $processResult = $this->_processor->processFailedPaymentResponse($order, $paymentRequest);
@@ -696,60 +791,80 @@ namespace LvdWcMc {
         }
 
         private function _sendInvalidGatewayHttpAction() {
-            $this->_processor->sendErrorResponse(
+            $this->_sendErrorResponse(
                 \Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT,
                 \Mobilpay_Payment_Request_Abstract::ERROR_CONFIRM_INVALID_ACTION,
                     'Invalid request received');
         }
         
         private function _sendInvalidGatewayPOSTData() {
-            $this->_processor->sendErrorResponse(
+            $this->_sendErrorResponse(
                 \Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
                 \Mobilpay_Payment_Request_Abstract::ERROR_CONFIRM_INVALID_POST_PARAMETERS, 
                     'Invalid request parameters received');
         }
 
         private function _sendFailedDecodingGatewayData() {
-            $this->_processor->sendErrorResponse(
+            $this->_sendErrorResponse(
                 \Mobilpay_Payment_Request_Abstract::CONFIRM_ERROR_TYPE_PERMANENT, 
                 \Mobilpay_Payment_Request_Abstract::ERROR_CONFIRM_FAILED_DECODING_DATA, 
                     'Invalid request parameters received');
         }
 
+        private function _sendErrorResponse($type, $code, $message) {
+            header('Content-type: application/xml');
+            echo '<?xml version="1.0" encoding="utf-8"?>';
+            echo '<crc error_type="' . $type . '" error_code="' . $code . '">' . $message . '</crc>';
+            exit;
+        }
+    
+        private function _sendSuccessResponse($crc) {
+            header('Content-type: application/xml');
+            echo '<?xml version="1.0" encoding="utf-8"?>';
+            echo '<crc>' . $crc . '</crc>';
+            exit;
+        }
+
         private function _getSettingsScriptTranslations() {
             return array(
                 'errPluploadTooLarge' 
-                    => $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
+                    => __('The selected file is too large. Maximum allowed size is 10MB', 'wc-mobilpayments-card'), 
                 'errPluploadFileType' 
-                    => $this->__('The selected file type is not valid.'), 
+                    => __('The selected file type is not valid.', 'wc-mobilpayments-card'), 
                 'errPluploadIoError' 
-                    => $this->__('The file could not be read'), 
+                    => __('The file could not be read', 'wc-mobilpayments-card'), 
                 'errPluploadSecurityError' 
-                    => $this->__('The file could not be read'), 
+                    => __('The file could not be read', 'wc-mobilpayments-card'), 
                 'errPluploadInitError' 
-                    => $this->__('The uploader could not be initialized'), 
+                    => __('The uploader could not be initialized', 'wc-mobilpayments-card'), 
                 'errPluploadHttp' 
-                    =>  $this->__('The file could not be uploaded'), 
+                    => __('The file could not be uploaded', 'wc-mobilpayments-card'), 
                 'errServerUploadFileType' 
-                    =>  $this->__('The selected file type is not valid.'), 
+                    => __('The selected file type is not valid.', 'wc-mobilpayments-card'), 
                 'errServerUploadTooLarge' 
-                    =>  $this->__('The selected file is too large. Maximum allowed size is 10MB'), 
+                    => __('The selected file is too large. Maximum allowed size is 10MB', 'wc-mobilpayments-card'), 
                 'errServerUploadNoFile' 
-                    => $this->__('No file was uploaded'), 
-                'errServerUploadInternal' => 
-                    $this->__('The file could not be uploaded due to a possible internal server issue'), 
+                    => __('No file was uploaded', 'wc-mobilpayments-card'), 
+                'errServerUploadInternal' 
+                    => __('The file could not be uploaded due to a possible internal server issue', 'wc-mobilpayments-card'), 
                 'errServerUploadFail' 
-                    => $this->__('The file could not be uploaded'),
+                    => __('The file could not be uploaded', 'wc-mobilpayments-card'),
                 'warnRemoveAssetFile' 
-                    => $this->__('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!'),
+                    => __('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!', 'wc-mobilpayments-card'),
                 'errAssetFileCannotBeRemoved' 
-                    => $this->__('The asset file could not be removed'),
+                    => __('The asset file could not be removed', 'wc-mobilpayments-card'),
                 'errAssetFileCannotBeRemovedNetwork' 
-                    => $this->__('The asset file could not be removed due to a possible network issue'),
+                    => __('The asset file could not be removed due to a possible network issue', 'wc-mobilpayments-card'),
                 'assetUploadOk' 
-                    => $this->__('The file has been successfully uploaded'),
+                    => __('The file has been successfully uploaded', 'wc-mobilpayments-card'),
                 'assetRemovalOk' 
-                    => $this->__('The file has been successfulyl removed')
+                    => __('The file has been successfulyl removed', 'wc-mobilpayments-card'),
+                'returnURLGenerationOk'
+                    => __('The return URL has been successfully generated.','wc-mobilpayments-card'),
+                'errReturnURLCannotBeGenerated'
+                    => __('The return URL could not generated.', 'wc-mobilpayments-card'),
+                'errReturnURLCannotBeGeneratedNetwork'
+                    => __('The return URL could not be generated due to a possible network issue', 'wc-mobilpayments-card')
             );
         }
 
@@ -856,10 +971,6 @@ namespace LvdWcMc {
 
         private function _isLiveMode() {
             return $this->_mobilpayEnvironment == 'no';
-        }
-
-        private function __($text) {
-            return __($text, lvdwcmc_plugin()->getTextDomain());
         }
 
         public function getLogger() {

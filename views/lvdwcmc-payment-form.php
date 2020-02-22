@@ -38,6 +38,6 @@
 
         <input type="submit" name="submit_mobilpay_payment_form" 
             id="submit_mobilpay_payment_form" 
-            value="Plateste via MobilPay" />
+            value="<?php echo esc_attr__('Pay via mobilPay&trade;', 'wc-mobilpayments-card') ?>" />
     </form>
 <?php endif; ?>

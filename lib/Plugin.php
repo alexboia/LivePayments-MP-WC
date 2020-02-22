@@ -65,6 +65,9 @@ namespace LvdWcMc {
          */
         private $_transactionFactory = null;
 
+        /**
+         * @var array The list of required plugins for our plug-in to work
+         */
         private $_requiredPlugins = array(
             'woocommerce/woocommerce.php'
         );
@@ -122,13 +125,16 @@ namespace LvdWcMc {
                 $errors = $this->_getInstallationErrorTranslations();
                 $message = isset($errors[$test]) 
                     ? $errors[$test] 
-                    : $this->__('Could not activate plug-in: requirements not met.');
+                    : __('Could not activate plug-in: requirements not met.', 'wc-mobilpayments-card');
 
                 deactivate_plugins(plugin_basename(LVD_WCMC_MAIN));
-                wp_die(lvdwcmc_append_error($message, $this->_installer->getLastError()),  $this->__('Activation error'));
+                wp_die(lvdwcmc_append_error($message, $this->_installer->getLastError()),  __('Activation error', 'wc-mobilpayments-card'));
             } else {
                 if (!$this->_installer->activate()) {
-                    wp_die(lvdwcmc_append_error($this->__('Could not activate plug-in: activation failure.'), $this->_installer->getLastError()), $this->__('Activation error'));
+                    wp_die(lvdwcmc_append_error(
+                        __('Could not activate plug-in: activation failure.', 'wc-mobilpayments-card'), 
+                        $this->_installer->getLastError()), 
+                        __('Activation error', 'wc-mobilpayments-card'));
                 }
             }
         }
@@ -157,8 +163,12 @@ namespace LvdWcMc {
                 }
             }
 
-            add_filter('woocommerce_payment_gateways', array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
-            add_filter('woocommerce_order_details_after_order_table', array($this, 'addTransactionDetailsOnAccountOrderDetails'), -1, 1);
+            add_filter('woocommerce_payment_gateways', 
+                array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
+            add_filter('woocommerce_order_details_after_order_table', 
+                array($this, 'addTransactionDetailsOnAccountOrderDetails'), -1, 1);
+            add_filter('woocommerce_format_log_entry', 
+                array($this, 'onFormatWooCommerceLogMessage'), 10, 2);
         }
 
         public function onPluginsInit() {
@@ -174,8 +184,8 @@ namespace LvdWcMc {
         public function onAddAdminMenuEntries() {
             if ($this->_canManageWooCommerce()) {
                 add_submenu_page('woocommerce', 
-                    $this->__('MobilPay Payment Transactions'), 
-                    $this->__('MobilPay payment transactions'), 
+                    __('mobilPay&trade; Card Transactions', 'wc-mobilpayments-card'), 
+                    __('mobilPay&trade; Card Transactions', 'wc-mobilpayments-card'), 
                     'manage_woocommerce', 
                     'lvdwcmc-card-transactions-listing',
                     array($this, 'showAdminTransactionsListing'));
@@ -204,6 +214,7 @@ namespace LvdWcMc {
             }
             if ($this->_env->isViewingAdminTransactionListing()) {
                 $this->_mediaIncludes->includeScriptTransactionListing();
+                $this->_mediaIncludes->localizeTransactionListingScript($this->_getTransactionsListingScriptTranslations());
             }
         }
 
@@ -219,7 +230,7 @@ namespace LvdWcMc {
         public function onRegisterMetaboxes($postType, $post) {
             if ($postType == 'shop_order') {
                 add_meta_box('lvdwcmc-transaction-details-metabox', 
-                    $this->__('Payment transaction details'), 
+                    __('Payment transaction details', 'wc-mobilpayments-card'), 
                     array($this, 'addTransactionDetailsOnAdminOrderDetails'), 
                     'shop_order', 
                     'side', 
@@ -331,7 +342,7 @@ namespace LvdWcMc {
         public function onDashboardWidgetsSetup() {
             if ($this->_canManageWooCommerce()) {
                 wp_add_dashboard_widget('lvdwcmc-transactions-status', 
-                    $this->__('MobilPay Transaction Status'), 
+                    __('mobilPay&trade; Card Transaction Status', 'wc-mobilpayments-card'), 
                     array($this, 'renderTransactionsStatusWidget'), 
                         null,
                         null);
@@ -367,6 +378,19 @@ namespace LvdWcMc {
             $data->success = true;
 
             require $this->_env->getViewFilePath('lvdwcmc-dashboard-transactions-status.php');
+        }
+
+        public function onFormatWooCommerceLogMessage($entry, $args) {
+            return $this->_shouldFormatWooCommerceLogMessage($args)
+                ? $entry . ' Additional context: ' . var_export($args['context'], true) 
+                : $entry;
+        }
+
+        private function _shouldFormatWooCommerceLogMessage($args) {
+            return !empty($args['context']) && (
+                empty($args['context']['source']) 
+                || $args['context']['source'] == MobilpayCreditCardGateway::GATEWAY_ID
+            );
         }
 
         public function isActive() {
@@ -432,9 +456,9 @@ namespace LvdWcMc {
 
         private function _formatTransactionAmount($amount) {
             return number_format($amount, 
-                    wc_get_price_decimals(), 
-                    wc_get_price_decimal_separator(), 
-                    wc_get_price_thousand_separator());
+                wc_get_price_decimals(), 
+                wc_get_price_decimal_separator(), 
+                wc_get_price_thousand_separator());
         }
 
         private function _formatTransactionTimestamp($strTimestamp) {
@@ -477,38 +501,52 @@ namespace LvdWcMc {
             load_plugin_textdomain($this->_textDomain, false, plugin_basename(LVD_WCMC_LANG_DIR));
         }
 
+        private function _getTransactionsListingScriptTranslations() {
+            return array(
+                'errCannotLoadTransactionDetails' 
+                    => __('Could not load transaction details data', 'wc-mobilpayments-card'),
+                'errCannotLoadTransactionDetailsNetwork' 
+                    => __('Could not load transaction details data due to a possible network issue', 'wc-mobilpayments-card')
+            );
+        }
+
         private function _getInstallationErrorTranslations() {
             $this->_loadTextDomain();
             return array(
                 Installer::INCOMPATIBLE_PHP_VERSION 
-                    => sprintf($this->__('Minimum required PHP version is %s.'), $this->_env->getRequiredPhpVersion()),
+                    => sprintf(__('Minimum required PHP version is %s.', 'wc-mobilpayments-card'), $this->_env->getRequiredPhpVersion()),
                 Installer::INCOMPATIBLE_WP_VERSION 
-                    => sprintf($this->__('Minimum required WordPress version is %s.'), $this->_env->getRequiredWpVersion()),
+                    => sprintf(__('Minimum required WordPress version is %s.', 'wc-mobilpayments-card'), $this->_env->getRequiredWpVersion()),
                 Installer::SUPPORT_MYSQLI_NOT_FOUND 
-                    => $this->__('Mysqli extension was not found on your system or is not fully compatible.'),
+                    => __('Mysqli extension was not found on your system or is not fully compatible.', 'wc-mobilpayments-card'),
                 Installer::SUPPORT_OPENSSL_NOT_FOUND 
-                    => $this->__('Openssl extension was not found on your system or is not fully compatible.'),
+                    => __('Openssl extension was not found on your system or is not fully compatible.', 'wc-mobilpayments-card'),
                 Installer::GENERIC_ERROR 
-                    => $this->__('The installation failed.')
+                    => __('The installation failed.', 'wc-mobilpayments-card')
             );
         }
 
         private function _getTransactionStatusLabel($status) {
             $labelsForCodes = array(
-                MobilpayTransaction::STATUS_CANCELLED => $this->__('Cancelled'),
-                MobilpayTransaction::STATUS_CONFIRMED => $this->__('Confirmed. Payment successful'),
-                MobilpayTransaction::STATUS_CONFIRMED_PENDING => $this->__('Pending confirmation'),
-                MobilpayTransaction::STATUS_CREDIT => $this->__('Credited'),
-                MobilpayTransaction::STATUS_FAILED => $this->__('Failed'),
-                MobilpayTransaction::STATUS_NEW => $this->__('Started'),
-                MobilpayTransaction::STATUS_PAID_PENDING => $this->__('Pending payment')
+                MobilpayTransaction::STATUS_CANCELLED 
+                    => __('Cancelled', 'wc-mobilpayments-card'),
+                MobilpayTransaction::STATUS_CONFIRMED 
+                    => __('Confirmed. Payment successful', 'wc-mobilpayments-card'),
+                MobilpayTransaction::STATUS_CONFIRMED_PENDING 
+                    => __('Pending confirmation', 'wc-mobilpayments-card'),
+                MobilpayTransaction::STATUS_CREDIT 
+                    => __('Credited', 'wc-mobilpayments-card'),
+                MobilpayTransaction::STATUS_FAILED 
+                    => __('Failed', 'wc-mobilpayments-card'),
+                MobilpayTransaction::STATUS_NEW 
+                    => __('Started', 'wc-mobilpayments-card'),
+                MobilpayTransaction::STATUS_PAID_PENDING 
+                    => __('Pending payment', 'wc-mobilpayments-card')
             );
 
-            return isset($labelsForCodes[$status]) ? $labelsForCodes[$status] : '-';
-        }
-
-        private function __($text) {
-            return esc_html__($text, LVD_WCMC_TEXT_DOMAIN);
+            return isset($labelsForCodes[$status]) 
+                ? $labelsForCodes[$status] 
+                : '-';
         }
     }
 }

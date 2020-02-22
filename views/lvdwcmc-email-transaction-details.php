@@ -33,12 +33,22 @@
 
 <?php if ($data->success): ?>
     <section class="woocommerce-mobilpay-transaction-details" style="margin-bottom: 40px;">
-        <h2 class="woocommerce-mobilpay-transaction-details-heading"><?php echo __('Card payment transaction details', LVD_WCMC_TEXT_DOMAIN); ?></h2>
+        <h2 class="woocommerce-mobilpay-transaction-details-heading"><?php echo esc_html__('Card payment transaction details', 'wc-mobilpayments-card'); ?></h2>
         <table class="td" cellspacing="0" cellpadding="6" style="width: 100%; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;" border="1">
             <tr>
-                <td class="td" style="text-align:left; font-weight: bold;"><?php echo __('Transaction id', LVD_WCMC_TEXT_DOMAIN) ?></td>
-                <td class="td" style="text-align:left"><?php echo $data->mobilpayTransactionId ?></td>
+                <td class="td" style="text-align:left; font-weight: bold;"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card') ?></td>
+                <td class="td" style="text-align:left"><?php echo esc_html($data->mobilpayTransactionId); ?></td>
             </tr>
+            <tr>
+                <td class="td" style="text-align:left; font-weight: bold;"><?php echo esc_html__('Card number', 'wc-mobilpayments-card') ?></td>
+                <td class="td" style="text-align:left"><?php echo esc_html($data->panMasked); ?></td>
+            </tr>
+            <?php if (!empty($data->clientIpAddress)): ?>
+                <tr>
+                    <td class="td" style="text-align:left; font-weight: bold;"><?php echo esc_html__('Client IP address', 'wc-mobilpayments-card') ?></td>
+                    <td class="td" style="text-align:left"><?php echo esc_html($data->clientIpAddress); ?></td>
+                </tr>
+            <?php endif; ?>
         </table>
     </section>
 <?php endif; ?>

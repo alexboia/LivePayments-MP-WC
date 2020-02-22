@@ -1,3 +1,4 @@
+<?php
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -27,71 +28,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#mainform {
-    position: relative;
-}
+    defined('LVD_WCMC_LOADED') or die;
+?>
 
-#toast-container {
-    opacity: 0.9;
-}
-
-.lvdwcmc-return-url-generate {
-    padding: 5px 8px 5px 8px;
-    border-radius: 3px;
-    border: 1px solid #b8daff;
-    background-color: #cce5ff;
-    color: #004085;
-    text-decoration: none;
-    font-size: 12px;
-    display: inline-block;
-    position: relative;
-    height: 20px;
-    line-height: 20px;
-    vertical-align: middle;
-}
-
-.lvdwcmc-payment-asset-file-removal {
-    padding: 5px 8px 5px 8px;
-    border-radius: 3px;
-    border: 1px solid #f5c6cb;
-    background-color: #f5c6cb;
-    color: #721c24;
-    text-decoration: none;
-    font-size: 12px;
-}
-
-.lvdwcmc-payment-asset-file-removal:hover {
-    color: #721c24;
-}
-
-.lvdwcmc-payment-asset-file-selector {
-    padding: 5px 8px 5px 8px;
-    border-radius: 3px;
-    border: 1px solid #b8daff;
-    background-color: #cce5ff;
-    color: #004085;
-    text-decoration: none;
-    font-size: 12px;
-}
-
-.lvdwcmc-payment-asset-file-selector:hover {
-    color: #004085;
-}
-
-label.lvdwcmc-asset-label {
-    padding: 3px 5px 3px 5px;
-    border-radius: 3px;
-}
-
-label.lvdwcmc-live-asset-label {
-    color: #155724;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-}
-
-label.lvdwcmc-sandbox-asset-label {
-    color: #856404;
-    background-color: #fff3cd;
-    border: 1px solid #ffeeba;
-}
+<tr valign="top">
+    <th scope="row" class="titledesc">
+        <label for="mobilpay_return_url">
+            <?php echo esc_html($data->fieldInfo['title']); ?> 
+            <?php if (!empty($data->fieldInfo['description'])): ?>
+                <?php echo $this->get_tooltip_html($data->fieldInfo); ?>
+            <?php endif; ?>
+        </label>
+    </th>
+    <td class="forminp">
+        <fieldset>
+            <legend class="screen-reader-text"><span><?php echo esc_html($data->fieldInfo['title']); ?></span></legend>
+            <input class="input-text regular-input" 
+                type="text" 
+                name="mobilpay_return_url" 
+                id="mobilpay_return_url" 
+                value="<?php echo esc_attr($data->returnUrl);  ?>" 
+                placeholder="">
+            <a href="javascript:void(0);" 
+                id="mobilpay_return_url_generate"
+                class="lvdwcmc-return-url-generate"><?php echo esc_html__('Generate it for me', 'wc-mobilpayments-card') ?></a>
+        </fieldset>
+    </td>
+</tr>

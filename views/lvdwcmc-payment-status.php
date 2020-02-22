@@ -31,16 +31,16 @@
     defined('LVD_WCMC_LOADED') or die;
 ?>
 
-<div class="lvdwcmc-mobilpay-return-container order-status-<?php echo $data->orderStatus; ?>">
+<div class="lvdwcmc-mobilpay-return-container order-status-<?php echo esc_attr($data->orderStatus); ?>">
     <?php if (in_array($data->orderStatus, array('cancelled', 'failed'))): ?>
-        <p><?php echo __('Your payment could not be processed or has been cancelled.', LVD_WCMC_TEXT_DOMAIN); ?></p>
+        <p><?php echo esc_html__('Your payment could not be processed or has been cancelled.', 'wc-mobilpayments-card'); ?></p>
     <?php elseif ($data->orderStatus === 'on-hold'):  ?>
-        <p><?php echo __('Your payment is currently being processed.', LVD_WCMC_TEXT_DOMAIN); ?></p>
-        <p><?php echo __('Order Id', LVD_WCMC_TEXT_DOMAIN); ?>: <strong><?php echo $data->orderId; ?></strong></p>
-        <p><?php echo __('Detailed order status') ?>: <strong><?php echo wc_get_order_status_name($data->orderStatus); ?></strong></p>
+        <p><?php echo esc_html__('Your payment is currently being processed.', 'wc-mobilpayments-card'); ?></p>
+        <p><?php echo esc_html__('Order Id', 'wc-mobilpayments-card'); ?>: <strong><?php echo $data->orderId; ?></strong></p>
+        <p><?php echo esc_html__('Detailed order status', 'wc-mobilpayments-card') ?>: <strong><?php echo wc_get_order_status_name($data->orderStatus); ?></strong></p>
     <?php else: ?>
-        <p><?php echo __('We have successfully received your payment', LVD_WCMC_TEXT_DOMAIN); ?></p>
-        <p><?php echo __('Order Id', LVD_WCMC_TEXT_DOMAIN); ?>: <strong><?php echo $data->orderId; ?></strong></p>
-        <p><?php echo __('Detailed order status') ?>: <strong><?php echo wc_get_order_status_name($data->orderStatus); ?></strong></p>
+        <p><?php echo esc_html__('We have successfully received your payment', 'wc-mobilpayments-card'); ?></p>
+        <p><?php echo esc_html__('Order Id', 'wc-mobilpayments-card'); ?>: <strong><?php echo $data->orderId; ?></strong></p>
+        <p><?php echo esc_html__('Detailed order status', 'wc-mobilpayments-card') ?>: <strong><?php echo wc_get_order_status_name($data->orderStatus); ?></strong></p>
     <?php endif; ?>
 </div>

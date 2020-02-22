@@ -87,7 +87,6 @@
             _hideProgress();
             if (data && data.success && data.transaction != null) {
                 var $html = $(_renerDetailsHtml(data.transaction));
-                var blockUICss = $.blockUI.defaults.css;
 
                 $.blockUI({
                     message: $html,
@@ -101,11 +100,19 @@
                     }
                 });
             } else {
-                _toastMessage(false, 'Could not load transaction details data');
+                _toastMessage(false, lvdwcmcTransactionsListL10n.errCannotLoadTransactionDetails);
             }
         }).fail(function() {
             _hideProgress();
-            _toastMessage(false, 'Could not load transaction details data');
+            _toastMessage(false, lvdwcmcTransactionsListL10n.errCannotLoadTransactionDetailsNetwork);
+        });
+    }
+
+    function _initToastMessages() {
+        toastr.options = $.extend(toastr.options, {
+            target: 'body',
+            positionClass: 'toast-bottom-right',
+            timeOut: 4000
         });
     }
 
@@ -128,6 +135,7 @@
 
     $(document).ready(function() {
         _initState();
+        _initToastMessages();
         _initListeners();
     });
 })(jQuery);

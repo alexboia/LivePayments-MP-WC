@@ -32,18 +32,18 @@
 ?>
 
 <script id="lvdwcmc-tpl-asset-file-removal" type="text/x-kite">
-    <span class="lvdwcmc-payment-asset-file-exists"><?php echo $this->__('The file has already been uploaded.'); ?></span>
+    <span class="lvdwcmc-payment-asset-file-exists"><?php echo esc_html__('The file has already been uploaded.', 'wc-mobilpayments-card'); ?></span>
     <a href="javascript:void(0);" 
         id="{{assetId}}_file_removal"
         data-asset-id="{{assetId}}"
-        class="lvdwcmc-payment-asset-file-removal"><?php echo $this->__('Remove') ?></a>
+        class="lvdwcmc-payment-asset-file-removal"><?php echo esc_html__('Remove', 'wc-mobilpayments-card'); ?></a>
 </script>
 
 <script id="lvdwcmc-tpl-asset-file-upload" type="text/x-kite">
     <a href="javascript:void(0);" 
         id="{{assetId}}_file_selector"
         data-asset-id="{{assetId}}"
-        class="lvdwcmc-payment-asset-file-selector"><?php echo $this->__('Chose a file from disk'); ?></a>
+        class="lvdwcmc-payment-asset-file-selector"><?php echo esc_html__('Chose a file from disk', 'wc-mobilpayments-card'); ?></a>
 </script>
 
 <script type="text/javascript">
@@ -52,6 +52,9 @@
 
     var lvdwcmc_removePaymentAssetUrl = '<?php echo esc_js($data->removePaymentAssetUrl); ?>';
     var lvdwcmc_removePaymentAssetNonce = '<?php echo esc_js($data->removePaymentAssetNonce); ?>';
+
+    var lvdwcmc_returnUrlGenerationUrl = '<?php echo esc_js($data->returnUrlGenerationUrl); ?>';
+    var lvdwcmc_returnUrlGenerationNonce = '<?php echo esc_js($data->returnUrlGenerationNonce); ?>';
 
     var lvdwcmc_uploadMaxFileSize = '<?php echo esc_js($data->uploadMaxFileSize) ?>';
     var lvdwcmc_uploadChunkSize = '<?php echo esc_js($data->uploadChunkSize); ?>';

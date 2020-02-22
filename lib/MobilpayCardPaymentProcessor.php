@@ -30,7 +30,7 @@
  */
 
 namespace LvdWcMc {
-    class MobilpayCardPaymentProcessor {
+    class MobilpayCardPaymentProcessor implements MobilpayCardPaymentProcessorInterface {
         use LoggingExtensions;
 
         /**
@@ -60,11 +60,7 @@ namespace LvdWcMc {
         }
 
         public function onOrderFullyRefundedGetRefundedStatus($status, $orderId, $refundId) {
-            $context = array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'orderId' => $orderId
-            );
-
+            $context = $this->_getLoggingContext($orderId);
             $transaction = $this->_transactionFactory->existingFromOrder($orderId);
 
             if ($transaction != null 
@@ -78,24 +74,16 @@ namespace LvdWcMc {
         }
 
         public function processOrderInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
-            $this->_transactionFactory->newFromOrder($order);
+            return ($this->_transactionFactory->newFromOrder($order) != null)
+                ? MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK
+                : MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
         }
 
         public function processConfirmedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
-            $context = array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'orderId' => $order->get_id()
-            );
+            $context = $this->_getLoggingContext($order);
 
             $this->logDebug('Begin processing confirmed payment response for order...', 
                 $context);
-
-            //If the order has already been processed, 
-            //  return successful result
-            if (!$this->_isGatewayResponseProcessableForOrder($order)) {
-                $this->logDebug('The order has already been processed', $context);
-                return MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
-            }
 
             $originalAmount = $this->_getOriginalAmount($request);
             $processedAmount = $this->_getProcessedAmount($request);
@@ -110,7 +98,7 @@ namespace LvdWcMc {
 
             $transaction = $this->_transactionFactory->existingFromOrder($order);
             if ($transaction != null) {
-                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                $this->logDebug('Found local transaction data from current order. Processing order...', 
                     $context);
 
                 $this->logDebug(sprintf('Processed amount is %s. Original amount is %s', $processedAmount, $originalAmount), 
@@ -163,10 +151,7 @@ namespace LvdWcMc {
         }
 
         public function processFailedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
-            $context = array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'orderId' => $order->get_id()
-            );
+            $context = $this->_getLoggingContext($order);
 
             $this->logDebug('Begin processing failed payment response for order...', 
                 $context);
@@ -183,7 +168,7 @@ namespace LvdWcMc {
 
             $transaction = $this->_transactionFactory->existingFromOrder($order);
             if ($transaction != null) {
-                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                $this->logDebug('Found local transaction data from current order. Processing order...', 
                     $context);
 
                 if ($transaction->canBeSetFailed()) {
@@ -215,10 +200,7 @@ namespace LvdWcMc {
         }
 
         public function processPaymentCancelledResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
-            $context = array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'orderId' => $order->get_id()
-            );
+            $context = $this->_getLoggingContext($order);
 
             $this->logDebug('Begin processing canceled payment response for order...', 
                 $context);
@@ -228,7 +210,7 @@ namespace LvdWcMc {
 
             $transaction = $this->_transactionFactory->existingFromOrder($order);
             if ($transaction != null) {
-                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                $this->logDebug('Found local transaction data from current order. Processing order...', 
                     $context);
 
                 if ($transaction->canBeSetCancelled()) {
@@ -255,21 +237,18 @@ namespace LvdWcMc {
         }
 
         public function processPendingPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
-            $context = array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'orderId' => $order->get_id()
-            );
+            $context = $this->_getLoggingContext($order);
 
             $this->logDebug('Begin processing pending payment response for order...', 
                 $context);
-            
+
             $action = $this->_getAction($request);
             $transactionId = $this->_getTransactionId($request);
             $processResult = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
 
             $transaction = $this->_transactionFactory->existingFromOrder($order);
             if ($transaction != null) {
-                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                $this->logDebug('Found local transaction data from current order. Processing order...', 
                     $context);
 
                 if ($transaction->canBeSetPaymentPending()) {
@@ -296,10 +275,7 @@ namespace LvdWcMc {
         }
 
         public function processCreditPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
-            $context = array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'orderId' => $order->get_id()
-            );
+            $context = $this->_getLoggingContext($order);
 
             $this->logDebug('Begin processing credit payment response for order...', 
                 $context);
@@ -318,14 +294,14 @@ namespace LvdWcMc {
 
             $transaction = $this->_transactionFactory->existingFromOrder($order);
             if ($transaction != null) {
-                $this->logDebug('Found local transaction data from current order. Attempting to process order...', 
+                $this->logDebug('Found local transaction data from current order. Processing order...', 
                     $context);
 
                 if ($transaction->canBeSetCredited()) {
                     $transaction->setCredited($transactionId, $processedAmount, $panMasked);
 
                     //Create partial refund record
-                    wc_create_refund(array(
+                    $refund = wc_create_refund(array(
                         'order_id' => $order->get_id(),
                         'amount' => $processedAmount,
                         'reason' => $this->_getPartialRefundReason($transactionId),
@@ -334,16 +310,18 @@ namespace LvdWcMc {
                         'refund_payment' => false
                     ));
 
-                    if ($transaction->isAmountCompletelyProcessed()) {
-                        //Do not set status or add notes more than once
-                        if (!$order->has_status('refunded')) {
-                            $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
-                            $order->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
-                            $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+                    if (!is_wp_error($refund)) {
+                        if ($transaction->isAmountCompletelyProcessed()) {
+                            //Do not set status or add notes more than once
+                            if (!$order->has_status('refunded')) {
+                                $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
+                                $order->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
+                                $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+                            }
                         }
                     }
                 } else {
-                    $this->logDebug('Order refund already processed or local transaction could not be set as credited.', 
+                    $this->logDebug('The local transaction could not be set as credited.', 
                         $context);
                 }
 
@@ -357,6 +335,13 @@ namespace LvdWcMc {
                 $context);
 
             return $processResult;
+        }
+
+        private function _getLoggingContext(\WC_Order $order) {
+            return array(
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'orderId' => $order->get_id()
+            );
         }
 
         private function _getTransactionId(\Mobilpay_Payment_Request_Abstract $request) {
@@ -391,30 +376,30 @@ namespace LvdWcMc {
 
         private function _getMobilpayPaymentMessageError($errorCode) {
             $standardErrors = array(
-                '16' => $this->__('Card has a risk (i.e. stolen card)'), 
-                '17' => $this->__('Card number is incorrect'), 
-                '18' => $this->__('Closed card'), 
-                '19' => $this->__('Card is expired'), 
-                '20' => $this->__('Insufficient funds'), 
-                '21' => $this->__('CVV2 code incorrect'), 
-                '22' => $this->__('Issuer is unavailable'), 
-                '32' => $this->__('Amount is incorrect'), 
-                '33' => $this->__('Currency is incorrect'), 
-                '34' => $this->__('Transaction not permitted to cardholder'), 
-                '35' => $this->__('Transaction declined'), 
-                '36' => $this->__('Transaction rejected by antifraud filters'), 
-                '37' => $this->__('Transaction declined (breaking the law)'), 
-                '38' => $this->__('Transaction declined'), 
-                '48' => $this->__('Invalid request'), 
-                '49' => $this->__('Duplicate PREAUTH'), 
-                '50' => $this->__('Duplicate AUTH'), 
-                '51' => $this->__('You can only CANCEL a preauth order'), 
-                '52' => $this->__('You can only CONFIRM a preauth order'), 
-                '53' => $this->__('You can only CREDIT a confirmed order'), 
-                '54' => $this->__('Credit amount is higher than auth amount'), 
-                '55' => $this->__('Capture amount is higher than preauth amount'), 
-                '56' => $this->__('Duplicate request'), 
-                '99' => $this->__('Generic error')
+                '16' => __('Card has a risk (i.e. stolen card)', 'wc-mobilpayments-card'), 
+                '17' => __('Card number is incorrect', 'wc-mobilpayments-card'), 
+                '18' => __('Closed card', 'wc-mobilpayments-card'), 
+                '19' => __('Card is expired', 'wc-mobilpayments-card'), 
+                '20' => __('Insufficient funds', 'wc-mobilpayments-card'), 
+                '21' => __('CVV2 code incorrect', 'wc-mobilpayments-card'), 
+                '22' => __('Issuer is unavailable', 'wc-mobilpayments-card'), 
+                '32' => __('Amount is incorrect', 'wc-mobilpayments-card'), 
+                '33' => __('Currency is incorrect', 'wc-mobilpayments-card'), 
+                '34' => __('Transaction not permitted to cardholder', 'wc-mobilpayments-card'), 
+                '35' => __('Transaction declined', 'wc-mobilpayments-card'), 
+                '36' => __('Transaction rejected by antifraud filters', 'wc-mobilpayments-card'), 
+                '37' => __('Transaction declined (breaking the law)', 'wc-mobilpayments-card'), 
+                '38' => __('Transaction declined', 'wc-mobilpayments-card'), 
+                '48' => __('Invalid request', 'wc-mobilpayments-card'), 
+                '49' => __('Duplicate PREAUTH', 'wc-mobilpayments-card'), 
+                '50' => __('Duplicate AUTH', 'wc-mobilpayments-card'), 
+                '51' => __('You can only CANCEL a preauth order', 'wc-mobilpayments-card'), 
+                '52' => __('You can only CONFIRM a preauth order', 'wc-mobilpayments-card'), 
+                '53' => __('You can only CREDIT a confirmed order', 'wc-mobilpayments-card'), 
+                '54' => __('Credit amount is higher than auth amount', 'wc-mobilpayments-card'), 
+                '55' => __('Capture amount is higher than preauth amount', 'wc-mobilpayments-card'), 
+                '56' => __('Duplicate request', 'wc-mobilpayments-card'), 
+                '99' => __('Generic error', 'wc-mobilpayments-card')
             );
     
             return isset($standardErrors[$errorCode]) 
@@ -422,129 +407,108 @@ namespace LvdWcMc {
                 : null;
         }
 
-        private function _isGatewayResponseProcessableForOrder(\WC_Order $customerOrder) {
-            $status = $customerOrder->get_status();
-            return $status != 'completed' 
-                && $status != 'processing';
-        }
-
-        public function sendErrorResponse($type, $code, $message) {
-            header('Content-type: application/xml');
-            echo '<?xml version="1.0" encoding="utf-8"?>';
-            echo '<crc error_type="' . $type . '" error_code="' . $code . '">' . $message . '</crc>';
-            exit;
-        }
-    
-        public function sendSuccessResponse($crc) {
-            header('Content-type: application/xml');
-            echo '<?xml version="1.0" encoding="utf-8"?>';
-            echo '<crc>' . $crc . '</crc>';
-            exit;
-        }
-
-        private function __($text) {
-            return __($text, lvdwcmc_plugin()->getTextDomain());
-        }
-
         private function _getGenericRefundOrderAdminNote($transactionId) {
-            return sprintf($this->__('The amount you paid has been refuned. The order has been marked as refunded as well. Transaction id: %s'), 
+            return sprintf(__('The amount you paid has been refuned. The order has been marked as refunded as well. Transaction id: %s', 'wc-mobilpayments-card'), 
                 $transactionId);
         }
 
         private function _getGenericRefundOrderCustomerNote($transactionId) {
-            return sprintf($this->__('The paid amount has been refuned. The order has been marked as refunded as well. Transaction id: %s'), 
+            return sprintf(__('The paid amount has been refuned. The order has been marked as refunded as well. Transaction id: %s', 'wc-mobilpayments-card'), 
                 $transactionId);
         }
 
         private function _getGenericRefundOrderStatusNote() {
-            return $this->__('The paid amount has been refuned. The order has been marked as refunded as well.');
+            return __('The paid amount has been refuned. The order has been marked as refunded as well.', 'wc-mobilpayments-card');
         }
 
         private function _getPartialRefundReason($transactionId) {
-            return sprintf($this->__('Partial refund notification received from MobilPay gateway. Transaction id: %s'), $transactionId);
+            return sprintf(__('Partial refund notification received from MobilPay gateway. Transaction id: %s', 'wc-mobilpayments-card'), 
+                $transactionId);
         }
 
         private function _getGenericCancelledOrderAdminNote($transactionId) {
-            return sprintf($this->__('The payment has been cancelled. The order has been cancelled as well. Transaction id: %s'), 
+            return sprintf(__('The payment has been cancelled. The order has been cancelled as well. Transaction id: %s', 'wc-mobilpayments-card'), 
                 $transactionId);
         }
 
         private function _getGenericCancelledOrderCustomerNote($transactionId) {
-            return sprintf($this->__('Your payment has been cancelled. The order has been cancelled as well. Transaction id: %s'), 
+            return sprintf(__('Your payment has been cancelled. The order has been cancelled as well. Transaction id: %s', 'wc-mobilpayments-card'), 
                 $transactionId);
         }
 
         private function _getGenericCancelledOrderStatusNote() {
-            return $this->__('Your payment has been cancelled. The order has been cancelled as well.');
+            return __('Your payment has been cancelled. The order has been cancelled as well.', 'wc-mobilpayments-card');
         }
 
         private function _getGenericOnHoldOrderAdminNote($transactionId) {
-            return sprintf($this->__('Order payment is currently being processed. The order has been placed on-hold. Transaction id: %s'),
+            return sprintf(__('Order payment is currently being processed. The order has been placed on-hold. Transaction id: %s', 'wc-mobilpayments-card'),
                 $transactionId);
         }
 
         private function _getGenericOnHoldOrderCustomerNote($transactionId) {
-            return sprintf($this->__('Your payment is currently being processed. Your order has been placed on-hold. Transaction id: %s'),
+            return sprintf(__('Your payment is currently being processed. Your order has been placed on-hold. Transaction id: %s', 'wc-mobilpayments-card'),
                 $transactionId);
         }
 
         public function _getGenericOnHoldOrderStatusNote() {
-            return $this->__('Your payment is currently being processed and the order has been placed on-hold');
+            return __('Your payment is currently being processed and the order has been placed on-hold', 'wc-mobilpayments-card');
         }
 
         private function _getDifferentAmountsOnHoldOrderAdminNote($transactionId, $originalAmount, $processedAmount) {
-            return sprintf($this->__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s vs. %s). Transaction id: %s'), 
+            return sprintf(__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s vs. %s). Transaction id: %s', 'wc-mobilpayments-card'), 
                 $originalAmount, 
                 $processedAmount, 
                 $transactionId);
         }
     
         private function _getDifferentAmountsOnHoldOrderCustomerNote($transactionId, $originalAmount, $processedAmount) {
-            return sprintf($this->__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s RON vs. %s RON). Transaction id: %s'), 
+            return sprintf(__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s RON vs. %s RON). Transaction id: %s', 'wc-mobilpayments-card'), 
                 $originalAmount, 
                 $processedAmount, 
                 $transactionId);
         }
 
         private function _getDifferentAmountsOnHoldOrderStatusNote() {
-            return $this->__('The order has been placed on hold as the processed amount is smaller than the total order amount');
+            return __('The order has been placed on hold as the processed amount is smaller than the total order amount', 'wc-mobilpayments-card');
         }
     
         private function _getFailedPaymentOrderGenericNote($transactionId, $errorCode, $errorMessage) {
-            return sprintf($this->__('Error processing payment: %s (code: %s). Transaction id: %s'), 
+            return sprintf(__('Error processing payment: %s (code: %s). Transaction id: %s', 'wc-mobilpayments-card'), 
                 $errorMessage, 
                 $errorCode, 
                 $transactionId);
         }
     
         private function _getFailedPaymentOrderStatusNote() {
-            return $this->__('The payment has failed. See order notes for additional details');
+            return __('The payment has failed. See order notes for additional details', 'wc-mobilpayments-card');
         }
 
         private function _getGenericOrderCompletedCustomerNote($transactionId) {
-            return sprintf($this->__('Your payment has been successfully received. Your order is now completed. Transaction id: %s'), $transactionId);
+            return sprintf(__('Your payment has been successfully received. Your order is now completed. Transaction id: %s', 'wc-mobilpayments-card'), 
+                $transactionId);
         }
 
         private function _getGenericOrderCompletedAdminNote($transactionId) {
-            return sprintf($this->__('The payment has been successfully received. The order is now completed. Transaction id: %s'), $transactionId);
+            return sprintf(__('The payment has been successfully received. The order is now completed. Transaction id: %s', 'wc-mobilpayments-card'), 
+                $transactionId);
         }
     
         private function _getOrderCompletedOrderStatusNote() {
-            return $this->__('The payment has been successfully received. The order is now completed');
+            return __('The payment has been successfully received. The order is now completed', 'wc-mobilpayments-card');
         }
 
         private function _getGenericOrderProcessingCustomerNote($transactionId) {
-            return sprintf($this->__('Your payment has been successfully received. Your order is currently being processed. Transaction id: %s'), 
+            return sprintf(__('Your payment has been successfully received. Your order is currently being processed. Transaction id: %s', 'wc-mobilpayments-card'), 
                 $transactionId);
         }
 
         private function _getGenericOrderProcessingAdminNote($transactionId) {
-            return sprintf($this->__('The payment has been successfully received. The order is currently being processed. Transaction id: %s'), 
+            return sprintf(__('The payment has been successfully received. The order is currently being processed. Transaction id: %s', 'wc-mobilpayments-card'), 
                 $transactionId);
         }
     
         private function _getOrderProcessingStatusNote() {
-            return $this->__('The payment has been successfully received. The order is currently being processed.');
+            return __('The payment has been successfully received. The order is currently being processed.', 'wc-mobilpayments-card');
         }
 
         public function getLogger() {

@@ -14,5 +14,10 @@ namespace LvdWcMc {
             ));
             $this->getLogger()->error($message, $context);
         }
+
+        /**
+         * @return \WC_Logger
+         */
+        abstract public function getLogger();
     }
 }

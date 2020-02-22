@@ -1,3 +1,4 @@
+<?php
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -27,71 +28,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#mainform {
-    position: relative;
-}
 
-#toast-container {
-    opacity: 0.9;
-}
+namespace LvdWcMc {
+    interface MobilpayCardPaymentProcessorInterface {
+        function processOrderInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
 
-.lvdwcmc-return-url-generate {
-    padding: 5px 8px 5px 8px;
-    border-radius: 3px;
-    border: 1px solid #b8daff;
-    background-color: #cce5ff;
-    color: #004085;
-    text-decoration: none;
-    font-size: 12px;
-    display: inline-block;
-    position: relative;
-    height: 20px;
-    line-height: 20px;
-    vertical-align: middle;
-}
+        function processConfirmedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
 
-.lvdwcmc-payment-asset-file-removal {
-    padding: 5px 8px 5px 8px;
-    border-radius: 3px;
-    border: 1px solid #f5c6cb;
-    background-color: #f5c6cb;
-    color: #721c24;
-    text-decoration: none;
-    font-size: 12px;
-}
+        function processFailedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
 
-.lvdwcmc-payment-asset-file-removal:hover {
-    color: #721c24;
-}
+        function processPaymentCancelledResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
 
-.lvdwcmc-payment-asset-file-selector {
-    padding: 5px 8px 5px 8px;
-    border-radius: 3px;
-    border: 1px solid #b8daff;
-    background-color: #cce5ff;
-    color: #004085;
-    text-decoration: none;
-    font-size: 12px;
-}
+        function processPendingPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
 
-.lvdwcmc-payment-asset-file-selector:hover {
-    color: #004085;
-}
-
-label.lvdwcmc-asset-label {
-    padding: 3px 5px 3px 5px;
-    border-radius: 3px;
-}
-
-label.lvdwcmc-live-asset-label {
-    color: #155724;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-}
-
-label.lvdwcmc-sandbox-asset-label {
-    color: #856404;
-    background-color: #fff3cd;
-    border: 1px solid #ffeeba;
+        function processCreditPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
+    }
 }

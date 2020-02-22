@@ -144,7 +144,8 @@ namespace LvdWcMc {
         }
 
         public function isViewingAdminTransactionListing() {
-            return $this->getCurrentPage() == 'admin.php' 
+            return is_admin() 
+                && $this->getCurrentPage() == 'admin.php' 
                 && isset($_GET['page']) 
                 && $_GET['page'] == 'lvdwcmc-card-transactions-listing';
         }

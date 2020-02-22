@@ -109,21 +109,21 @@
     }
 
     function _getAssetFileUploadUrl() {
-        var url = window.lvdwcmc_uploadPaymentAssetUrl;
-
-        url += url.indexOf('?') < 0 ? '?' : '&';
-        url += 'payment_asset_upload_nonce=' + window.lvdwcmc_uploadPaymentAssetNonce;
-
-        return url;
+        return URI(window.lvdwcmc_uploadPaymentAssetUrl)
+            .addSearch('payment_asset_upload_nonce', window.lvdwcmc_uploadPaymentAssetNonce)
+            .toString();
     }
 
     function _getAssetFileRemovalUrl() {
-        var url = window.lvdwcmc_removePaymentAssetUrl;
+        return URI(window.lvdwcmc_removePaymentAssetUrl)
+            .addSearch('payment_asset_remove_nonce', window.lvdwcmc_removePaymentAssetNonce)
+            .toString();
+    }
 
-        url += url.indexOf('?') < 0 ? '?' : '&';
-        url += 'payment_asset_remove_nonce=' + window.lvdwcmc_removePaymentAssetNonce;
-
-        return url;
+    function _getReturnUrlGenerationUrl() {
+        return URI(window.lvdwcmc_returnUrlGenerationUrl)
+            .addSearch('return_url_generation_nonce', window.lvdwcmc_returnUrlGenerationNonce)
+            .toString();
     }
 
     function _getAssetContainerElement(assetId) {
@@ -397,6 +397,34 @@
         });
     }
 
+    function _setReturnUrl(returnUrl) {
+        $('#mobilpay_return_url').val(returnUrl);
+    }
+
+    function _generateReturnUrl() {
+        _showProgress();
+        $.ajax(_getReturnUrlGenerationUrl(), {
+            type: 'POST',
+            dataType: 'json',
+            data: {}
+        }).done(function(data, status, xhr) {
+            _hideProgress();
+            if (data) {
+                if (data.success) {
+                    _setReturnUrl(data.returnPageUrl);
+                    _toastMessage(true, lvdwcmcSettingsL10n.returnURLGenerationOk);
+                } else {
+                    _toastMessage(false, data.message || lvdwcmcSettingsL10n.errReturnURLCannotBeGenerated);
+                }
+            } else {
+                _toastMessage(false, lvdwcmcSettingsL10n.errReturnURLCannotBeGenerated);
+            }
+        }).fail(function() {
+            _hideProgress();
+            _toastMessage(false, lvdwcmcSettingsL10n.errReturnURLCannotBeGeneratedNetwork);
+        });
+    }
+
     function _initAssetFileRemoval() {
         $('body').on('click', '.lvdwcmc-payment-asset-file-removal', function(e) {
             var assetId = $(this).attr('data-asset-id');
@@ -417,9 +445,16 @@
         });
     }
 
+    function _initReturnUrlGeneration() {
+        $('body').on('click', '#mobilpay_return_url_generate', function() {
+            _generateReturnUrl();
+        });
+    }
+
     $(document).ready(function() {
         _initToastMessages();
         _initAssetFileUploaders();
         _initAssetFileRemoval();
+        _initReturnUrlGeneration();
     });
 })(jQuery);
