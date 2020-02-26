@@ -243,7 +243,7 @@ namespace LvdWcMc {
             if (!empty($order) && ($order instanceof \WC_Order)) {
                 $data = $this->_getDisplayableTransactionDetailsFromOrder($order);
                 if ($data != null) {
-                    require $this->_env->getViewFilePath('lvdwcmc-transaction-details.php');
+                    require $this->_env->getViewFilePath('lvdwcmc-admin-transaction-details.php');
                 }
             }
         }

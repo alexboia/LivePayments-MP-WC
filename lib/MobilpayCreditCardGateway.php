@@ -110,6 +110,8 @@ namespace LvdWcMc {
          */
         private $_logger = null;
 
+        private $_paymentAssetFileTemplates;
+
         public static function matchesGatewayId($gatewayId) {
             return $gatewayId == self::GATEWAY_ID;
         }
@@ -136,7 +138,8 @@ namespace LvdWcMc {
 
             $this->_apiDescriptor = strtolower(str_replace('\\', '_', __CLASS__));
             $this->_mobilpayNotifyUrl = WC()->api_request_url($this->_apiDescriptor);
-            $this->_mobilpayAssetsDir = $this->_env->getPaymentAssetsStorageDir();
+            $this->_mobilpayAssetsDir = $this->_getPaymentAssetsDir();
+            $this->_paymentAssetFileTemplates = $this->_getPaymentAssetFileTemplates();
 
             $this->_mobilpayAssetUploadApiDescriptor = strtolower(self::GATEWAY_ID . '_payment_asset_upload');
             $this->_mobilpayAssetUploadUrl = WC()->api_request_url($this->_mobilpayAssetUploadApiDescriptor);
@@ -260,7 +263,8 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .cer',
-                    '_file_format' => 'live.%s.public.cer'
+                    '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
+                    '_is_live_mode' => true
                 ),
                 'mobilpay_live_private_key' => array(
                     'title' => __('The private key for the live environment', 'wc-mobilpayments-card'),
@@ -269,7 +273,8 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .key',
-                    '_file_format' => 'live.%s.private.key'
+                    '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
+                    '_is_live_mode' => true
                 ),
                 'mobilpay_sandbox_public_cert' => array(
                     'title' => __('mobilPay&trade; digital certificate for the sandbox environment', 'wc-mobilpayments-card'),
@@ -278,7 +283,8 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .cer',
-                    '_file_format' => 'sandbox.%s.public.cer'
+                    '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
+                    '_is_live_mode' => false
                 ),
                 'mobilpay_sandbox_private_key' => array(
                     'title' => __('The private key for the sandbox environment', 'wc-mobilpayments-card'),
@@ -287,7 +293,8 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
                     'allowed_files_hints' => 'allowed file types: .key',
-                    '_file_format' => 'sandbox.%s.private.key'
+                    '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
+                    '_is_live_mode' => false
                 )
             );
         }
@@ -918,25 +925,68 @@ namespace LvdWcMc {
         }
 
         private function _getX509CertificateFilePath() {
-            return $this->_getPaymentAssetFilePath(sprintf('%s.%s.public.cer', 
-                $this->_getPaymentAssetFilePrefix(), 
-                $this->_mobilpayAccountId));
+            $replace = $this->_getPaymentAssetFileReplaceData();
+            
+            $fileName = str_ireplace(array_keys($replace), 
+                array_values($replace), 
+                $this->_paymentAssetFileTemplates['public_key_certificate']);
+
+            return $this->_getPaymentAssetFilePath($fileName);
         }
     
         private function _getPrivateKeyFilePath() {
-            return $this->_getPaymentAssetFilePath(sprintf('%s.%s.private.key', 
-                $this->_getPaymentAssetFilePrefix(), 
-                $this->_mobilpayAccountId));
+            $replace = $this->_getPaymentAssetFileReplaceData();
+            
+            $fileName = str_ireplace(array_keys($replace), 
+                array_values($replace), 
+                $this->_paymentAssetFileTemplates['private_key_file']);
+
+            return $this->_getPaymentAssetFilePath($fileName);
         }
 
-        private function _getPaymentAssetFilePrefix() {
-            return $this->_isLiveMode() ? 'live' : 'sandbox';
+        private function _getPaymentAssetFileReplaceData() {
+            return array(
+                '%env%' => $this->_getPaymentAssetFileDescriptor(),
+                '%account%' => $this->_mobilpayAccountId
+            );
+        }
+
+        private function _getPaymentAssetFileDescriptor() {
+            $isLiveMode = func_num_args() == 1 
+                ? func_get_arg(0) === true 
+                : $this->_isLiveMode();
+
+            $defaultDescriptor = $isLiveMode 
+                ? 'live' 
+                : 'sandbox';
+
+            /**
+             * Filters the payment asset file environment descriptor 
+             * (i.e. a string that describes whether the asset file 
+             * is used for the live environment or the sandbox environment).
+             * 
+             * @hook lvdwcmc_get_payment_assets_file_descriptor
+             * 
+             * @param string $defaultDescriptor The descriptor provided by default by WC-MobilPayments-Card 
+             * @param boolean $isLiveMode Whether the descriptor belongs to the live environment (true) or the sandbox environment (false)
+             * @return string The actual descriptor, as returned by the registered filters
+             */
+            return apply_filters('lvdwcmc_get_payment_assets_file_descriptor', 
+                $defaultDescriptor, 
+                $isLiveMode);
         }
 
         private function _getPaymentAssetFilePathFromFieldInfo(array $fieldInfo, $accountId) {
-            $destinationFileName = sprintf($fieldInfo['_file_format'], !empty($accountId) 
-                ? $accountId 
-                : '__TEMP__');
+            $replace = array(
+                '%env%' => $this->_getPaymentAssetFileDescriptor($fieldInfo['_is_live_mode']),
+                '%account%' => !empty($accountId) 
+                    ? $accountId 
+                    : '__TEMP__'
+            );
+
+            $destinationFileName = str_ireplace(array_keys($replace), 
+                array_values($replace), 
+                $fieldInfo['_file_format']);
 
             return $this->_getPaymentAssetFilePath($destinationFileName);
         }
@@ -951,6 +1001,53 @@ namespace LvdWcMc {
             return wp_normalize_path(sprintf('%s/%s', 
                 $this->_mobilpayAssetsDir, 
                 $file));
+        }
+
+        private function _getPaymentAssetsDir() {
+            $defaultDir = $this->_env->getPaymentAssetsStorageDir();
+
+            /**
+             * Filters the directory where the payment asset files are stored
+             * 
+             * @hook lvdwcmc_get_payment_assets_storage_dir
+             * @param string $defaultDir The directory used by default by WC-MobilPayments-Card
+             * @return string The actual directory, as returned by the registered filters
+             */
+            return apply_filters('lvdwcmc_get_payment_assets_storage_dir', 
+                $defaultDir);
+        }
+
+        /**
+         * Retrieves the templates used for the file names of the payment assets, as an associative array:
+         *  - the public_key_certificate key stores the template for the public key certificate file
+         *  - the private_key_file key stores the template for the private key file
+         * 
+         * @return array The file name templates
+         */
+        private function _getPaymentAssetFileTemplates() {
+            $defaultTemplates = array(
+                'public_key_certificate' => '%env%.%account%.public.cer',
+                'private_key_file' => '%env%.%account%.private.key'
+            );
+
+            /**
+             * Filters the file name templates for the payment assets. 
+             * 
+             * The templates are represented as an associative array:
+             *  - the public_key_certificate key stores the template for the public key certificate file;
+             *  - the private_key_file key stores the template for the private key file.
+             * 
+             * Each of the templates supports the following placeholders:
+             *  - %account% for the mobilpay account id;
+             *  - %env% for the environment in which the asset must be used (sandbox or live).
+             * 
+             * @hook lvdwcmc_get_payment_assets_file_templates
+             * 
+             * @param array $defaultTemplates The templates provided by default by WC-MobilPayments-Card
+             * @return array The actual templates, as returned by the registered filters
+             */
+            return apply_filters('lvdwcmc_get_payment_assets_file_templates', 
+                $defaultTemplates);
         }
 
         private function _isPaymentAssetField(array $fieldInfo) {
