@@ -170,10 +170,33 @@ namespace LvdWcMc {
         public function enqueue_form_scripts() {
             $this->_mediaIncludes
                 ->includeStyleSettings();
+
+            /**
+             * Enqueue styles for the gateway settings page. 
+             * Triggered after the core plug-in styles have been enqueued.
+             * 
+             * @hook lvdwcmc_enqueue_gateway_settings_form_styles
+             * 
+             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
+             */
+            do_action('lvdwcmc_enqueue_gateway_settings_form_styles', 
+                $this->_mediaIncludes);
+
             $this->_mediaIncludes
                 ->includeScriptSettings();
             $this->_mediaIncludes
                 ->localizeSettingsScript($this->_getSettingsScriptTranslations());
+
+            /**
+             * Enqueue scripts for the gateway settings page. 
+             * Triggered after the core plug-in scripts have been enqueued.
+             * 
+             * @hook lvdwcmc_enqueue_gateway_settings_form_scripts
+             * 
+             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
+             */
+            do_action('lvdwcmc_enqueue_gateway_settings_form_scripts', 
+                $this->_mediaIncludes);
         }
 
         public function process_admin_options() {
@@ -182,8 +205,26 @@ namespace LvdWcMc {
             }
 
             $renameOk = true;
-            $result = parent::process_admin_options();
+            $processResult = parent::process_admin_options();
             $mobilpayAccountId = $this->get_option('mobilpay_account_id');
+
+            /**
+             * Fires after the core admin option processing has been performed 
+             *  (including the options being saved),
+             *  but before the gateway peforms its custom processing.
+             * 
+             * @hook lvdwcmc_before_process_admin_options
+             * 
+             * @param boolean $processResult The intermediary result of the options processing operation
+             * @param array $settings The new settings values
+             * @param array $errors The current list of errors that occured during processing
+             * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
+             */
+            do_action('lvdwcmc_process_admin_options', 
+                $processResult, 
+                $this->settings, 
+                $this->errors,
+                $this);
 
             if ($this->_mobilpayAccountId != $mobilpayAccountId) {
                 foreach ($this->_getPaymentAssetFields() as $fieldId => $fieldInfo) {
@@ -200,11 +241,30 @@ namespace LvdWcMc {
                 }
             }
 
-            if ($result) {
+            if ($processResult) {
                 $this->init_settings();
             }
 
-            return $result && $renameOk;
+            //Update final processing result
+            $processResult = $processResult && $renameOk;
+
+            /**
+             * Fires after the gateway has performed its custom processing
+             * 
+             * @hook lvdwcmc_after_process_admin_options
+             * 
+             * @param boolean $processResult The result of options processing operation
+             * @param array $settings The new settings values
+             * @param array $errors The current list of errors that occurred during processing
+             * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
+             */
+            do_action('lvdwcmc_process_admin_options_result', 
+                $processResult,
+                $this->errors,
+                $this->settings,
+                $this);
+
+            return $processResult;
         }
 
         public function init_settings() {
@@ -216,10 +276,25 @@ namespace LvdWcMc {
             $this->_mobilpayEnvironment = $this->get_option('mobilpay_environment');
             $this->_mobilpayAccountId = $this->get_option('mobilpay_account_id');
             $this->_mobilpayReturnUrl = $this->get_option('mobilpay_return_url');
+
+            /**
+             * Fires after the the gateway has read the options 
+             *  and done initializing itself with the values it needs
+             * 
+             * @hook lvdwcmc_admin_options_init
+             * 
+             * @param array $settings The current settings values
+             * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
+             */
+            do_action('lvdwcmc_admin_options_init', 
+                $this->settings,
+                $this);
         }
 
         public function init_form_fields() {
-            $this->form_fields = array(
+            $additionalFields = array();
+
+            $defaultFields = array(
                 'enabled' => array(
                     'title' => __('Enable / Disable', 'wc-mobilpayments-card'),
                     'label' => __('Enable this payment gateway', 'wc-mobilpayments-card'),
@@ -297,6 +372,49 @@ namespace LvdWcMc {
                     '_is_live_mode' => false
                 )
             );
+
+            /**
+             * Filters the list of additional fields added to the gateway settings form.
+             * Any additional field will be overridden by a default field with the same key.
+             * 
+             * @hook lvdwcmc_additional_gateway_settings_fields
+             * 
+             * @param array $additionalFields The initial list of additional fields, as provided by WC-MobilPayments-Card
+             * @param array $defaultFields The list of default fields provided by WC-MobilPayments-Card
+             * @return array The actual list of additional fields, as returned by the registered filters
+             */
+            $additionalFields = apply_filters('lvdwcmc_additional_gateway_settings_fields', 
+                $additionalFields, 
+                $defaultFields);
+
+            //We do not allow overriding of the default fields, 
+            //  only specifying additional ones, so any additional field 
+            //  will be overridden by a default field with the same key
+            $this->form_fields = array_merge($additionalFields,
+                $defaultFields);
+        }
+
+        public function generate_text_html($fieldId, $fieldInfo) {
+            if (isset($fieldInfo['_generate_html']) && is_callable($fieldInfo['_generate_html'])) {
+                $content = call_user_func($fieldInfo['_generate_html'], 
+                    $fieldId, 
+                    $fieldInfo, 
+                    $this->settings);
+            } else {
+                $content = parent::generate_text_html($fieldId, $fieldInfo);
+            }
+            return $content;
+        }
+
+        public function validate_text_field($fieldId, $fieldInfo) {
+            if (isset($fieldInfo['_validate_field']) && is_callable($fieldInfo['_validate_field'])) {
+                $value = call_user_func($fieldInfo['_validate_field'], 
+                    $fieldId, 
+                    $fieldInfo);
+            } else {
+                $value = parent::validate_text_field($fieldId, $fieldInfo);
+            }
+            return $value;
         }
 
         private function _renderAdminOptionsJSSettings() {
@@ -314,6 +432,33 @@ namespace LvdWcMc {
             $data->uploadMaxFileSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE;
             $data->uploadChunkSize = LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE;
             $data->uploadKey = LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY;
+
+            /**
+             * Filters any additional data to be added to the view model of the gateway js settings.
+             * The view model is a plain stdClass and contains any data required to inject the gateway settings 
+             *  required for the JS scripts on this page.
+             * Additional data is provided by user filters as an associative array 
+             *  and then added to the view model as properties, but only the corresponding keys 
+             *  that do not overlap the existing ones.
+             * 
+             * @hook lvdwcmc_get_inline_js_settings_data
+             * 
+             * @param array $additionalData The initial set of additional data fields, as provided by WC-MobilPayments-Card
+             * @param array $settings The current settings form values
+             * @return array The actual set of additional data fields, as returned by the registered filters
+             */
+            $additionalData = apply_filters('lvdwcmc_get_inline_js_settings_data', 
+                array(), 
+                $this->settings);
+
+            if (is_array($additionalData)) {
+                foreach($additionalData as $key => $value) {
+                    //Do not override existing properties
+                    if (!property_exists($data, $key)) {
+                        $data->$key = $value;
+                    }
+                }
+            }
 
             require $this->_env->getViewFilePath('lvdwcmc-gateway-settings-js.php');
             return ob_get_clean();
@@ -419,6 +564,31 @@ namespace LvdWcMc {
             $result->status = $uploader->receive();
             $result->ready = $uploader->isReady();
 
+            /**
+             * Fires after a payment asset upload step has been completed.
+             * The asset is uploaded in chunks, so this is triggered for every uploaded chunk.
+             * When all the chunks have been successfully uploaded, the $ready parameter is set to true.
+             * 
+             * @hook lvdwcmc_payment_asset_uploaded
+             * 
+             * @param array $uploadedAssetInfo The information pertaining to the uploaded asset
+             * @param array $uploadProcessInfo The information pertaining to the current upload process step
+             * @param boolean $status Whether or not the current step of the upload process has been successful
+             * @param boolean $ready Whether or not the entire upload is now successfully completed
+             */
+            do_action('lvdwcmc_payment_asset_uploaded', 
+                array(
+                    'assetId' => $assetId,
+                    'fieldInfo' => $fieldInfo
+                ), 
+                array(
+                    'chunk' => $chunk, 
+                    'chunks' => $chunks,
+                    'destination' => $destination
+                ), 
+                $result->status, 
+                $result->ready);
+
             lvdwcmc_send_json($result);
         }
 
@@ -449,6 +619,23 @@ namespace LvdWcMc {
                 ? __('Payment asset file successfully removed.', 'wc-mobilpayments-card')
                 : __('Payment asset file could not be removed.', 'wc-mobilpayments-card');
 
+            /**
+             * Fires after a payment asset has been removed.
+             * 
+             * @hook lvdwcmc_payment_asset_removed
+             * 
+             * @param array $uploadedAssetInfo The information pertaining to the uploaded asset
+             * @param boolean $success Whether or not the operation is successfully completed
+             * @param string $message The message pertaining to the operation status
+             */
+            do_action('lvdwcmc_payment_asset_removed',
+                array(
+                    'assetId' => $assetId,
+                    'fieldInfo' => $fieldInfo
+                ),
+                $result->success,
+                $result->message);
+
             lvdwcmc_send_json($result);
         }
 
@@ -458,11 +645,28 @@ namespace LvdWcMc {
                 die;
             }
 
-            $slug = 'lvdwcmc-thank-you';
-            $page = get_page_by_path($slug, OBJECT, 'page');
+            /**
+             * Filters the slug used to create the return page
+             * 
+             * @hook lvdwcmc_generate_return_url_slug
+             * 
+             * @param string $defaultSlug The default slug used by WC-MobilPayments-Card to create the return page
+             * @param string The actual page slug, as returned by the registered filters
+             */
+            $slug = apply_filters('lvdwcmc_generate_return_url_slug', 'lvdwcmc-thank-you');
 
+            $page = get_page_by_path($slug, OBJECT, 'page');
             if ($page == null) {
-                $pageId = wp_insert_post(array(
+                /**
+                 * Filters the information used to create the return page. 
+                 * This is the data passed along to wp_insert_post().
+                 * 
+                 * @hook lvdwcmc_generate_return_url_data
+                 * 
+                 * @param array $defaultPagePostInfo The default page info used by WC-MobilPayments-Card to create the return page
+                 * @return array The actual page post info, as returned by the registered filters
+                 */
+                $pagePostInfo = apply_filters('lvdwcmc_generate_return_url_page_info', array(
                     'post_author' => get_current_user_id(),
                     'post_content' => '[lvdwcmc_display_mobilpay_order_status]',
                     'post_title' => __('Thank you for your order', 'wc-mobilpayments-card'),
@@ -471,8 +675,9 @@ namespace LvdWcMc {
                     'post_type' => 'page',
                     'comment_status' => 'closed',
                     'ping_status' => 'closed'
-                ), true);
+                ));
 
+                $pageId = wp_insert_post($pagePostInfo, true);
                 if (!is_wp_error($pageId)) {
                     $page = get_post($pageId, OBJECT, 'raw');
                 }
@@ -493,24 +698,60 @@ namespace LvdWcMc {
         public function needs_setup() {
             //Used by WC when toggling gateway on or off via AJAX 
             //  (see WC_Ajax::toggle_gateway_enabled())
-            return empty($this->_mobilpayAccountId) 
+            $defaultNeedsSetup = empty($this->_mobilpayAccountId) 
                 || empty($this->_mobilpayReturnUrl)
                 || !$this->_hasPaymentAssets();
+
+            /**
+             * Filters whether or not the gateway needs setup.
+             * This is invoked by WC, when toggling gateway on or off via AJAX
+             * 
+             * @hook lvdwcmc_gateway_needs_setup
+             * @see \WC_Ajax::toggle_gateway_enabled()
+             * 
+             * @param boolean $defaultNeedsSetup Whether or not setup is needed, as determined by default by WC-MobilPayments-Card
+             * @param array $settings The current settings values
+             * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
+             * 
+             * @return boolean Whether or not setup is neded, as returned by the registered filters
+             */
+            return apply_filters('lvdwcmc_gateway_needs_setup', $defaultNeedsSetup, 
+                $this->settings, 
+                $this);
         }
 
         public function is_available() {
             //Used by WC to determine what payment gateways are available on checkout 
             //  (see WC_Payment_Gateways::get_available_payment_gateways())
-            return !$this->needs_setup() && parent::is_available();
+            $defaultIsAvailable = !$this->needs_setup() && parent::is_available();
+
+            /**
+             * Filters the gateway availability status.
+             * This is invoked when WC tries to determine what payment gateways are available for checkout.
+             *
+             * @hook lvdwcmc_gateway_is_available
+             * @see \WC_Payment_Gateways::get_available_payment_gateways().
+             * 
+             * @param boolean $defaultIsAvailable The availability status computed by default by WC-MobilPayments-Card 
+             * @param array $settings The current settings values
+             * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
+             * 
+             * @return boolean The actual availability status, as returned by the registered filters
+             */
+            return apply_filters('lvdwcmc_gateway_is_available', $defaultIsAvailable, 
+                $this->settings, 
+                $this);
         }
 
         public function process_payment($orderId) {
+            $result = array();
             $context = array(
                 'orderId' => $orderId,
                 'source' => self::GATEWAY_ID
             );
 
-            $this->logDebug('Begin processing payment for order', $context);
+            $this->logDebug('Begin processing payment for order', 
+                $context);
 
             try {
                 $order = wc_get_order($orderId);
@@ -533,6 +774,21 @@ namespace LvdWcMc {
                                 $order->get_checkout_payment_url(true)
                             )
                     );
+
+                    /**
+                     * Fires after the order has been completed, during payment processing, 
+                     *  before redirecting to the checkout receipt page, when the order 
+                     *  has a total greater than zero.
+                     * 
+                     * @hook lvdwcmc_payment_before_checkout
+                     * @see \WC_Payment_Gateway::process_payment()
+                     * 
+                     * @param \WC_Order $order The order affected by the operation
+                     * @param array $result The operation result, as specified by \WC_Payment_Gateway::process_payment()
+                     */
+                    do_action('lvdwcmc_order_before_checkout_payment', 
+                        $order, 
+                        $result);
                 } else {
                     $this->logDebug('Order total is 0. Will complete order and redirect to thank-you page', 
                         $context);
@@ -546,6 +802,20 @@ namespace LvdWcMc {
                         'result' => 'success',
                         'redirect' => $order->get_checkout_order_received_url()
                     );
+
+                    /**
+                     * Fires after the order has been completed, during payment processing, 
+                     *  when the order has a total of zero.
+                     * 
+                     * @hook lvdwcmc_payment_initialized
+                     * @see \WC_Payment_Gateway::process_payment()
+                     * 
+                     * @param \WC_Order $order The order affected by the operation
+                     * @param array $result The operation result, as specified by \WC_Payment_Gateway::process_payment()
+                     */
+                    do_action('lvdwcmc_order_before_checkout_thank_you', 
+                        $order, 
+                        $result);
                 }
 
                 $this->logDebug('Done processing payment for order', $context);
@@ -698,13 +968,25 @@ namespace LvdWcMc {
         }
 
         private function _createMobilpayRequest(\WC_Order $order) {
+            $requestInfo = apply_filters('lvdwcmc_get_payment_request_information', 
+                array(
+                    'orderId' => md5(uniqid(rand())),
+                    'invoice' => array(
+                        'currency' => $order->get_currency(),
+                        'amount' => sprintf('%.2f', $order->get_total()),
+                        'details' => sprintf(__('Payment for order #%s.', 'wc-mobilpayments-card'), $order->get_order_key())
+                    ),
+                    'billing'
+                ), 
+                $order);
+
             $cardPaymentRequest = new \Mobilpay_Payment_Request_Card();
             $cardPaymentRequest->signature = $this->_mobilpayAccountId;
             $cardPaymentRequest->orderId = md5(uniqid(rand()));
     
             $cardPaymentRequest->confirmUrl = $this->_mobilpayNotifyUrl;
             $cardPaymentRequest->returnUrl = trim($this->_mobilpayReturnUrl) . '?order_id=' . $order->get_id();
-    
+
             $cardPaymentRequest->invoice = new \Mobilpay_Payment_Invoice();
             $cardPaymentRequest->invoice->currency = 
                 $order->get_currency();
@@ -712,7 +994,7 @@ namespace LvdWcMc {
                 sprintf('%.2f', $order->get_total());
             $cardPaymentRequest->invoice->details = 
                 sprintf(__('Payment for order #%s.', 'wc-mobilpayments-card'), $order->get_order_key());
-            
+
             $billingAndShipping = new \Mobilpay_Payment_Address();
             $billingAndShipping->type = 'person';
             $billingAndShipping->firstName = $order->get_billing_first_name();

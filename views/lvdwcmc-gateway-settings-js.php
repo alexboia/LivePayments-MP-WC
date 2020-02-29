@@ -60,3 +60,15 @@
     var lvdwcmc_uploadChunkSize = '<?php echo esc_js($data->uploadChunkSize); ?>';
     var lvdwcmc_uploadKey = '<?php echo esc_js($data->uploadKey); ?>';
 </script>
+
+<?php 
+    /**
+     * Insert inline gateway JS settings. The plug-in does not automatically wrap those in script tags, 
+     *  so user action hook callback must provide those if required.
+     * Triggered after the core gateway JS settings have been inserted.
+     * 
+     * @hook lvdwcmc_insert_inline_js_settings
+     * @param \stdClass $data The view model that contains the data required to render the settings
+     */
+    do_action('lvdwcmc_insert_inline_js_settings', $data); 
+?>
