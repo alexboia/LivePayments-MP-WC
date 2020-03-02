@@ -73,10 +73,29 @@ namespace LvdWcMc {
             return $status;
         }
 
-        public function processOrderInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
-            return ($this->_transactionFactory->newFromOrder($order) != null)
-                ? MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK
-                : MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
+        public function processPaymentInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
+            $transaction = $this->_transactionFactory->newFromOrder($order);
+
+            if ($transaction != null) {
+                /**
+                 * Fires after the payment transaction has been successfully 
+                 *  registered and initialized for a given order
+                 * 
+                 * @hook lvdwcmc_payment_initialized
+                 * 
+                 * @param \WC_Order $order The target order
+                 * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
+                 */
+                do_action('lvdwcmc_order_payment_initialized', 
+                    $order, 
+                    $transaction);
+
+                $result = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK;
+            } else {
+                $result = MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION;
+            }
+
+            return $result;
         }
 
         public function processConfirmedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request) {
@@ -136,6 +155,28 @@ namespace LvdWcMc {
                                 $processedAmount), 0);
                         }
                     }
+
+                    /**
+                     * Fires when the gateway sends a payment confirmation notification
+                     *  and that notification is successfully processed.
+                     * 
+                     * @hook lvdwcmc_order_payment_confirmed
+                     * 
+                     * @param \WC_Order $order The target order
+                     * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
+                     * @param array $args Additional arguments that establish the context of the payment completion notification
+                     */
+                    do_action('lvdwcmc_order_payment_confirmed', 
+                        $order, 
+                        $transaction, 
+                        array(
+                            'transactionId' => $transactionId,
+                            'orderAction' => $order->get_status(),
+                            'originalAmount' => $originalAmount,
+                            'processedAmount' => $processedAmount,
+                            'isAmountCompletelyProcessed' => $transaction->isAmountCompletelyProcessed(),
+                            'panMasked' => $panMasked
+                        ));
                 } else {
                     $this->logDebug('The local transaction could not be set as completed.', 
                         $context);
@@ -182,6 +223,26 @@ namespace LvdWcMc {
                     $order->add_order_note($this->_getFailedPaymentOrderGenericNote($transactionId, 
                         $errorCode, 
                         $errorMessage), 0);
+
+                    /**
+                     * Fires when the gateway sends a payment failure notification
+                     *  and that notification is successfully processed.
+                     * 
+                     * @hook lvdwcmc_order_payment_failed
+                     * 
+                     * @param \WC_Order $order The target order
+                     * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
+                     * @param array $args Additional arguments that establish the context of the payment failure notification
+                     */
+                    do_action('lvdwcmc_order_payment_failed', 
+                        $order, 
+                        $transaction, 
+                        array(
+                            'transactionId' => $transactionId,
+                            'orderAction' => $order->get_status(),
+                            'errorCode' => $errorCode,
+                            'errorMessage' => $errorMessage
+                        ));
                 } else {
                     $this->logDebug('The local transaction could not be set as failed.', 
                         $context);
@@ -219,6 +280,24 @@ namespace LvdWcMc {
 
                     $order->add_order_note($this->_getGenericCancelledOrderCustomerNote($transactionId), 1);
                     $order->add_order_note($this->_getGenericCancelledOrderAdminNote($transactionId), 0);
+
+                    /**
+                     * Fires when the gateway sends a payment cancellation notification
+                     *  and that notification is successfully processed.
+                     * 
+                     * @hook lvdwcmc_order_payment_cancelled
+                     * 
+                     * @param \WC_Order $order The target order
+                     * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
+                     * @param array $args Additional arguments that establish the context of the payment cancellation notification
+                     */
+                    do_action('lvdwcmc_order_payment_cancelled', 
+                        $order, 
+                        $transaction, 
+                        array(
+                            'transactionId' => $transactionId,
+                            'orderAction' => $order->get_status()
+                        ));
                 } else {
                     $this->logDebug('The local transaction could not be set as cancelled.', 
                         $context);
@@ -257,6 +336,25 @@ namespace LvdWcMc {
                     
                     $order->add_order_note($this->_getGenericOnHoldOrderCustomerNote($transactionId), 1);
                     $order->add_order_note($this->_getGenericOnHoldOrderAdminNote($transactionId), 0);
+
+                    /**
+                     * Fires when the gateway sends a payment pending notification
+                     *  and that notification is successfully processed.
+                     * 
+                     * @hook lvdwcmc_order_payment_pending
+                     * 
+                     * @param \WC_Order $order The target order
+                     * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
+                     * @param array $args Additional arguments that establish the context of the payment pending notification
+                     */
+                    do_action('lvdwcmc_order_payment_pending', 
+                        $order, 
+                        $transaction, 
+                        array(
+                            'transactionId' => $transactionId,
+                            'paymentAction' => $action,
+                            'orderAction' => $order->get_status()
+                        ));
                 } else {
                     $this->logDebug('The local transaction could not be set as payment pending.', 
                         $context);
@@ -319,6 +417,29 @@ namespace LvdWcMc {
                                 $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
                             }
                         }
+
+                        /**
+                         * Fires when the gateway sends a payment refund/credit notification
+                         *  and that notification is successfully processed.
+                         * 
+                         * @hook lvdwcmc_order_payment_refund
+                         * 
+                         * @param \WC_Order $order The target order
+                         * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
+                         * @param array $args Additional arguments that establish the context of the payment refund/credit notification
+                         */
+                        do_action('lvdwcmc_order_payment_refund', 
+                            $order, 
+                            $transaction, 
+                            array(
+                                'refundId' => $refund->get_id(),
+                                'transactionId' => $transactionId,
+                                'orderAction' => $order->get_status(),
+                                'originalAmount' => $originalAmount,
+                                'processedAmount' => $processedAmount,
+                                'isAmountCompletelyProcessed' => $transaction->isAmountCompletelyProcessed(),
+                                'panMasked' => $panMasked
+                            ));
                     }
                 } else {
                     $this->logDebug('The local transaction could not be set as credited.', 

@@ -274,8 +274,8 @@ namespace LvdWcMc {
             $this->description = $this->get_option('description');
 
             $this->_mobilpayEnvironment = $this->get_option('mobilpay_environment');
-            $this->_mobilpayAccountId = $this->get_option('mobilpay_account_id');
-            $this->_mobilpayReturnUrl = $this->get_option('mobilpay_return_url');
+            $this->_mobilpayAccountId = trim($this->get_option('mobilpay_account_id'));
+            $this->_mobilpayReturnUrl = trim($this->get_option('mobilpay_return_url'));
 
             /**
              * Fires after the the gateway has read the options 
@@ -451,14 +451,8 @@ namespace LvdWcMc {
                 array(), 
                 $this->settings);
 
-            if (is_array($additionalData)) {
-                foreach($additionalData as $key => $value) {
-                    //Do not override existing properties
-                    if (!property_exists($data, $key)) {
-                        $data->$key = $value;
-                    }
-                }
-            }
+            $data = $this->_mergeAdditionalData($data, 
+                $additionalData);
 
             require $this->_env->getViewFilePath('lvdwcmc-gateway-settings-js.php');
             return ob_get_clean();
@@ -842,8 +836,8 @@ namespace LvdWcMc {
 
             if ($order instanceof \WC_Order) {
                 try {
-                    $mobilpayRequest = $this->_createMobilpayRequest($order);
-                    $this->_processor->processOrderInitialized($order, $mobilpayRequest);
+                    $mobilpayRequest = $this->_createPaymentRequest($order);
+                    $this->_processor->processPaymentInitialized($order, $mobilpayRequest);
 
                     $data->paymentUrl = $this->_getGatewayEndpointUrl();
                     $data->envKey = $mobilpayRequest->getEnvKey();
@@ -938,7 +932,6 @@ namespace LvdWcMc {
 
         public function add_transaction_details_to_email(\WC_Order $order, $sent_to_admin, $plain_text, $email) {
             if ($this->_canAddTransactionDetailsToEmail($order, $sent_to_admin, $plain_text, $email)) {
-
                 $transaction = $this->_transactionFactory->existingFromOrder($order);
                 if ($transaction != null) {
 
@@ -952,7 +945,36 @@ namespace LvdWcMc {
                         $data->clientIpAddress = null;
                     }
 
-                    $data->success = true;
+                    /**
+                     * Filters any additional data to be added to the view model of the 
+                     *  transaction details template used for the order e-mail notification
+                     *  send to the user when the order status changes.
+                     * The view model is a plain stdClass and contains any data required 
+                     *  to correctly render the template.
+                     * Additional data is provided by user filters as an associative array 
+                     *  and then added to the view model as properties, but only the corresponding keys 
+                     *  that do not overlap the existing ones.
+                     * 
+                     * @hook lvdwcmc_get_email_transaction_details_data
+                     * 
+                     * @param array $additionalData The initial set of additional data fields, as provided by WC-MobilPayments-Card
+                     * @param \WC_Order $order The target order
+                     * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
+                     * @param array $args Additional arguments that establish the context in which the e-mail is being sent
+                     * @return array The actual set of additional data fields, as returned by the registered filters
+                     */
+                    $additionalData = apply_filters('lvdwcmc_get_email_transaction_details_data', 
+                        array(), 
+                        $order, 
+                        $transaction, 
+                        array(
+                            'sendToAdmin' => $sent_to_admin,
+                            'plainText' => $plain_text,
+                            'email' => $email
+                        ));
+
+                    $data = $this->_mergeAdditionalData($data, 
+                        $additionalData);
 
                     require $this->_env->getViewFilePath('lvdwcmc-email-transaction-details.php');
                 }
@@ -960,15 +982,95 @@ namespace LvdWcMc {
         }
 
         private function _canAddTransactionDetailsToEmail(\WC_Order $order, $sent_to_admin, $plain_text, $email) {
-            return self::matchesGatewayId($order->get_payment_method()) 
+            $defaultCanAdd = self::matchesGatewayId($order->get_payment_method()) 
                 && $order->has_status(array('completed', 'processing'))
                 && $email instanceof \WC_Email 
                 && ($email->id == 'customer_completed_order' || $email->id == 'customer_processing_order')
                 && !$plain_text;
+
+            /**
+             * Filters whether or not to add the transaction details 
+             *  to the e-mail notification send to the user when 
+             *  the order status changes
+             * 
+             * @hook lvdwcmc_add_email_transaction_details
+             * 
+             * @param boolean $canAdd The initial value of whether or not the transaction details are added to the e-mail notification
+             * @param \WC_Order $order The target order
+             * @param array $args Additional arguments that establish the context in which the e-mail is being sent
+             * @return boolean Whether or not to add to add the transaction details, as established by the registered filters
+             */
+            return apply_filters('lvdwcmc_add_email_transaction_details', 
+                $defaultCanAdd,
+                $order, 
+                array(
+                    'sendToAdmin' => $sent_to_admin,
+                    'plainText' => $plain_text,
+                    'email' => $email
+                ));
         }
 
-        private function _createMobilpayRequest(\WC_Order $order) {
-            $requestInfo = apply_filters('lvdwcmc_get_payment_request_information', 
+        private function _createPaymentRequest(\WC_Order $order) {
+            $requestInfo = $this->_getPaymentRequestInfo($order);
+
+            $paymentRequest = new \Mobilpay_Payment_Request_Card();
+            $paymentRequest->signature = $this->_mobilpayAccountId;
+            $paymentRequest->orderId = $requestInfo['orderId'];
+    
+            $paymentRequest->confirmUrl = $this->_mobilpayNotifyUrl;
+            $paymentRequest->returnUrl = add_query_arg(
+                'order_id', 
+                $order->get_id(), 
+                $this->_mobilpayReturnUrl
+            );
+
+            $paymentRequest->invoice = new \Mobilpay_Payment_Invoice();
+            $paymentRequest->invoice->currency = $requestInfo['invoice']['currency'];
+            $paymentRequest->invoice->amount = $requestInfo['invoice']['amount'];
+            $paymentRequest->invoice->details = $requestInfo['invoice']['details'];
+
+            if (!empty($requestInfo['billing']) && is_array($requestInfo['billing'])) {
+                $billingAddress = $this->_createPaymentAddressFromRequestInfo($requestInfo['billing']);
+            } else {
+                $billingAddress = null;
+            }
+
+            if (!empty($requestInfo['shipping']) && is_array($requestInfo['shipping'])) {
+                $shippingAddress = $this->_createPaymentAddressFromRequestInfo($requestInfo['shipping']);
+            } else {
+                $shippingAddress = $billingAddress;
+            }
+            
+            if ($billingAddress != null) {
+                $paymentRequest->invoice->setBillingAddress($billingAddress);
+            }
+
+            if ($shippingAddress != null) {
+                $paymentRequest->invoice->setShippingAddress($shippingAddress);
+            }
+    
+            $paymentRequest->params = array(
+                '_lvdwcmc_order_id' => $order->get_id(),
+                '_lvdwcmc_customer_id' => $order->get_customer_id(),
+                '_lvdwcmc_customer_ip' => $order->get_customer_ip_address()
+            );
+
+            $paymentRequest->encrypt($this->_getX509CertificateFilePath());
+            return $paymentRequest;
+        }
+
+        private function _getPaymentRequestInfo(\WC_Order $order) {
+            /**
+             * Filters the information fed into the payment 
+             *  request sent to the payment gateway
+             * 
+             * @hook lvdwcmc_get_payment_request_info
+             * 
+             * @param array $defaultRequestInfo The payment request information provided by default by WC-MobilPayments-Card 
+             * @param \WC_Order $order The order for which the payment request needs to be generated
+             * @return array The actual payment request information, as returned by the registered filters
+             */
+            return apply_filters('lvdwcmc_get_payment_request_info', 
                 array(
                     'orderId' => md5(uniqid(rand())),
                     'invoice' => array(
@@ -976,47 +1078,52 @@ namespace LvdWcMc {
                         'amount' => sprintf('%.2f', $order->get_total()),
                         'details' => sprintf(__('Payment for order #%s.', 'wc-mobilpayments-card'), $order->get_order_key())
                     ),
-                    'billing'
+                    'billing' => array(
+                        'type' => 'person',
+                        'firstName' => $order->get_billing_first_name(),
+                        'lastName' => $order->get_billing_last_name(),
+                        'email' => $order->get_billing_email(),
+                        'fiscalNumber' => '',
+                        'address' => $order->get_formatted_billing_address(),
+                        'mobilePhone' => $order->get_billing_phone()
+                    ),
+                    'shipping' => array(
+                        'type' => 'person',
+                        'firstName' => $order->get_shipping_first_name(),
+                        'lastName' => $order->get_shipping_last_name(),
+                        'email' => $order->get_billing_email(),
+                        'fiscalNumber' => '',
+                        'address' => $order->get_formatted_shipping_address(),
+                        'mobilePhone' => $order->get_billing_phone()
+                    )
                 ), 
                 $order);
+        }
 
-            $cardPaymentRequest = new \Mobilpay_Payment_Request_Card();
-            $cardPaymentRequest->signature = $this->_mobilpayAccountId;
-            $cardPaymentRequest->orderId = md5(uniqid(rand()));
-    
-            $cardPaymentRequest->confirmUrl = $this->_mobilpayNotifyUrl;
-            $cardPaymentRequest->returnUrl = trim($this->_mobilpayReturnUrl) . '?order_id=' . $order->get_id();
-
-            $cardPaymentRequest->invoice = new \Mobilpay_Payment_Invoice();
-            $cardPaymentRequest->invoice->currency = 
-                $order->get_currency();
-            $cardPaymentRequest->invoice->amount = 
-                sprintf('%.2f', $order->get_total());
-            $cardPaymentRequest->invoice->details = 
-                sprintf(__('Payment for order #%s.', 'wc-mobilpayments-card'), $order->get_order_key());
-
-            $billingAndShipping = new \Mobilpay_Payment_Address();
-            $billingAndShipping->type = 'person';
-            $billingAndShipping->firstName = $order->get_billing_first_name();
-            $billingAndShipping->lastName = $order->get_billing_last_name();
-            $billingAndShipping->email = $order->get_billing_email();
-            $billingAndShipping->fiscalNumber = 'N/A';
-            $billingAndShipping->address = $order->get_formatted_billing_address();
-            $billingAndShipping->mobilePhone = $order->get_billing_phone();
-            
-            $cardPaymentRequest->invoice
-                ->setBillingAddress($billingAndShipping);
-            $cardPaymentRequest->invoice
-                ->setShippingAddress($billingAndShipping);
-    
-            $cardPaymentRequest->params = array(
-                '_lvdwcmc_order_id' => $order->get_id(),
-                '_lvdwcmc_customer_id' => $order->get_customer_id(),
-                '_lvdwcmc_customer_ip' => $order->get_customer_ip_address()
-            );
-
-            $cardPaymentRequest->encrypt($this->_getX509CertificateFilePath());
-            return $cardPaymentRequest;
+        private function _createPaymentAddressFromRequestInfo(array $info) {
+            $address = new \Mobilpay_Payment_Address();
+            $address->type = isset($info['type']) 
+                ? $info['type'] 
+                : null;
+            $address->firstName = isset($info['firstName']) 
+                ? $info['firstName'] 
+                : null;
+            $address->lastName = isset($info['lastName']) 
+                ? $info['lastName'] 
+                : null;
+            $address->email = isset($info['email']) 
+                ? $info['email'] 
+                : null;
+            $address->fiscalNumber = isset($info['fiscalNumber']) 
+                ? $info['fiscalNumber'] 
+                : null;
+            $address->address = isset($info['address']) 
+                ? $info['address'] 
+                : null;
+            $address->mobilePhone = isset($info['mobilePhone']) 
+                ? $info['mobilePhone'] 
+                : null;
+            return $address;
         }
 
         private function _processGatewayAction(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $paymentRequest, $context) {
@@ -1171,6 +1278,19 @@ namespace LvdWcMc {
 
         private function _emptyCart() {
             WC()->cart->empty_cart();
+        }
+
+        private function _mergeAdditionalData(\stdClass $data, array $additionalData) {
+            if (is_array($additionalData)) {
+                foreach($additionalData as $key => $value) {
+                    //Do not override existing properties
+                    if (!property_exists($data, $key)) {
+                        $data->$key = $value;
+                    }
+                }
+            }
+            
+            return $data;
         }
 
         private function _getPaymentAssetFields() {

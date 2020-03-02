@@ -85,17 +85,23 @@
                 : null;
         }
 
+        /**
+         * @return \LvdWcMc\MobilpayTransaction The corresponding transaction or null if not found
+         */
         public function newFromOrder($order) {
             return $this->_fromOrder($order, true);
         }
 
         /**
-         * @return MobilpayTransaction The corresponding transaction or null if not found
+         * @return \LvdWcMc\MobilpayTransaction The corresponding transaction or null if not found
          */
         public function existingFromOrder($order) {
             return $this->_fromOrder($order, false);
         }
 
+        /**
+         * @return \LvdWcMc\MobilpayTransaction The corresponding transaction or null if not found
+         */
         public function fromTransactionId($transactionId) {
             $db = $this->_getDb();
             $db->where('tx_id', $transactionId);

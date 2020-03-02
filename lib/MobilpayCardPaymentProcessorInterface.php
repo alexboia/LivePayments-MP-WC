@@ -31,7 +31,7 @@
 
 namespace LvdWcMc {
     interface MobilpayCardPaymentProcessorInterface {
-        function processOrderInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
+        function processPaymentInitialized(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
 
         function processConfirmedPaymentResponse(\WC_Order $order, \Mobilpay_Payment_Request_Abstract $request);
 
