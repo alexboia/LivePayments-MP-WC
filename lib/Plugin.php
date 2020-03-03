@@ -228,7 +228,24 @@ namespace LvdWcMc {
         }
 
         public function onRegisterMetaboxes($postType, $post) {
-            if ($postType == 'shop_order') {
+            /**
+             * Filters whether or not to add the payment details metabox 
+             *  to the admin order details screen.
+             * 
+             * @hook lvdwcmc_register_order_payment_details_metabox
+             * 
+             * @param boolean $registerMetabox Whether or not to register the metabox, initially provided by WC-MobilPayments-Card
+             * @param array $args Additional arguments that establish the context of the operation
+             * @return boolean Whether or not to register the metabox, as established by the registered filters
+             */
+            $registerMetabox = apply_filters('lvdwcmc_register_order_payment_details_metabox', 
+                ($postType === 'shop_order'),
+                array(
+                    'postType' => $postType,
+                    'post' => $post
+                ));
+
+            if ($registerMetabox) {
                 add_meta_box('lvdwcmc-transaction-details-metabox', 
                     __('Payment transaction details', 'wc-mobilpayments-card'), 
                     array($this, 'addTransactionDetailsOnAdminOrderDetails'), 
@@ -451,25 +468,35 @@ namespace LvdWcMc {
                 $data->clientIpAddress = null;
             }
 
-            return $data;
+            /**
+             * Filters the transaction details view model, used both 
+             *  in the backend and in the frontend to display transaction information.
+             * Properties may be overwritten.
+             * 
+             * @hook lvdwcmc_get_displayable_transaction_details
+             * 
+             * @param \stdClass $data The initial view model, as provided by WC-MobilPayments-Card
+             * @param \LvdWcMc\MobilpayTransaction $transaction The source transaction
+             * @return \stdClass The actual view model, as returned by the registered filters
+             */
+            return apply_filters('lvdwcmc_get_displayable_transaction_details', 
+                $data, 
+                $transaction);
         }
 
         private function _formatTransactionAmount($amount) {
+            $amountFormat = $this->_getAmountFormat();
             return number_format($amount, 
-                wc_get_price_decimals(), 
-                wc_get_price_decimal_separator(), 
-                wc_get_price_thousand_separator());
+                $amountFormat['decimals'], 
+                $amountFormat['decimalSeparator'], 
+                $amountFormat['thousandSeparator']);
         }
 
         private function _formatTransactionTimestamp($strTimestamp) {
             $timestamp = date_create_from_format('Y-m-d H:i:s', $strTimestamp);
             return !empty($timestamp) 
-                ? $timestamp->format($this->_getFullDateTimeFormat()) 
+                ? $timestamp->format($this->_getDateTimeFormat()) 
                 : null;
-        }
-
-        private function _getFullDateTimeFormat() {
-            return get_option('date_format') . ' ' . get_option('time_format');
         }
 
         private function _addAjaxAction($action, $callBack, $noPriv = false) {
@@ -547,6 +574,14 @@ namespace LvdWcMc {
             return isset($labelsForCodes[$status]) 
                 ? $labelsForCodes[$status] 
                 : '-';
+        }
+
+        private function _getAmountFormat() {
+            return lvdwcmc_get_amount_format();
+        }
+
+        private function _getDateTimeFormat() {
+            return lvdwcmc_get_datetime_format();
         }
     }
 }

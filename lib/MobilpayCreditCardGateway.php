@@ -31,6 +31,7 @@
 
 namespace LvdWcMc {
     class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
+        use DataExtensions;
         use LoggingExtensions;
 
         const GATEWAY_PROCESS_RESPONSE_ERR_OK = 0x0000;
@@ -294,7 +295,7 @@ namespace LvdWcMc {
         public function init_form_fields() {
             $additionalFields = array();
 
-            $defaultFields = array(
+            $coreFields = array(
                 'enabled' => array(
                     'title' => __('Enable / Disable', 'wc-mobilpayments-card'),
                     'label' => __('Enable this payment gateway', 'wc-mobilpayments-card'),
@@ -375,23 +376,23 @@ namespace LvdWcMc {
 
             /**
              * Filters the list of additional fields added to the gateway settings form.
-             * Any additional field will be overridden by a default field with the same key.
+             * Any additional field will be overridden by a core field with the same key.
              * 
              * @hook lvdwcmc_additional_gateway_settings_fields
              * 
-             * @param array $additionalFields The initial list of additional fields, as provided by WC-MobilPayments-Card
-             * @param array $defaultFields The list of default fields provided by WC-MobilPayments-Card
+             * @param array $additionalFields The current list of additional fields, initially provided by WC-MobilPayments-Card
+             * @param array $coreFields The list of core fields provided by WC-MobilPayments-Card
              * @return array The actual list of additional fields, as returned by the registered filters
              */
             $additionalFields = apply_filters('lvdwcmc_additional_gateway_settings_fields', 
                 $additionalFields, 
-                $defaultFields);
+                $coreFields);
 
-            //We do not allow overriding of the default fields, 
+            //We do not allow overriding of the core fields, 
             //  only specifying additional ones, so any additional field 
-            //  will be overridden by a default field with the same key
+            //  will be overwritten by a core field with the same key
             $this->form_fields = array_merge($additionalFields,
-                $defaultFields);
+                $coreFields);
         }
 
         public function generate_text_html($fieldId, $fieldInfo) {
@@ -451,7 +452,7 @@ namespace LvdWcMc {
                 array(), 
                 $this->settings);
 
-            $data = $this->_mergeAdditionalData($data, 
+            $data = $this->mergeAdditionalData($data, 
                 $additionalData);
 
             require $this->_env->getViewFilePath('lvdwcmc-gateway-settings-js.php');
@@ -644,8 +645,8 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_generate_return_url_slug
              * 
-             * @param string $defaultSlug The default slug used by WC-MobilPayments-Card to create the return page
-             * @param string The actual page slug, as returned by the registered filters
+             * @param string $slug The current slug, initially provided by WC-MobilPayments-Card
+             * @param string The actual & final page slug, as returned by the registered filters
              */
             $slug = apply_filters('lvdwcmc_generate_return_url_slug', 'lvdwcmc-thank-you');
 
@@ -657,8 +658,8 @@ namespace LvdWcMc {
                  * 
                  * @hook lvdwcmc_generate_return_url_data
                  * 
-                 * @param array $defaultPagePostInfo The default page info used by WC-MobilPayments-Card to create the return page
-                 * @return array The actual page post info, as returned by the registered filters
+                 * @param array $pagePostInfo The curent page info, initially provided by WC-MobilPayments-Card
+                 * @return array The actual & final page post info, as returned by the registered filters
                  */
                 $pagePostInfo = apply_filters('lvdwcmc_generate_return_url_page_info', array(
                     'post_author' => get_current_user_id(),
@@ -692,7 +693,7 @@ namespace LvdWcMc {
         public function needs_setup() {
             //Used by WC when toggling gateway on or off via AJAX 
             //  (see WC_Ajax::toggle_gateway_enabled())
-            $defaultNeedsSetup = empty($this->_mobilpayAccountId) 
+            $needsSetup = empty($this->_mobilpayAccountId) 
                 || empty($this->_mobilpayReturnUrl)
                 || !$this->_hasPaymentAssets();
 
@@ -703,13 +704,13 @@ namespace LvdWcMc {
              * @hook lvdwcmc_gateway_needs_setup
              * @see \WC_Ajax::toggle_gateway_enabled()
              * 
-             * @param boolean $defaultNeedsSetup Whether or not setup is needed, as determined by default by WC-MobilPayments-Card
+             * @param boolean $needsSetup Whether or not setup is needed, initially determined by default by WC-MobilPayments-Card
              * @param array $settings The current settings values
              * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
              * 
              * @return boolean Whether or not setup is neded, as returned by the registered filters
              */
-            return apply_filters('lvdwcmc_gateway_needs_setup', $defaultNeedsSetup, 
+            return apply_filters('lvdwcmc_gateway_needs_setup', $needsSetup, 
                 $this->settings, 
                 $this);
         }
@@ -717,7 +718,7 @@ namespace LvdWcMc {
         public function is_available() {
             //Used by WC to determine what payment gateways are available on checkout 
             //  (see WC_Payment_Gateways::get_available_payment_gateways())
-            $defaultIsAvailable = !$this->needs_setup() && parent::is_available();
+            $isAvailable = !$this->needs_setup() && parent::is_available();
 
             /**
              * Filters the gateway availability status.
@@ -726,13 +727,13 @@ namespace LvdWcMc {
              * @hook lvdwcmc_gateway_is_available
              * @see \WC_Payment_Gateways::get_available_payment_gateways().
              * 
-             * @param boolean $defaultIsAvailable The availability status computed by default by WC-MobilPayments-Card 
+             * @param boolean $isAvailable The current availability status, initially computed by WC-MobilPayments-Card 
              * @param array $settings The current settings values
              * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
              * 
-             * @return boolean The actual availability status, as returned by the registered filters
+             * @return boolean The actual & final availability status, as returned by the registered filters
              */
-            return apply_filters('lvdwcmc_gateway_is_available', $defaultIsAvailable, 
+            return apply_filters('lvdwcmc_gateway_is_available', $isAvailable, 
                 $this->settings, 
                 $this);
         }
@@ -973,7 +974,7 @@ namespace LvdWcMc {
                             'email' => $email
                         ));
 
-                    $data = $this->_mergeAdditionalData($data, 
+                    $data = $this->mergeAdditionalData($data, 
                         $additionalData);
 
                     require $this->_env->getViewFilePath('lvdwcmc-email-transaction-details.php');
@@ -982,7 +983,7 @@ namespace LvdWcMc {
         }
 
         private function _canAddTransactionDetailsToEmail(\WC_Order $order, $sent_to_admin, $plain_text, $email) {
-            $defaultCanAdd = self::matchesGatewayId($order->get_payment_method()) 
+            $canAdd = self::matchesGatewayId($order->get_payment_method()) 
                 && $order->has_status(array('completed', 'processing'))
                 && $email instanceof \WC_Email 
                 && ($email->id == 'customer_completed_order' || $email->id == 'customer_processing_order')
@@ -995,13 +996,13 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_add_email_transaction_details
              * 
-             * @param boolean $canAdd The initial value of whether or not the transaction details are added to the e-mail notification
+             * @param boolean $canAdd The current value of whether or not the transaction details are added to the e-mail notification
              * @param \WC_Order $order The target order
              * @param array $args Additional arguments that establish the context in which the e-mail is being sent
              * @return boolean Whether or not to add to add the transaction details, as established by the registered filters
              */
             return apply_filters('lvdwcmc_add_email_transaction_details', 
-                $defaultCanAdd,
+                $canAdd,
                 $order, 
                 array(
                     'sendToAdmin' => $sent_to_admin,
@@ -1066,9 +1067,9 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_payment_request_info
              * 
-             * @param array $defaultRequestInfo The payment request information provided by default by WC-MobilPayments-Card 
+             * @param array $requestInfo The current payment request information, initially provided by WC-MobilPayments-Card 
              * @param \WC_Order $order The order for which the payment request needs to be generated
-             * @return array The actual payment request information, as returned by the registered filters
+             * @return array The actual & final payment request information, as returned by the registered filters
              */
             return apply_filters('lvdwcmc_get_payment_request_info', 
                 array(
@@ -1280,19 +1281,6 @@ namespace LvdWcMc {
             WC()->cart->empty_cart();
         }
 
-        private function _mergeAdditionalData(\stdClass $data, array $additionalData) {
-            if (is_array($additionalData)) {
-                foreach($additionalData as $key => $value) {
-                    //Do not override existing properties
-                    if (!property_exists($data, $key)) {
-                        $data->$key = $value;
-                    }
-                }
-            }
-            
-            return $data;
-        }
-
         private function _getPaymentAssetFields() {
             static $paymentAssetFields = null;
             if ($paymentAssetFields === null) {
@@ -1358,7 +1346,7 @@ namespace LvdWcMc {
                 ? func_get_arg(0) === true 
                 : $this->_isLiveMode();
 
-            $defaultDescriptor = $isLiveMode 
+            $descriptor = $isLiveMode 
                 ? 'live' 
                 : 'sandbox';
 
@@ -1369,12 +1357,12 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_payment_assets_file_descriptor
              * 
-             * @param string $defaultDescriptor The descriptor provided by default by WC-MobilPayments-Card 
+             * @param string $descripor The current descriptor, initially provided by WC-MobilPayments-Card
              * @param boolean $isLiveMode Whether the descriptor belongs to the live environment (true) or the sandbox environment (false)
-             * @return string The actual descriptor, as returned by the registered filters
+             * @return string The actual & final descriptor, as returned by the registered filters
              */
             return apply_filters('lvdwcmc_get_payment_assets_file_descriptor', 
-                $defaultDescriptor, 
+                $descriptor, 
                 $isLiveMode);
         }
 
@@ -1406,17 +1394,18 @@ namespace LvdWcMc {
         }
 
         private function _getPaymentAssetsDir() {
-            $defaultDir = $this->_env->getPaymentAssetsStorageDir();
+            $assetsDir = $this->_env->getPaymentAssetsStorageDir();
 
             /**
              * Filters the directory where the payment asset files are stored
              * 
              * @hook lvdwcmc_get_payment_assets_storage_dir
-             * @param string $defaultDir The directory used by default by WC-MobilPayments-Card
-             * @return string The actual directory, as returned by the registered filters
+             * 
+             * @param string $assetsDir The current asset directory, initially provided by WC-MobilPayments-Card
+             * @return string The actual & final asset directory, as returned by the registered filters
              */
             return apply_filters('lvdwcmc_get_payment_assets_storage_dir', 
-                $defaultDir);
+                $assetsDir);
         }
 
         /**
@@ -1427,7 +1416,7 @@ namespace LvdWcMc {
          * @return array The file name templates
          */
         private function _getPaymentAssetFileTemplates() {
-            $defaultTemplates = array(
+            $fileNameTemplates = array(
                 'public_key_certificate' => '%env%.%account%.public.cer',
                 'private_key_file' => '%env%.%account%.private.key'
             );
@@ -1445,11 +1434,11 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_payment_assets_file_templates
              * 
-             * @param array $defaultTemplates The templates provided by default by WC-MobilPayments-Card
-             * @return array The actual templates, as returned by the registered filters
+             * @param array $fileNameTemplates The current file name templates, intially provided by WC-MobilPayments-Card
+             * @return array The actual & final templates, as returned by the registered filters
              */
             return apply_filters('lvdwcmc_get_payment_assets_file_templates', 
-                $defaultTemplates);
+                $fileNameTemplates);
         }
 
         private function _isPaymentAssetField(array $fieldInfo) {

@@ -32,6 +32,7 @@
 ?>
 
 <section class="woocommerce-mobilpay-transaction-details" style="margin-bottom: 40px;">
+    <h2 class="woocommerce-mobilpay-transaction-details-heading"><?php echo esc_html__('Card payment transaction details', 'wc-mobilpayments-card'); ?></h2>
 
     <?php 
         /**
@@ -39,14 +40,13 @@
          *  are rendered in the e-mail notification send to the user
          *  when the order status changes.
          * 
-         * @hook lvdwcmc_before_before_email_transaction_details
+         * @hook lvdwcmc_before_email_transaction_details
          * 
          * @param \stdClass $data The view model that contains the data required to render any additional details
          */
-        do_action('lvdwcmc_before_before_email_transaction_details', $data);
+        do_action('lvdwcmc_before_email_transaction_details', $data);
     ?>
 
-    <h2 class="woocommerce-mobilpay-transaction-details-heading"><?php echo esc_html__('Card payment transaction details', 'wc-mobilpayments-card'); ?></h2>
     <table class="td" cellspacing="0" cellpadding="6" style="width: 100%; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;" border="1">
         <tr>
             <td class="td" style="text-align:left; font-weight: bold;"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card') ?></td>
@@ -70,10 +70,10 @@
          *  are rendered in the e-mail notification send to the user
          *  when the order status changes.
          * 
-         * @hook lvdwcmc_before_before_email_transaction_details
+         * @hook lvdwcmc_after_email_transaction_details
          * 
          * @param \stdClass $data The view model that contains the data required to render any additional details
          */
-        do_action('lvdwcmc_before_after_email_transaction_details', $data);
+        do_action('lvdwcmc_after_email_transaction_details', $data);
     ?>
 </section>

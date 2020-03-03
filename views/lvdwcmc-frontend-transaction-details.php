@@ -33,45 +33,88 @@
 ?>
 
 <h2 class="woocommerce-order-details__title"><?php echo esc_html__('Payment transaction details', 'wc-mobilpayments-card'); ?></h2>
+
+<?php 
+    /**
+     * Fires after the core transaction details 
+     *  are rendered in the frontend order details page
+     *  (user account area)
+     * 
+     * @hook lvdwcmc_before_frontend_transaction_details
+     * 
+     * @param \stdClass $data The view model
+     */
+    do_action('lvdwcmc_before_frontend_transaction_details', $data);
+?>
+
 <table class="woocommerce-table woocommerce-table--mobilpay-transaction-details shop_table order_details transaction_details">
     <tbody>
-        <tr>
-            <th scope="row"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card'); ?>:</th>
-            <td><?php echo esc_html($data->providerTransactionId); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?php echo esc_html__('Transaction status', 'wc-mobilpayments-card'); ?>:</th>
-            <td><?php echo esc_html($data->status); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?php echo esc_html__('Card number', 'wc-mobilpayments-card'); ?>:</th>
-            <td><?php echo esc_html($data->panMasked); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?php echo esc_html__('Original amount', 'wc-mobilpayments-card'); ?>:</th>
-            <td><?php echo esc_html($data->amount); ?> <?php echo $data->currency; ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?php echo esc_html__('Actually processed amount', 'wc-mobilpayments-card'); ?>:</th>
-            <td><?php echo esc_html($data->processedAmount); ?> <?php echo $data->currency; ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?php echo esc_html__('Date initiated', 'wc-mobilpayments-card'); ?>:</th>
-            <td><?php echo esc_html($data->timestampInitiated); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?php echo esc_html__('Date of last activity', 'wc-mobilpayments-card'); ?>:</th>
-            <td><?php echo esc_html($data->timestampLastUpdated); ?></td>
-        </tr>
+        <?php if (!empty($data->providerTransactionId)): ?>
+            <tr>
+                <th scope="row"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->providerTransactionId); ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($data->status)): ?>
+            <tr>
+                <th scope="row"><?php echo esc_html__('Transaction status', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->status); ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($data->panMasked)): ?>
+            <tr>
+                <th scope="row"><?php echo esc_html__('Card number', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->panMasked); ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($data->amount)): ?>
+            <tr>
+                <th scope="row"><?php echo esc_html__('Original amount', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->amount); ?> <?php echo $data->currency; ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($data->processedAmount)): ?>
+            <tr>
+                <th scope="row"><?php echo esc_html__('Actually processed amount', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->processedAmount); ?> <?php echo $data->currency; ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($data->timestampInitiated)): ?>
+            <tr>
+                <th scope="row"><?php echo esc_html__('Date initiated', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->timestampInitiated); ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($data->timestampLastUpdated)): ?>
+            <tr>
+                <th scope="row"><?php echo esc_html__('Date of last activity', 'wc-mobilpayments-card'); ?>:</th>
+                <td><?php echo esc_html($data->timestampLastUpdated); ?></td>
+            </tr>
+        <?php endif; ?>
         <?php if (!empty($data->errorCode)): ?>
             <tr>
                 <th scope="row"><?php echo esc_html__('Transaction error code', 'wc-mobilpayments-card'); ?>:</th>
                 <td><?php echo esc_html($data->errorCode); ?></td>
             </tr>
-            <tr>
-                <th scope="row"><?php echo esc_html__('Transaction error message', 'wc-mobilpayments-card'); ?>:</th>
-                <td><?php echo esc_html($data->errorMessage); ?></td>
-            </tr>
+            <?php if (!empty($data->errorMessage)): ?>
+                <tr>
+                    <th scope="row"><?php echo esc_html__('Transaction error message', 'wc-mobilpayments-card'); ?>:</th>
+                    <td><?php echo esc_html($data->errorMessage); ?></td>
+                </tr>
+            <?php endif; ?>
         <?php endif; ?>
     </tbody>
 </table>
+
+<?php 
+    /**
+     * Fires after the core transaction details 
+     *  are rendered in the frontend order details page
+     *  (user account area)
+     * 
+     * @hook lvdwcmc_after_frontend_transaction_details
+     * 
+     * @param \stdClass $data The view model
+     */
+    do_action('lvdwcmc_after_frontend_transaction_details', $data);
+?>

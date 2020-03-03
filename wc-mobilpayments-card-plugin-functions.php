@@ -44,17 +44,37 @@ function lvd_wcmc_init_autoloader() {
    ));
 }
 
-function lvdwcmc_plugin() {
-   static $plugin = null;
-   if ($plugin === null) {
-      $plugin = new LvdWcMc\Plugin(array(
-         'mediaIncludes' => array(
-            'refPluginsPath' => LVD_WCMC_MAIN,
-            'scriptsInFooter' => true
-         )
-      ));
-   }
-   return $plugin;
+function lvdwcmc_get_datetime_format() {
+   $dateTimeFormat = get_option('date_format') . ' ' . get_option('time_format');
+   /**
+    * Filters the format used by WC-MobilPayments-Card to format dates
+    * 
+    * @hook lvdwcmc_datetime_format
+    * 
+    * @param string $dateTimeFormat The current date time format, initially provided by WC-MobilPayments-Card
+    * @return string The actual & final date time format, as returned by the registered filters
+    */
+   return apply_filters('lvdwcmc_datetime_format', 
+         $dateTimeFormat);
+}
+
+function lvdwcmc_get_amount_format() {
+   $amountFormat = array(
+      'decimals' => wc_get_price_decimals(), 
+      'decimalSeparator' => wc_get_price_decimal_separator(), 
+      'thousandSeparator' => wc_get_price_thousand_separator()
+   );
+
+   /** 
+    * Filters the format used by WC-MobilPayments-Card to format money amounts
+    * 
+    * @hook lvdwcmc_amount_format
+    * 
+    * @param array $amountFormat The current amount format, initially provided by WC-MobilPayments-Card
+    * @return array The actual & final amount format, as returned by the registered filters
+    */
+   return apply_filters('lvdwcmc_amount_format', 
+      $amountFormat);
 }
 
 function lvdwcmc_get_ajax_response($additionalProps = array()) {
@@ -115,6 +135,19 @@ function lvdwcmc_env() {
    }
 
    return $env;
+}
+
+function lvdwcmc_plugin() {
+   static $plugin = null;
+   if ($plugin === null) {
+      $plugin = new LvdWcMc\Plugin(array(
+         'mediaIncludes' => array(
+            'refPluginsPath' => LVD_WCMC_MAIN,
+            'scriptsInFooter' => true
+         )
+      ));
+   }
+   return $plugin;
 }
 
 function lvd_wcmc_run() {
