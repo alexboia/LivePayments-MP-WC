@@ -100,6 +100,7 @@ namespace LvdWcMc {
             add_action('init', array($this, 'onPluginsInit'));
             
             add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueStyles'), 9999);
+            add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueScripts'), 9999);
             add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'), 9999);
             add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueScripts'), 9999);
 
@@ -196,6 +197,34 @@ namespace LvdWcMc {
             if ($this->_env->isViewingFrontendWcOrder()) {
                 $this->_mediaIncludes->includeStyleFrontendTransactionDetails();
             }
+
+            /**
+             * Triggered after all the core-plug-in frontend styles 
+             *  have been enqueued.
+             * 
+             * @hook lvdwcmc_frontend_enqueue_styles
+             * 
+             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
+             */
+            do_action('lvdwcmc_frontend_enqueue_styles', 
+                $this->_mediaIncludes);
+        }
+
+        public function onFrontendEnqueueScripts() {
+            if ($this->_env->isAtWcOrderPayEndpoint()) {
+                $this->_mediaIncludes->includeScriptPaymentInitiation();
+            }
+
+            /**
+             * Triggered after all the core-plug-in frontend scripts 
+             *  have been enqueued.
+             * 
+             * @hook lvdwcmc_frontend_enqueue_scripts
+             * 
+             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
+             */
+            do_action('lvdwcmc_frontend_enqueue_scripts', 
+                $this->_mediaIncludes);
         }
 
         public function onAdminEnqueueStyles() {
@@ -206,16 +235,39 @@ namespace LvdWcMc {
             if ($this->_env->isViewingAdminTransactionListing()) {
                 $this->_mediaIncludes->includeStyleAdminTransactionListing();
             }
+
+            /**
+             * Triggered after all the core-plug-in admin styles 
+             *  have been enqueued.
+             * 
+             * @hook lvdwcmc_admin_enqueue_styles
+             * 
+             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
+             */
+            do_action('lvdwcmc_admin_enqueue_styles', 
+                $this->_mediaIncludes);
         }
 
         public function onAdminEnqueueScripts() {
             if ($this->_env->isViewingWpDashboard()) {
                 $this->_mediaIncludes->includeStyleDashboard();
             }
+
             if ($this->_env->isViewingAdminTransactionListing()) {
                 $this->_mediaIncludes->includeScriptTransactionListing();
                 $this->_mediaIncludes->localizeTransactionListingScript($this->_getTransactionsListingScriptTranslations());
             }
+
+            /**
+             * Triggered after all the core-plug-in admin scripts 
+             *  have been enqueued.
+             * 
+             * @hook lvdwcmc_admin_enqueue_scripts
+             * 
+             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
+             */
+            do_action('lvdwcmc_admin_enqueue_scripts', 
+                $this->_mediaIncludes);
         }
 
         public function addTransactionDetailsOnAccountOrderDetails(\WC_Order $order) {

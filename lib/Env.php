@@ -134,6 +134,10 @@ namespace LvdWcMc {
             return is_wc_endpoint_url('view-order');
         }
 
+        public function isAtWcOrderPayEndpoint() {
+            return is_wc_endpoint_url('order-pay');
+        }
+
         public function isEditingWcOrder() {
             if ($this->getCurrentPage() == 'post.php' && !empty($_GET['post'])) {
                 $order = wc_get_order(intval($_GET['post']));

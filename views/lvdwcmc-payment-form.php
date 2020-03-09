@@ -33,8 +33,8 @@
 
 <?php if ($data->success): ?>
     <form method="post" id="lvdWcMcMobilpayRedirect" action="<?php echo $data->paymentUrl; ?>">
-        <input type="hidden" name="env_key" value="<?php echo $data->envKey; ?>"/>
-        <input type="hidden" name="data" value="<?php echo $data->encData; ?>"/>	
+        <input type="hidden" name="env_key" value="<?php echo esc_attr($data->envKey); ?>"/>
+        <input type="hidden" name="data" value="<?php echo esc_attr($data->encData); ?>"/>	
 
         <input type="submit" name="submit_mobilpay_payment_form" 
             id="submit_mobilpay_payment_form" 

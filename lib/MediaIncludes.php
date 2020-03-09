@@ -51,6 +51,8 @@
 
         const JS_LVDWCMC_TRANSACTION_LISTING = 'lvdwcmc-transaction-listing-js';
 
+        const JS_LVDWCMC_PAYMENT_INITIATION = 'lvdwcmc-payment-initiation-js';
+
         const STYLE_TOASTR = 'toastr-css';
 
         const STYLE_LVDWCMC_COMMON = 'lvdwcmc-common-css';
@@ -147,6 +149,14 @@
                     self::JS_TOASTR,
                     self::JS_LVDWCMC_COMMON
                 )
+            ),
+            self::JS_LVDWCMC_PAYMENT_INITIATION => array(
+                'path' => 'media/js/lvdwcmc-payment-initiation.js',
+                'version' => LVD_WCMC_VERSION,
+                'deps' => array(
+                    self::JS_JQUERY,
+                    self::JS_JQUERY_BLOCKUI
+                )
             )
         );
 
@@ -237,6 +247,12 @@
             $this->_enqueueScript(self::JS_KITE_JS);
             $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
             $this->_enqueueScript(self::JS_LVDWCMC_TRANSACTION_LISTING);
+        }
+
+        public function includeScriptPaymentInitiation() {
+            $this->_enqueueScript(self::JS_JQUERY);
+            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
+            $this->_enqueueScript(self::JS_LVDWCMC_PAYMENT_INITIATION);
         }
 
         public function includeStyleCommon() {

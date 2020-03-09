@@ -174,7 +174,7 @@ namespace LvdWcMc {
 
             /**
              * Enqueue styles for the gateway settings page. 
-             * Triggered after the core plug-in styles have been enqueued.
+             * Triggered after the core plug-in gateway settings page styles have been enqueued.
              * 
              * @hook lvdwcmc_enqueue_gateway_settings_form_styles
              * 
@@ -190,7 +190,7 @@ namespace LvdWcMc {
 
             /**
              * Enqueue scripts for the gateway settings page. 
-             * Triggered after the core plug-in scripts have been enqueued.
+             * Triggered after the core plug-in gateway settings page scripts have been enqueued.
              * 
              * @hook lvdwcmc_enqueue_gateway_settings_form_scripts
              * 
