@@ -435,8 +435,10 @@ namespace LvdWcMc {
             $data->uploadKey = LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY;
 
             /**
-             * Filters any additional data to be added to the view model of the gateway js settings.
-             * The view model is a plain stdClass and contains any data required to inject the gateway settings 
+             * Filters the view model of the gateway js settings, 
+             *  thus allowing any additional data to be added to it.
+             * The view model is a plain stdClass and contains any data 
+             *  required to inject the gateway settings, 
              *  required for the JS scripts on this page.
              * Additional data is provided by user filters as an associative array 
              *  and then added to the view model as properties, but only the corresponding keys 

@@ -41,6 +41,19 @@
 <div class="lvdwcmc-page-container">
     <h1><?php echo esc_html($data->pageTitle); ?></h1>
 
+    <?php
+        /**
+         * Fires before the core transactions listing 
+         *  is rendered on the admin transactions 
+         *  listing page.
+         * 
+         * @hook lvdwcmc_before_admin_transactions_listing
+         * 
+         * @param \stdClass $data The view model
+         */
+        do_action('lvdwcmc_before_admin_transactions_listing', $data);
+    ?>
+
     <?php if ($data->hasTransactions): ?>
         <table id="lvdwcmc-tx-listing" class="wp-list-table widefat fixed striped posts lvdwcmc-tx-listing">
             <thead>
@@ -50,11 +63,16 @@
                     <th><?php echo esc_html__('Status', 'wc-mobilpayments-card'); ?></th>
                     <th><?php echo esc_html__('Amount', 'wc-mobilpayments-card'); ?></th>
                     <th><?php echo esc_html__('Processed amount', 'wc-mobilpayments-card'); ?></th>
+
+                    <?php foreach ($data->additionalColumns as $column): ?>
+                        <th <?php echo !empty($column['class']) ? 'class="' . esc_attr($column['class']) . '"' : '' ?>><?php echo esc_html($column['header']); ?></th>
+                    <?php endforeach; ?>
+
                     <th><?php echo esc_html__('Actions', 'wc-mobilpayments-card'); ?></th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($data->transactions as $tx):  ?>
+                <?php foreach ($data->transactions as $key => $tx):  ?>
                     <tr>
                         <td class="lvdwcmc-order-id-column">
                             <a href="<?php echo esc_url($tx['tx_admin_details_link']); ?>" target="_blank">
@@ -67,6 +85,23 @@
                         </td>
                         <td><?php echo esc_html($tx['tx_amount_formatted']); ?></td>
                         <td><?php echo esc_html($tx['tx_processed_amount_formatted']); ?></td>
+
+                        <?php foreach ($data->additionalColumns as $column): ?>
+                            <td <?php echo !empty($column['class']) ? 'class="' . esc_attr($column['class']) . '"' : '' ?>>
+                                <?php if (isset($column['provider'])): ?>
+                                    <?php if (is_callable($column['provider'])): ?>
+                                        <?php echo esc_html(call_user_func($column['provider'], $key, $tx, $data)); ?>
+                                    <?php else: ?>
+                                        <?php echo !empty($tx[$column['provider']]) 
+                                            ? esc_html($tx[$column['provider']]) 
+                                            : '<span class="lvdwcmc-novalue">-</span>'; ?>    
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="lvdwcmc-novalue">-</span>
+                                <?php endif; ?>
+                            </td>
+                        <?php endforeach; ?>
+
                         <td>
                             <a href="javascript:void(0)" class="lvdwcmc-tx-action" data-transactionId="<?php echo esc_attr($tx['tx_id']); ?>"><?php echo esc_html__('Details', 'wc-mobilpayments-card'); ?></a>
                         </td>
@@ -76,20 +111,26 @@
         </table>
 
         <div class="lvdwcmc-pagination-links">
-            <?php echo paginate_links(array(
-                'base' => add_query_arg('page_num', '%#%'),
-                'format' => '',
-                'prev_text' => __('&laquo;', 'wc-mobilpayments-card'),
-                'next_text' => __('&raquo;', 'wc-mobilpayments-card'),
-                'total' => $data->totalPages,
-                'current' => $data->currentPage
-            )); ?>
+            <?php echo paginate_links($data->paginateLinksArgs); ?>
         </div>
     <?php else: ?>
         <div class="lvdwcmc-admin-notice">
             <?php echo esc_html__('There are no transactions matching your criteria', 'wc-mobilpayments-card'); ?>
         </div>
     <?php endif; ?>
+
+    <?php
+        /**
+         * Fires before the core transactions listing 
+         *  is rendered on the admin transactions 
+         *  listing page.
+         * 
+         * @hook lvdwcmc_after_admin_transactions_listing
+         * 
+         * @param \stdClass $data The view model
+         */
+        do_action('lvdwcmc_after_admin_transactions_listing', $data);
+    ?>
 </div>
 
 <script id="lvdwcmc-tpl-transaction-details" type="text/x-kite">
@@ -98,6 +139,17 @@
             <h3><?php echo esc_html__('Transaction details', 'wc-mobilpayments-card'); ?></h3>
         </div>
         <div class="lvdwcmc-admin-transaction-details-wnd-content">
+
+            <?php 
+                /**
+                 * Fires before core details table of the JS admin listing 
+                 *   transaction details template
+                 *
+                 * @hook lvdwcmc_before_admin_transactions_listing_details_template
+                 */
+                do_action('lvdwcmc_before_admin_transactions_listing_details_template');
+            ?>
+
             <table class="lvdwcmc-admin-transaction-details-list">
                 <tbody>
                     <tr>
@@ -146,6 +198,17 @@
                     {{/?}}
                 </tbody>
             </table>
+
+            <?php 
+                /**
+                 * Fires after core details table of the JS admin listing 
+                 *   transaction details template
+                 *
+                 * @hook lvdwcmc_after_admin_transactions_listing_details_template
+                 */
+                do_action('lvdwcmc_after_admin_transactions_listing_details_template');
+            ?>
+
         </div>
         <div class="lvdwcmc-admin-transaction-details-wnd-footer">
             <a href="javascript:void(0)" 

@@ -32,6 +32,18 @@
     defined('LVD_WCMC_LOADED') or die;
 ?>
 <?php if ($data->success): ?>
+    <?php 
+        /**
+         * Fires before the core content of the admin 
+         *  dashboard status widget is rendered
+         * 
+         * @hook lvdwcmc_before_admin_dasboard_transaction_status
+         * 
+         * @param \stdClass $data The view model
+         */
+        do_action('lvdwcmc_before_admin_dasboard_transaction_status', $data);
+    ?>
+    
     <ul class="lvdwcmc-dashboard-transaction-status">
         <?php foreach ($data->status as $status => $data): ?>
             <li class="<?php echo esc_attr($status); ?>">
@@ -41,4 +53,16 @@
             </li>
         <?php endforeach; ?>
     </ul>
+
+    <?php 
+        /**
+         * Fires after the core content of the admin 
+         *  dashboard status widget is rendered
+         * 
+         * @hook lvdwcmc_after_admin_dasboard_transaction_status
+         * 
+         * @param \stdClass $data The view model
+         */
+        do_action('lvdwcmc_after_admin_dasboard_transaction_status', $data);
+    ?>
 <?php endif; ?>

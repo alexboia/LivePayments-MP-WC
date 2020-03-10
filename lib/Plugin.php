@@ -346,7 +346,7 @@ namespace LvdWcMc {
                 $numRows, 
                 'tx.*, wp.post_title tx_title') ;
 
-            foreach ($transactions as &$tx) {
+            foreach ($transactions as $key => $tx) {
                 $tx['tx_title_full'] = '#' 
                     . $tx['tx_order_id'] . ' ' 
                     . $tx['tx_title'];
@@ -363,9 +363,29 @@ namespace LvdWcMc {
                     $this->_formatTransactionAmount($tx['tx_processed_amount']) . ' ' . $tx['tx_currency'];
                 $tx['tx_status_formatted'] = 
                     $this->_getTransactionStatusLabel($tx['tx_status']);
+
+                /**
+                 * Filters a transaction listing item, represented as an array, 
+                 *  after the formatted data has been added to it.
+                 * The view model is a plain stdClass and contains 
+                 *  any data required to correctly render the template.
+                 * 
+                 * @hook lvdwcmc_get_admin_transansactions_listing_item
+                 * 
+                 * @param array $tx The view model, initially provided by WC-MobilPayments-Card
+                 * @param array $args Additional arguments to establish the context of the operation
+                 * 
+                 * @return array The view model, as returned by the registered filters
+                 */
+                $transactions[$key] = apply_filters('lvdwcmc_get_admin_transansactions_listing_item', $tx, array(
+                    'pageNum' => $currentPage,
+                    'totalRecords' => $totalRecords,
+                    'totalPages' => $totalPages
+                ));
             }
 
             $data = new \stdClass();
+            $data->additionalColumns = array();
             $data->pageTitle = get_admin_page_title();
             $data->transactions = $transactions;
             $data->hasTransactions = !empty($transactions);
@@ -377,6 +397,32 @@ namespace LvdWcMc {
             $data->transactionDetailsNonce = $this->_createGetTransactionDetailsNonce();
             $data->transactionDetailsAction = self::ACTION_GET_ADMIN_TRANSACTION_DETAILS;
             $data->ajaxBaseUrl = $this->_getAjaxBaseUrl();
+            
+            $data->paginateLinksArgs = array(
+                'base' => add_query_arg('page_num', '%#%'),
+                'format' => '',
+                'prev_text' => __('&laquo;', 'wc-mobilpayments-card'),
+                'next_text' => __('&raquo;', 'wc-mobilpayments-card'),
+                'total' => $data->totalPages,
+                'current' => $data->currentPage
+            );
+
+            /**
+             * Filters the view model of the admin transactions listing page, 
+             *  thus allowing additional data to be added to it.
+             * 
+             * @hook lvdwcmc_get_admin_transansactions_listing_data
+             * 
+             * @param \stdClass $data The view model, initially provided by WC-MobilPayments-Card
+             * @param array $args Additional arguments to establish the context of the operation
+             * 
+             * @return \stdClass The view model, as returned by the registered filters
+             */
+            $data = apply_filters('lvdwcmc_get_admin_transansactions_listing_data', $data, array(
+                'pageNum' => $currentPage,
+                'totalRecords' => $totalRecords,
+                'totalPages' => $totalPages
+            ));
 
             require $this->_env->getViewFilePath('lvdwcmc-admin-transactions-listing.php');
         }
@@ -409,7 +455,20 @@ namespace LvdWcMc {
         }
 
         public function onDashboardWidgetsSetup() {
-            if ($this->_canManageWooCommerce()) {
+
+            /**
+             * Filters whether or not to add the transactions 
+             *  status widget to the WP admin dashboard
+             * 
+             * @hook lvdwcmc_add_status_dashboard_widget
+             * 
+             * @param boolean $addDashboardWidget Whether to add the widget or not, initially provided by WC-MobilPayments-Card
+             * @return boolean Whether to add the widget or not, as returned by the registered filters
+             */
+            $addDashboardWidget = apply_filters('lvdwcmc_add_status_dashboard_widget', 
+                $this->_canManageWooCommerce());
+
+            if ($addDashboardWidget) {
                 wp_add_dashboard_widget('lvdwcmc-transactions-status', 
                     __('mobilPay&trade; Card Transaction Status', 'wc-mobilpayments-card'), 
                     array($this, 'renderTransactionsStatusWidget'), 
@@ -445,6 +504,18 @@ namespace LvdWcMc {
             $data = new \stdClass();
             $data->status = $statusData;
             $data->success = true;
+
+            /**
+             * Filters the view model of the admin dashboard transaction status widget
+             *  thus allowing additional data to be added to it.
+             * 
+             * @hook lvdwcmc_get_dashboard_widget_status_data
+             * 
+             * @param \stdClass $data The view model, initially provided by WC-MobilPayments-Card
+             * @return \stdClass The view model, as returned by the registered filters
+             */
+            $data = apply_filters('lvdwcmc_get_dashboard_widget_status_data', 
+                $data);
 
             require $this->_env->getViewFilePath('lvdwcmc-dashboard-transactions-status.php');
         }

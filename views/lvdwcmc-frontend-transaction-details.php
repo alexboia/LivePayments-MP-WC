@@ -36,7 +36,7 @@
 
 <?php 
     /**
-     * Fires after the core transaction details 
+     * Fires before the core transaction details 
      *  are rendered in the frontend order details page
      *  (user account area)
      * 
