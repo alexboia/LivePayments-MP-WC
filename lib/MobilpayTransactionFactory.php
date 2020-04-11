@@ -52,7 +52,11 @@
                 'tx_currency' => $order->get_currency(),
                 'tx_timestamp_initiated' => date('Y-m-d H:i:s'),
                 'tx_timestamp_last_updated' => date('Y-m-d H:i:s'),
-                'tx_ip_address' => $order->get_customer_ip_address()
+                'tx_ip_address' => $order->get_customer_ip_address(),
+                'tx_provider_transaction_id' => null,
+                'tx_error_code' => null,
+                'tx_error_message' => null,
+                'tx_pan_masked' => null
             );
         }
 
@@ -72,7 +76,12 @@
             if (!is_array($data)) {
                 if ($createIfNotExists) {
                     $data = $this->_getTransactionData($order);
-                    if (!$db->insert($this->_env->getPaymentTransactionsTableName(), $data)) {
+                    $internalTxId = $db->insert($this->_env->getPaymentTransactionsTableName(), $data);
+                    if (is_numeric($internalTxId) && $internalTxId > 0) {
+                        $data = array_merge($data, array(
+                            'tx_id' => $internalTxId
+                        ));
+                    } else {
                         $data = null;
                     }
                 } else {

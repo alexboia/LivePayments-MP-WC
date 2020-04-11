@@ -267,6 +267,9 @@ namespace LvdWcMc {
             return strtolower($_SERVER['REQUEST_METHOD']) === 'get';
         }
     
+        public function getPublicAssetUrl($path) {
+            return plugins_url($path, LVD_WCMC_HEADER);
+        }
 
         public function getRequiredPhpVersion() {
             return '5.6.2';

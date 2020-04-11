@@ -78,7 +78,9 @@ namespace LvdWcMc {
 
         private static function _getRelativePath($className, $separator) {
             $classPath = array();
-            $pathParts = explode($separator, $className);
+			$pathParts = array_filter(explode($separator, $className), function($el) {
+				return !empty($el);
+			});
             $className = array_pop($pathParts);
             foreach ($pathParts as $namePart) {
                 if (!empty($namePart)) {

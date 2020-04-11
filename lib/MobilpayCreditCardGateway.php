@@ -120,10 +120,25 @@ namespace LvdWcMc {
         public function __construct() {
             $this->id = self::GATEWAY_ID;
             $this->plugin_id = LVD_WCMC_PLUGIN_ID;
+            
             $this->_logger = wc_get_logger();
+            $this->_env = lvdwcmc_plugin()->getEnv();
+            $this->_mediaIncludes = lvdwcmc_plugin()->getMediaIncludes();
+            $this->_processor = new MobilpayCardPaymentProcessor();
+            $this->_transactionFactory = new MobilpayTransactionFactory();
 
             $this->method_title = __('mobilPay&trade; Card Gateway', 'wc-mobilpayments-card');
             $this->method_description = __('mobilPay&trade; Payment Gateway for WooCommerce', 'wc-mobilpayments-card');
+
+            /**
+             * Filters the absolute URL for the payment gateway icon.
+             * Default value is the absolute URL to media/img/mobilpay.png.
+             * 
+             * @hook lvdwcmc_payment_gateway_icon
+             * @param string $url The current URL, initially provided by WC-MobilPayments-Card
+             * @return string The actual and final URL, as returned by the registered filters
+             */
+            $this->icon = apply_filters('lvdwcmc_payment_gateway_icon', $this->_env->getPublicAssetUrl('media/img/mobilpay.png'));
             
             $this->title = __('mobilPay&trade; Card Gateway', 'wc-mobilpayments-card');
 
@@ -131,11 +146,6 @@ namespace LvdWcMc {
                 'products', 
                 'refunds'
             );
-
-            $this->_env = lvdwcmc_plugin()->getEnv();
-            $this->_mediaIncludes = lvdwcmc_plugin()->getMediaIncludes();
-            $this->_processor = new MobilpayCardPaymentProcessor();
-            $this->_transactionFactory = new MobilpayTransactionFactory();
 
             $this->_apiDescriptor = strtolower(str_replace('\\', '_', __CLASS__));
             $this->_mobilpayNotifyUrl = WC()->api_request_url($this->_apiDescriptor);

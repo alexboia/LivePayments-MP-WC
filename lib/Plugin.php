@@ -94,7 +94,7 @@ namespace LvdWcMc {
         public function run() {
             register_activation_hook(LVD_WCMC_MAIN, array($this, 'onActivatePlugin'));
             register_deactivation_hook(LVD_WCMC_MAIN, array($this, 'onDeactivatePlugin'));
-            register_uninstall_hook(LVD_WCMC_MAIN, array($this, 'onUninstallPlugin'));
+            register_uninstall_hook(LVD_WCMC_MAIN, array(__CLASS__, 'onUninstallPlugin'));
 
             add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
             add_action('init', array($this, 'onPluginsInit'));
@@ -150,8 +150,8 @@ namespace LvdWcMc {
             }
         }
 
-        public function onUninstallPlugin() {
-            if (!$this->_installer->uninstall()) {
+        public static  function onUninstallPlugin() {
+            if (!lvdwcmc_plugin()->getInstaller()->uninstall()) {
                 wp_die(lvdwcmc_append_error('Could not uninstall plug-in', $this->_installer->getLastError()), 
                     'Uninstall error');
             }
@@ -705,6 +705,10 @@ namespace LvdWcMc {
 
         private function _getDateTimeFormat() {
             return lvdwcmc_get_datetime_format();
+        }
+
+        public function getInstaller() {
+            return $this->_installer;
         }
     }
 }

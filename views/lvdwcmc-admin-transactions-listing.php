@@ -92,9 +92,11 @@
                                     <?php if (is_callable($column['provider'])): ?>
                                         <?php echo esc_html(call_user_func($column['provider'], $key, $tx, $data)); ?>
                                     <?php else: ?>
-                                        <?php echo !empty($tx[$column['provider']]) 
-                                            ? esc_html($tx[$column['provider']]) 
-                                            : '<span class="lvdwcmc-novalue">-</span>'; ?>    
+                                        <?php 
+                                            echo !empty($tx[$column['provider']]) 
+                                                ? esc_html($tx[$column['provider']]) 
+                                                : '<span class="lvdwcmc-novalue">-</span>'; 
+                                        ?>
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <span class="lvdwcmc-novalue">-</span>
@@ -154,7 +156,13 @@
                 <tbody>
                     <tr>
                         <th scope="row"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card'); ?>:</th>
-                        <td>{{transaction.providerTransactionId}}</td>
+                        <td>
+                            {{? !!transaction.providerTransactionId }}
+                                {{transaction.providerTransactionId}}
+                            {{^?}}
+                                -
+                            {{/?}}
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row"><?php echo esc_html__('Transaction status', 'wc-mobilpayments-card'); ?>:</th>
@@ -162,7 +170,13 @@
                     </tr>
                     <tr>
                         <th scope="row"><?php echo esc_html__('Card number', 'wc-mobilpayments-card'); ?>:</th>
-                        <td>{{transaction.panMasked}}</td>
+                        <td>
+                            {{? !!transaction.panMasked}}
+                                {{transaction.panMasked}}
+                            {{^?}}
+                                -
+                            {{/?}}
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row"><?php echo esc_html__('Original amount', 'wc-mobilpayments-card'); ?>:</th>

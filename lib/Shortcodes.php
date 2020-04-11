@@ -41,6 +41,7 @@ namespace LvdWcMc {
         }
 
         public function displayMobilpayOrderStatus($attributes) {
+			$content = null;
             if (isset($_GET['order_id'])) {
                 $orderId = intval($_GET['order_id']);
                 if ($orderId > 0 
@@ -52,9 +53,12 @@ namespace LvdWcMc {
                     $data->orderStatus = $order->get_status();
                     $data->order = $order;
         
+					ob_start();
                     require $this->_env->getViewFilePath('lvdwcmc-payment-status.php');
+					$content = ob_get_clean();
                 }
             }
+			return $content;
         }
     }
 }
