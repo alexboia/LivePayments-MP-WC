@@ -196,7 +196,9 @@ namespace LvdWcMc {
             $this->_mediaIncludes
                 ->includeScriptSettings();
             $this->_mediaIncludes
-                ->localizeSettingsScript($this->_getSettingsScriptTranslations());
+                ->localizeCommonScript(lvdwcmc_plugin()->getCommonScriptTranslations());
+            $this->_mediaIncludes
+                ->localizeSettingsScript(lvdwcmc_plugin()->getSettingsScriptTranslations());
 
             /**
              * Enqueue scripts for the gateway settings page. 
@@ -348,7 +350,7 @@ namespace LvdWcMc {
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
-                    'allowed_files_hints' => 'allowed file types: .cer',
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.cer'),
                     '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
                     '_is_live_mode' => true
                 ),
@@ -358,7 +360,7 @@ namespace LvdWcMc {
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
-                    'allowed_files_hints' => 'allowed file types: .key',
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.key'),
                     '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
                     '_is_live_mode' => true
                 ),
@@ -368,7 +370,7 @@ namespace LvdWcMc {
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
-                    'allowed_files_hints' => 'allowed file types: .cer',
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.cer'),
                     '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
                     '_is_live_mode' => false
                 ),
@@ -378,7 +380,7 @@ namespace LvdWcMc {
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
-                    'allowed_files_hints' => 'allowed file types: .key',
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.key'),
                     '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
                     '_is_live_mode' => false
                 )
@@ -1232,49 +1234,6 @@ namespace LvdWcMc {
             echo '<?xml version="1.0" encoding="utf-8"?>';
             echo '<crc>' . $crc . '</crc>';
             exit;
-        }
-
-        private function _getSettingsScriptTranslations() {
-            return array(
-                'errPluploadTooLarge' 
-                    => __('The selected file is too large. Maximum allowed size is 10MB', 'wc-mobilpayments-card'), 
-                'errPluploadFileType' 
-                    => __('The selected file type is not valid.', 'wc-mobilpayments-card'), 
-                'errPluploadIoError' 
-                    => __('The file could not be read', 'wc-mobilpayments-card'), 
-                'errPluploadSecurityError' 
-                    => __('The file could not be read', 'wc-mobilpayments-card'), 
-                'errPluploadInitError' 
-                    => __('The uploader could not be initialized', 'wc-mobilpayments-card'), 
-                'errPluploadHttp' 
-                    => __('The file could not be uploaded', 'wc-mobilpayments-card'), 
-                'errServerUploadFileType' 
-                    => __('The selected file type is not valid.', 'wc-mobilpayments-card'), 
-                'errServerUploadTooLarge' 
-                    => __('The selected file is too large. Maximum allowed size is 10MB', 'wc-mobilpayments-card'), 
-                'errServerUploadNoFile' 
-                    => __('No file was uploaded', 'wc-mobilpayments-card'), 
-                'errServerUploadInternal' 
-                    => __('The file could not be uploaded due to a possible internal server issue', 'wc-mobilpayments-card'), 
-                'errServerUploadFail' 
-                    => __('The file could not be uploaded', 'wc-mobilpayments-card'),
-                'warnRemoveAssetFile' 
-                    => __('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!', 'wc-mobilpayments-card'),
-                'errAssetFileCannotBeRemoved' 
-                    => __('The asset file could not be removed', 'wc-mobilpayments-card'),
-                'errAssetFileCannotBeRemovedNetwork' 
-                    => __('The asset file could not be removed due to a possible network issue', 'wc-mobilpayments-card'),
-                'assetUploadOk' 
-                    => __('The file has been successfully uploaded', 'wc-mobilpayments-card'),
-                'assetRemovalOk' 
-                    => __('The file has been successfulyl removed', 'wc-mobilpayments-card'),
-                'returnURLGenerationOk'
-                    => __('The return URL has been successfully generated.','wc-mobilpayments-card'),
-                'errReturnURLCannotBeGenerated'
-                    => __('The return URL could not generated.', 'wc-mobilpayments-card'),
-                'errReturnURLCannotBeGeneratedNetwork'
-                    => __('The return URL could not be generated due to a possible network issue', 'wc-mobilpayments-card')
-            );
         }
 
         private function _validatePaymentAssetUploadNonce() {

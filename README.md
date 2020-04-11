@@ -31,7 +31,8 @@ If you are a WordPress solution developer and  working on implementing a WooComm
 - extremely detailed reporting on transaction history and lifecycle;
 - dashboard widget for a quick outlook on overall transaction statuses;
 - detailed transaction details are reported for each order, for both admin staff and your clients;
-- multi-language support (romanian translation included).
+- multi-language support (romanian translation included);
+- detailed journaling.
 
 ## Supported transaction statuses (actions)
 <a name="lvdwcmc-transaction-statuses"></a>  

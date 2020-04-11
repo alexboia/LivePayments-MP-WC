@@ -296,5 +296,11 @@
                 'lvdwcmcTransactionsListL10n', 
     			$translations);
         }
+
+        public function localizeCommonScript($translations) {
+            wp_localize_script(self::JS_LVDWCMC_COMMON,
+                'lvdwcmcCommonScriptL10n', 
+                $translations);
+        }
     }
 }

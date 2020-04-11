@@ -42,8 +42,8 @@
     function showPleaseWait() {
         $.blockUI({
             message: [
-                '<img class="lvdwcmc-please-wait-spinner" src="/wp-content/plugins/wc-mobilpayments-card/media/img/lvdwcmc-wait.svg" alt="Please wait..." />',
-                '<p class="lvdwcmc-please-wait-txt">Please wait...</p>'
+                '<img class="lvdwcmc-please-wait-spinner" src="/wp-content/plugins/wc-mobilpayments-card/media/img/lvdwcmc-wait.svg" alt="' + lvdwcmcCommonScriptL10n.lblLoading + '" />',
+                '<p class="lvdwcmc-please-wait-txt">' + lvdwcmcCommonScriptL10n.lblLoading + '</p>'
             ],
             css: {
                 border: 'none', 

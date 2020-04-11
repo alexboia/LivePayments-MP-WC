@@ -1,0 +1,737 @@
+# Copyright (C) 2020 Alexandru Boia
+# This file is distributed under the same license as the WC MobilPayments Card plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: WC MobilPayments Card 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-mobilpayments-card\n"
+"POT-Creation-Date: 2020-04-11 23:46+0300\n"
+"PO-Revision-Date: 2020-04-11 23:47+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.5\n"
+"X-Domain: wc-mobilpayments-card\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1));\n"
+
+#. Plugin Name of the plugin
+msgid "WC MobilPayments Card"
+msgstr "WC MobilPayments Card"
+
+#. Plugin URI of the plugin
+msgid "https://github.com/alexboia/WC-MobilPayments-Card"
+msgstr "https://github.com/alexboia/WC-MobilPayments-Card"
+
+#. Description of the plugin
+msgid ""
+"Card WooCommerce Payment Gateway that uses the Romainan mobilPay payment processing "
+"gateway"
+msgstr ""
+"Un modul de plată pentru WooCommerce care permite integrarea cu procesatorul de "
+"plăți mobilPay."
+
+#. Author of the plugin
+msgid "Alexandru Boia"
+msgstr "Alexandru Boia"
+
+#. Author URI of the plugin
+msgid "http://alexboia.net"
+msgstr "http://alexboia.net"
+
+#: lib/MobilpayCardPaymentProcessor.php:500
+msgid "Card has a risk (i.e. stolen card)"
+msgstr "Card cu risc (de ex. card furat)"
+
+#: lib/MobilpayCardPaymentProcessor.php:501
+msgid "Card number is incorrect"
+msgstr "Numărul cardului este incorect"
+
+#: lib/MobilpayCardPaymentProcessor.php:502
+msgid "Closed card"
+msgstr "Card închis"
+
+#: lib/MobilpayCardPaymentProcessor.php:503
+msgid "Card is expired"
+msgstr "Cardul este expirat"
+
+#: lib/MobilpayCardPaymentProcessor.php:504
+msgid "Insufficient funds"
+msgstr "Fonduri insuficiente"
+
+#: lib/MobilpayCardPaymentProcessor.php:505
+msgid "CVV2 code incorrect"
+msgstr "Codul CVV2 este incorect"
+
+#: lib/MobilpayCardPaymentProcessor.php:506
+msgid "Issuer is unavailable"
+msgstr "Emitentul nu este disponibil"
+
+#: lib/MobilpayCardPaymentProcessor.php:507
+msgid "Amount is incorrect"
+msgstr "Suma incorectă"
+
+#: lib/MobilpayCardPaymentProcessor.php:508
+msgid "Currency is incorrect"
+msgstr "Valuta incorectă"
+
+#: lib/MobilpayCardPaymentProcessor.php:509
+msgid "Transaction not permitted to cardholder"
+msgstr "Deținătorului cardului nu-i este permisă tranzacția"
+
+#: lib/MobilpayCardPaymentProcessor.php:510 lib/MobilpayCardPaymentProcessor.php:513
+msgid "Transaction declined"
+msgstr "Tranzacție refuzată"
+
+#: lib/MobilpayCardPaymentProcessor.php:511
+msgid "Transaction rejected by antifraud filters"
+msgstr "Tranzacția respinsă de filtrele anti-fraudă"
+
+#: lib/MobilpayCardPaymentProcessor.php:512
+msgid "Transaction declined (breaking the law)"
+msgstr "Tranzacție respinsă (potențial ilegală)"
+
+#: lib/MobilpayCardPaymentProcessor.php:514
+msgid "Invalid request"
+msgstr "Cerere invalidă"
+
+#: lib/MobilpayCardPaymentProcessor.php:515
+msgid "Duplicate PREAUTH"
+msgstr "Operațiune PREAUTH redundantă"
+
+#: lib/MobilpayCardPaymentProcessor.php:516
+msgid "Duplicate AUTH"
+msgstr "Operațiune AUTH redundantă"
+
+#: lib/MobilpayCardPaymentProcessor.php:517
+msgid "You can only CANCEL a preauth order"
+msgstr "Se poate anula doar o comandă preautorizată"
+
+#: lib/MobilpayCardPaymentProcessor.php:518
+msgid "You can only CONFIRM a preauth order"
+msgstr "Poate fi confirmată doar o comandă preautorizată"
+
+#: lib/MobilpayCardPaymentProcessor.php:519
+msgid "You can only CREDIT a confirmed order"
+msgstr "Poate fi creditată doar o comandă confirmată"
+
+#: lib/MobilpayCardPaymentProcessor.php:520
+msgid "Credit amount is higher than auth amount"
+msgstr "Suma creditată este mai mare decât suma inițial autorizată"
+
+#: lib/MobilpayCardPaymentProcessor.php:521
+msgid "Capture amount is higher than preauth amount"
+msgstr "Suma capturată este mai mare decât suma inițial preautorizată"
+
+#: lib/MobilpayCardPaymentProcessor.php:522
+msgid "Duplicate request"
+msgstr "Cerere redundantă"
+
+#: lib/MobilpayCardPaymentProcessor.php:523
+msgid "Generic error"
+msgstr "Eroare generică"
+
+#: lib/MobilpayCardPaymentProcessor.php:532
+msgid ""
+"The amount you paid has been refuned. The order has been marked as refunded as "
+"well. Transaction id: %s"
+msgstr ""
+"Suma plătită ți-a fost rambursată. Comanda a fost marcată drept rambursată. ID "
+"Tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:537
+msgid ""
+"The paid amount has been refuned. The order has been marked as refunded as well. "
+"Transaction id: %s"
+msgstr ""
+"Suma plătită a fost rambursată. Comanda a fost marcată drept rambursată. ID "
+"Tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:542
+msgid ""
+"The paid amount has been refuned. The order has been marked as refunded as well."
+msgstr "Suma plătită a fost rambursată. Comanda a fost marcată drept rambursată."
+
+#: lib/MobilpayCardPaymentProcessor.php:546
+msgid "Partial refund notification received from MobilPay gateway. Transaction id: %s"
+msgstr ""
+"Notificare de rambursare parțială primită de la gateway-ul MobilPay. ID tranzacție: "
+"%s."
+
+#: lib/MobilpayCardPaymentProcessor.php:551
+msgid ""
+"The payment has been cancelled. The order has been cancelled as well. Transaction "
+"id: %s"
+msgstr ""
+"Plata a fost anulată. Comanda a fost de asemenea marcată drept anulată. ID "
+"tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:556
+msgid ""
+"Your payment has been cancelled. The order has been cancelled as well. Transaction "
+"id: %s"
+msgstr ""
+"Plata ta a fost anulată. Comanda a fost de asemenea marcată drept anulată. ID "
+"tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:561
+msgid "Your payment has been cancelled. The order has been cancelled as well."
+msgstr "Plata ta a fost anulată. Comanda a fost de asemenea marcată drept anulată."
+
+#: lib/MobilpayCardPaymentProcessor.php:565
+msgid ""
+"Order payment is currently being processed. The order has been placed on-hold. "
+"Transaction id: %s"
+msgstr ""
+"Plata este în procesare. Comanda a fost plasată în așteptare. ID tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:570
+msgid ""
+"Your payment is currently being processed. Your order has been placed on-hold. "
+"Transaction id: %s"
+msgstr ""
+"Plata ta este în procesare. Comanda a fost plasată în așteptare. ID tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:575
+msgid ""
+"Your payment is currently being processed and the order has been placed on-hold"
+msgstr "Plata ta este în procesare. Comanda a fost plasată în așteptare."
+
+#: lib/MobilpayCardPaymentProcessor.php:579
+msgid ""
+"The order has been placed on hold as the processed amount is smaller than the total "
+"order amount (%s vs. %s). Transaction id: %s"
+msgstr ""
+"Comanda a fost plasată în așteptare deoarece suma procesată este mai mică decât "
+"suma totală a comenzii (%s vs. %s). ID tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:586
+msgid ""
+"The order has been placed on hold as the processed amount is smaller than the total "
+"order amount (%s RON vs. %s RON). Transaction id: %s"
+msgstr ""
+"Comanda a fost plasată în așteptare deoarece suma procesată este mai mică decât "
+"suma totală a comenzii (%s RON vs. %s RON). ID tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:593
+msgid ""
+"The order has been placed on hold as the processed amount is smaller than the total "
+"order amount"
+msgstr ""
+"Comanda a fost plasată în așteptare deoarece suma procesată este mai mică decât "
+"suma totală a comenzii."
+
+#: lib/MobilpayCardPaymentProcessor.php:597
+msgid "Error processing payment: %s (code: %s). Transaction id: %s"
+msgstr "Eroare la procesarea plății: %s (cod eroare: %s). ID tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:604
+msgid "The payment has failed. See order notes for additional details"
+msgstr "Plata a eșuat. Vezi jurnalul comenzii pentru detalii suplimentare."
+
+#: lib/MobilpayCardPaymentProcessor.php:608
+msgid ""
+"Your payment has been successfully received. Your order is now completed. "
+"Transaction id: %s"
+msgstr ""
+"Plata ta a fost efectuată și procesată cu succes. Comanda a fost finalizată. ID "
+"tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:613
+msgid ""
+"The payment has been successfully received. The order is now completed. Transaction "
+"id: %s"
+msgstr ""
+"Plata a fost efectuată și procesată cu succes. Comanda a fost finalizată. ID "
+"tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:618
+msgid "The payment has been successfully received. The order is now completed"
+msgstr "Plata a fost efectuată și procesată cu succes. Comanda a fost finalizată."
+
+#: lib/MobilpayCardPaymentProcessor.php:622
+msgid ""
+"Your payment has been successfully received. Your order is currently being "
+"processed. Transaction id: %s"
+msgstr ""
+"Plata ta a fost efectuată și procesată cu succes. Comanda este în procesare. ID "
+"tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:627
+msgid ""
+"The payment has been successfully received. The order is currently being processed. "
+"Transaction id: %s"
+msgstr ""
+"Plata a fost efectuată și procesată cu succes. Comanda este în procesare. ID "
+"tranzacție: %s."
+
+#: lib/MobilpayCardPaymentProcessor.php:632
+msgid ""
+"The payment has been successfully received. The order is currently being processed."
+msgstr "Plata a fost efectuată și procesată cu succes. Comanda este în procesare."
+
+#: lib/MobilpayCreditCardGateway.php:130 lib/MobilpayCreditCardGateway.php:143
+msgid "mobilPay&trade; Card Gateway"
+msgstr "mobilPay&trade; Card Gateway"
+
+#: lib/MobilpayCreditCardGateway.php:131
+msgid "mobilPay&trade; Payment Gateway for WooCommerce"
+msgstr "mobilPay&trade; Gateway de plată pentru WooCommerce"
+
+#: lib/MobilpayCreditCardGateway.php:312
+msgid "Enable / Disable"
+msgstr "Activează / Dezactivează"
+
+#: lib/MobilpayCreditCardGateway.php:313
+msgid "Enable this payment gateway"
+msgstr "Activează acest gateway de plată"
+
+#: lib/MobilpayCreditCardGateway.php:318
+msgid "mobilPay&trade; Sandbox / Test Mode"
+msgstr "mobilPay&trade; Sandbox / Mod testare"
+
+#: lib/MobilpayCreditCardGateway.php:319
+msgid "Enable Test Mode"
+msgstr "Activează modul de testare"
+
+#: lib/MobilpayCreditCardGateway.php:321
+msgid "Place the payment gateway in test mode."
+msgstr "Plasează gateway-ul de plată în modul de testare"
+
+#: lib/MobilpayCreditCardGateway.php:325
+msgid "Title"
+msgstr "Titlu"
+
+#: lib/MobilpayCreditCardGateway.php:327
+msgid "Payment title the customer will see during the checkout process."
+msgstr "Titlul afișat clientului în timpul procesului de finalizare a comenzii"
+
+#: lib/MobilpayCreditCardGateway.php:328
+msgid "MobilPay"
+msgstr "MobilPay"
+
+#: lib/MobilpayCreditCardGateway.php:331
+msgid "Description"
+msgstr "Descriere"
+
+#: lib/MobilpayCreditCardGateway.php:333
+msgid "Payment description the customer will see during the checkout process."
+msgstr "Descrierea afișată clientului în timpul procesului de finalizare a comenzii"
+
+#: lib/MobilpayCreditCardGateway.php:337
+msgid "Seller Account ID"
+msgstr "Identificator cont comerciant"
+
+#: lib/MobilpayCreditCardGateway.php:339
+msgid ""
+"This is Account ID provided by MobilPay when you signed up for an account. Unique "
+"key for your seller account for the payment process."
+msgstr ""
+"Acest identificator este furnizat de MobilPay la înregistrarea în sistemul lor. "
+"Reprezintă în mod unic contul tău de comerciant folosit în timpul procesului de "
+"plată."
+
+#: lib/MobilpayCreditCardGateway.php:342
+msgid "Return URL"
+msgstr "URL înapoiere"
+
+#: lib/MobilpayCreditCardGateway.php:344
+msgid ""
+"You must create a new page and in the content field enter the shortcode "
+"[lvdwcmc_display_mobilpay_order_status] so that the user can see the message that "
+"is returned by the Mobilpay server regarding their transaction. Or any content you "
+"want to thank for buying."
+msgstr ""
+"Trebuie să creezi o pagină nouă și, în câmpul de conținut,să introduci shortcode-ul "
+"[lvdwcmc_display_mobilpay_order_status], pentru ca utilizatorul, redirecționat aici "
+"după ce a efectuat plată pe pagina MobilPay, să poată consulta statusul curent al "
+"tranzacției. Se poate adăuga orice conținut suplimentar prin care sunt transmise "
+"mulțumiri pentru achiziție."
+
+#: lib/MobilpayCreditCardGateway.php:348
+msgid "mobilPay&trade; digital certificate for the live environment"
+msgstr "Certificatul digital mobilPay&trade; pentru mediul de producție"
+
+#: lib/MobilpayCreditCardGateway.php:349
+msgid ""
+"The public key used for securing communication with the mobilPay&trade; gateway in "
+"the live environment."
+msgstr ""
+"Cheia publică folosită pentru securizarea comunicației cu gateway-ul de plată "
+"mobilPay&trade;, în mediul de producție"
+
+#: lib/MobilpayCreditCardGateway.php:353 lib/MobilpayCreditCardGateway.php:363
+#: lib/MobilpayCreditCardGateway.php:373 lib/MobilpayCreditCardGateway.php:383
+msgid "allowed file types: %s"
+msgstr "tipuri permise de fișiere: %s"
+
+#: lib/MobilpayCreditCardGateway.php:358
+msgid "The private key for the live environment"
+msgstr "Cheia privată pentru mediul de producție"
+
+#: lib/MobilpayCreditCardGateway.php:359
+msgid ""
+"The private key used for securing communication with the mobilPay&trade; gateway in "
+"the live environment."
+msgstr ""
+"Cheia privată folosită pentru securizarea comunicației cu gateway-ul de plată  "
+"mobilPay&trade;, în mediul de producție"
+
+#: lib/MobilpayCreditCardGateway.php:368
+msgid "mobilPay&trade; digital certificate for the sandbox environment"
+msgstr "Certificatul digital mobilPay&trade; pentru mediul de testare"
+
+#: lib/MobilpayCreditCardGateway.php:369
+msgid ""
+"The public key used for securing communication with the mobilPay&trade; gateway in "
+"the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
+msgstr ""
+"Cheia publică folosită pentru securizarea comunicației cu gateway-ul de plată "
+"mobilPay&trade;, în mediul de testare (folosită atunci când câmpul "
+"\"mobilPay&trade; Sandbox / Mod testare\" este bifat)"
+
+#: lib/MobilpayCreditCardGateway.php:378
+msgid "The private key for the sandbox environment"
+msgstr "Cheia privată pentru mediul de testare"
+
+#: lib/MobilpayCreditCardGateway.php:379
+msgid ""
+"The private key used for securing communication with the mobilPay&trade; gateway in "
+"the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
+msgstr ""
+"Cheia privată folosită pentru securizarea comunicației cu gateway-ul de plată  "
+"mobilPay&trade;, în mediul de producție (folosită atunci când câmpul "
+"\"mobilPay&trade; Sandbox / Mod testare\" este bifat)"
+
+#: lib/MobilpayCreditCardGateway.php:628
+msgid "Payment asset file successfully removed."
+msgstr "Fișierul a fost șters cu succes."
+
+#: lib/MobilpayCreditCardGateway.php:629
+msgid "Payment asset file could not be removed."
+msgstr "Fișierul nu a putut fi șters."
+
+#: lib/MobilpayCreditCardGateway.php:681
+msgid "Thank you for your order"
+msgstr "Îți mulțumim pentru comandă"
+
+#: lib/MobilpayCreditCardGateway.php:832
+msgid "Error initiating MobilPay card payment."
+msgstr "Eroare la inițierea plății prin card via MobilPay"
+
+#: lib/MobilpayCreditCardGateway.php:1094
+msgid "Payment for order #%s."
+msgstr "Plata pentru comanda #%s."
+
+#: lib/Plugin.php:129
+msgid "Could not activate plug-in: requirements not met."
+msgstr "Modulul nu a putut fi activat: cerințele tehnice nu sunt îndeplinite."
+
+#: lib/Plugin.php:132 lib/Plugin.php:138
+msgid "Activation error"
+msgstr "Eroare la activare"
+
+#: lib/Plugin.php:136
+msgid "Could not activate plug-in: activation failure."
+msgstr "Modulul nu a putut fi activat: eroare la activare."
+
+#: lib/Plugin.php:188 lib/Plugin.php:189
+msgid "mobilPay&trade; Card Transactions"
+msgstr "Tranzacții prin Card via mobilPay&trade; "
+
+#: lib/Plugin.php:303 views/lvdwcmc-frontend-transaction-details.php:35
+msgid "Payment transaction details"
+msgstr "Detalii tranzacție"
+
+#: lib/Plugin.php:405
+msgid "&laquo;"
+msgstr "&laquo;"
+
+#: lib/Plugin.php:406
+msgid "&raquo;"
+msgstr "&raquo;"
+
+#: lib/Plugin.php:474
+msgid "mobilPay&trade; Card Transaction Status"
+msgstr "Status Tranzacție prin Card via mobilPay&trade;"
+
+#: lib/Plugin.php:658 lib/Plugin.php:672
+msgid "The selected file is too large. Maximum allowed size is 10MB"
+msgstr ""
+"Fișierul selectat este prea voluminos. Dimensiunea maximă admisă este de 10 MB."
+
+#: lib/Plugin.php:660 lib/Plugin.php:670
+msgid "The selected file type is not valid."
+msgstr "Tipul fișierului nu este valid."
+
+#: lib/Plugin.php:662 lib/Plugin.php:664
+msgid "The file could not be read"
+msgstr "Fișierul nu a putut fi citit."
+
+#: lib/Plugin.php:666
+msgid "The uploader could not be initialized"
+msgstr "Componenta de upload nu a putut fi inițializată"
+
+#: lib/Plugin.php:668 lib/Plugin.php:678
+msgid "The file could not be uploaded"
+msgstr "Fișierul nu a putut fi încărcat"
+
+#: lib/Plugin.php:674
+msgid "No file was uploaded"
+msgstr "Nu a fost încărcat niciun fișier"
+
+#: lib/Plugin.php:676
+msgid "The file could not be uploaded due to a possible internal server issue"
+msgstr "Fișierul nu a putut fi încărcat  din cauza unei posibile probleme interne"
+
+#: lib/Plugin.php:680
+msgid ""
+"Remove asset file? This action cannot be undone and you will have to re-upload the "
+"asset again!"
+msgstr ""
+"Sigur ștergi fișierul? Această operațiune este definitivă și va trebui să reîncarci "
+"fișierul!"
+
+#: lib/Plugin.php:682
+msgid "The asset file could not be removed"
+msgstr "Fișierul nu a putut fi șters"
+
+#: lib/Plugin.php:684
+msgid "The asset file could not be removed due to a possible network issue"
+msgstr "Fișierul nu a putut fi șters din cauza unei posibile probleme de comunicație"
+
+#: lib/Plugin.php:686
+msgid "The file has been successfully uploaded"
+msgstr "Fișierul a fost încărcat cu succes"
+
+#: lib/Plugin.php:688
+msgid "The file has been successfulyl removed"
+msgstr "Fișierul a fost șters cu succes"
+
+#: lib/Plugin.php:690
+msgid "The return URL has been successfully generated."
+msgstr "URL-ul de înapoiere a fost generat cu succes"
+
+#: lib/Plugin.php:692
+msgid "The return URL could not generated."
+msgstr "URL-ul de înapoiere nu a putut fi generat."
+
+#: lib/Plugin.php:694
+msgid "The return URL could not be generated due to a possible network issue"
+msgstr ""
+"URL-ul de înapoiere nu a putut fi generat din cauza unei posibile probleme de "
+"comunicație."
+
+#: lib/Plugin.php:701
+msgid "Could not load transaction details data"
+msgstr "Detaliile tranzacției nu au putut fi încărcate"
+
+#: lib/Plugin.php:703
+msgid "Could not load transaction details data due to a possible network issue"
+msgstr ""
+"Detaliile tranzacției nu au putut fi încărcate din cauza unei probleme de "
+"comunicație"
+
+#: lib/Plugin.php:709
+msgid "Please wait..."
+msgstr "Te rugăm să aștepți..."
+
+#: lib/Plugin.php:717
+msgid "Minimum required PHP version is %s."
+msgstr "Versiunea minimă necesară de PHP este %s."
+
+#: lib/Plugin.php:719
+msgid "Minimum required WordPress version is %s."
+msgstr "Versiunea minimă necesară de WordPress este %s."
+
+#: lib/Plugin.php:721
+msgid "Mysqli extension was not found on your system or is not fully compatible."
+msgstr ""
+"Extensia Mysqli nu a putut fi găsită pe server-ul tău sau există și nu este "
+"compatibilă"
+
+#: lib/Plugin.php:723
+msgid "Openssl extension was not found on your system or is not fully compatible."
+msgstr ""
+"Extensia Openssl nu a putut fi găsită pe server-ul tău sau există și nu este "
+"compatibilă"
+
+#: lib/Plugin.php:725
+msgid "The installation failed."
+msgstr "Instalarea a eșuat"
+
+#: lib/Plugin.php:732
+msgid "Cancelled"
+msgstr "Anulată"
+
+#: lib/Plugin.php:734
+msgid "Confirmed. Payment successful"
+msgstr "Confirmată. Plată finalizată cu succes"
+
+#: lib/Plugin.php:736
+msgid "Pending confirmation"
+msgstr "Se așteaptă confirmarea"
+
+#: lib/Plugin.php:738
+msgid "Credited"
+msgstr "Rambursată"
+
+#: lib/Plugin.php:740
+msgid "Failed"
+msgstr "Eșuată"
+
+#: lib/Plugin.php:742
+msgid "Started"
+msgstr "Începută"
+
+#: lib/Plugin.php:744
+msgid "Pending payment"
+msgstr "Plata în așteptare"
+
+#: views/lvdwcmc-admin-transaction-details.php:51
+#: views/lvdwcmc-admin-transactions-listing.php:158
+#: views/lvdwcmc-email-transaction-details.php:52
+#: views/lvdwcmc-frontend-transaction-details.php:54
+msgid "Transaction Id"
+msgstr "ID tranzacție"
+
+#: views/lvdwcmc-admin-transaction-details.php:57
+#: views/lvdwcmc-admin-transactions-listing.php:168
+#: views/lvdwcmc-frontend-transaction-details.php:60
+msgid "Transaction status"
+msgstr "Status tranzacție"
+
+#: views/lvdwcmc-admin-transaction-details.php:63
+#: views/lvdwcmc-admin-transactions-listing.php:172
+#: views/lvdwcmc-email-transaction-details.php:56
+#: views/lvdwcmc-frontend-transaction-details.php:66
+msgid "Card number"
+msgstr "Număr de card"
+
+#: views/lvdwcmc-admin-transaction-details.php:69
+#: views/lvdwcmc-admin-transactions-listing.php:182
+#: views/lvdwcmc-frontend-transaction-details.php:72
+msgid "Original amount"
+msgstr "Suma originală"
+
+#: views/lvdwcmc-admin-transaction-details.php:75
+#: views/lvdwcmc-admin-transactions-listing.php:186
+#: views/lvdwcmc-frontend-transaction-details.php:78
+msgid "Actually processed amount"
+msgstr "Suma efectiv procesată"
+
+#: views/lvdwcmc-admin-transaction-details.php:81
+#: views/lvdwcmc-admin-transactions-listing.php:62
+#: views/lvdwcmc-admin-transactions-listing.php:190
+#: views/lvdwcmc-frontend-transaction-details.php:84
+msgid "Date initiated"
+msgstr "Data inițierii"
+
+#: views/lvdwcmc-admin-transaction-details.php:87
+#: views/lvdwcmc-admin-transactions-listing.php:194
+#: views/lvdwcmc-frontend-transaction-details.php:90
+msgid "Date of last activity"
+msgstr "Data ultimei activități"
+
+#: views/lvdwcmc-admin-transaction-details.php:93
+#: views/lvdwcmc-admin-transactions-listing.php:199
+#: views/lvdwcmc-frontend-transaction-details.php:96
+msgid "Transaction error code"
+msgstr "Codul de eroare al tranzacției"
+
+#: views/lvdwcmc-admin-transaction-details.php:97
+#: views/lvdwcmc-admin-transactions-listing.php:203
+#: views/lvdwcmc-frontend-transaction-details.php:101
+msgid "Transaction error message"
+msgstr "Mesajul de eroare al tranzacției"
+
+#: views/lvdwcmc-admin-transaction-details.php:103
+#: views/lvdwcmc-admin-transactions-listing.php:209
+msgid "Client IP Address"
+msgstr "Adresa de IP a clientului"
+
+#: views/lvdwcmc-admin-transactions-listing.php:61 views/lvdwcmc-payment-status.php:39
+#: views/lvdwcmc-payment-status.php:43
+msgid "Order Id"
+msgstr "ID comandă"
+
+#: views/lvdwcmc-admin-transactions-listing.php:63
+msgid "Status"
+msgstr "Status"
+
+#: views/lvdwcmc-admin-transactions-listing.php:64
+msgid "Amount"
+msgstr "Suma"
+
+#: views/lvdwcmc-admin-transactions-listing.php:65
+msgid "Processed amount"
+msgstr "Suma procesată"
+
+#: views/lvdwcmc-admin-transactions-listing.php:71
+msgid "Actions"
+msgstr "Acțiuni"
+
+#: views/lvdwcmc-admin-transactions-listing.php:108
+msgid "Details"
+msgstr "Detalii"
+
+#: views/lvdwcmc-admin-transactions-listing.php:120
+msgid "There are no transactions matching your criteria"
+msgstr "Nu există tranzacții corespunzătoare cu criteriile tale"
+
+#: views/lvdwcmc-admin-transactions-listing.php:141
+msgid "Transaction details"
+msgstr "Detalii tranzacție"
+
+#: views/lvdwcmc-admin-transactions-listing.php:230
+msgid "Close"
+msgstr "Închide"
+
+#: views/lvdwcmc-email-transaction-details.php:35
+msgid "Card payment transaction details"
+msgstr "Detalii plată tranzacție prin card"
+
+#: views/lvdwcmc-email-transaction-details.php:61
+msgid "Client IP address"
+msgstr "Adresa IP a clientului"
+
+#: views/lvdwcmc-gateway-return-url-field.php:54
+msgid "Generate it for me"
+msgstr "Generează pentru mine"
+
+#: views/lvdwcmc-gateway-settings-js.php:35
+#: views/lvdwcmc-gateway-upload-asset-field.php:45
+msgid "The file has already been uploaded."
+msgstr "Fișierul a fost deja încărcat"
+
+#: views/lvdwcmc-gateway-settings-js.php:39
+#: views/lvdwcmc-gateway-upload-asset-field.php:49
+msgid "Remove"
+msgstr "Ștergere"
+
+#: views/lvdwcmc-gateway-settings-js.php:46
+#: views/lvdwcmc-gateway-upload-asset-field.php:54
+msgid "Chose a file from disk"
+msgstr "Alege un fișier de pe disc"
+
+#: views/lvdwcmc-payment-form.php:41
+msgid "Pay via mobilPay&trade;"
+msgstr "Plătește via mobilPay&trade;"
+
+#: views/lvdwcmc-payment-status.php:36
+msgid "Your payment could not be processed or has been cancelled."
+msgstr "Plata ta nu a putut fi procesată sau a fost anulată"
+
+#: views/lvdwcmc-payment-status.php:38
+msgid "Your payment is currently being processed."
+msgstr "Plata ta este în procesare"
+
+#: views/lvdwcmc-payment-status.php:40 views/lvdwcmc-payment-status.php:44
+msgid "Detailed order status"
+msgstr "Starea detaliată a comenzii"
+
+#: views/lvdwcmc-payment-status.php:42
+msgid "We have successfully received your payment"
+msgstr "Plata ta a fost primită și procesată cu succes"
