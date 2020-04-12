@@ -30,7 +30,8 @@
  */
 
 namespace LvdWcMc {
-    class Plugin {
+
+class Plugin {
         const ACTION_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details';
 
         const NONCE_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details_nonce';
@@ -68,9 +69,7 @@ namespace LvdWcMc {
         /**
          * @var array The list of required plugins for our plug-in to work
          */
-        private $_requiredPlugins = array(
-            'woocommerce/woocommerce.php'
-        );
+        private $_requiredPlugins = null;
 
         public function __construct(array $options) {
             if (!isset($options['mediaIncludes']) || !is_array($options['mediaIncludes'])) {
@@ -79,6 +78,15 @@ namespace LvdWcMc {
                     'scriptsInFooter' => true
                 );
             }
+
+            $this->_requiredPlugins = array(
+                'woocommerce/woocommerce.php' => function() {
+                    return defined('WC_PLUGIN_FILE') 
+                        && class_exists('WC_Payment_Gateway') 
+                        && class_exists('WooCommerce')
+                        && function_exists('WC');
+                }
+            );
 
             $this->_env = lvdwcmc_env();
             $this->_installer = new Installer();
@@ -158,8 +166,8 @@ namespace LvdWcMc {
         }
 
         public function onPluginsLoaded() {
-            foreach ($this->_requiredPlugins as $plugin) {
-                if (!$this->_env->isPluginActive($plugin)) {
+            foreach ($this->_requiredPlugins as $plugin => $checker) {
+                if (!$checker) {
                     wp_die('Missing required plug-in: "' . $plugin . '".', 'Missing dependency');
                 }
             }
