@@ -193,12 +193,10 @@ namespace LvdWcMc {
             do_action('lvdwcmc_enqueue_gateway_settings_form_styles', 
                 $this->_mediaIncludes);
 
-            $this->_mediaIncludes
-                ->includeScriptSettings();
-            $this->_mediaIncludes
-                ->localizeCommonScript(lvdwcmc_plugin()->getCommonScriptTranslations());
-            $this->_mediaIncludes
-                ->localizeSettingsScript(lvdwcmc_plugin()->getSettingsScriptTranslations());
+            $plugin = lvdwcmc_plugin();
+            $this->_mediaIncludes->includeScriptSettings(
+                $plugin->getSettingsScriptTranslations(), 
+                $plugin->getCommonScriptTranslations());
 
             /**
              * Enqueue scripts for the gateway settings page. 

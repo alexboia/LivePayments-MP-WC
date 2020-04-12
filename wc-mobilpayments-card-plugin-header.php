@@ -44,7 +44,15 @@
  define('LVD_WCMC_TEXT_DOMAIN', 'wc-mobilpayments-card');
 
 define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY', 'payment_asset_file');
-define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE', 102400);
-define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE', max(wp_max_upload_size(), 10485760));
 
-define('LVD_WCMC_RECORDS_PER_PAGE', 25);
+if (!defined('LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE')) {
+    define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE', 102400);
+}
+
+if (!defined('LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE')) {
+    define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE', max(wp_max_upload_size(), 10485760));
+}
+
+if (!defined('LVD_WCMC_RECORDS_PER_PAGE')) {
+    define('LVD_WCMC_RECORDS_PER_PAGE', 25);
+}

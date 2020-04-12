@@ -254,9 +254,9 @@ namespace LvdWcMc {
             }
 
             if ($this->_env->isViewingAdminTransactionListing()) {
-                $this->_mediaIncludes->includeScriptTransactionListing();
-                $this->_mediaIncludes->localizeCommonScript($this->getCommonScriptTranslations());
-                $this->_mediaIncludes->localizeTransactionListingScript($this->getTransactionsListingScriptTranslations());
+                $this->_mediaIncludes->includeScriptTransactionListing(
+                    $this->getTransactionsListingScriptTranslations(), 
+                    $this->getCommonScriptTranslations());
             }
 
             /**

@@ -63,6 +63,8 @@
 
         const STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc-admin-transaction-details-css';
 
+        const STYLE_LVDWCMC_ADMIN_TRANSACTION_LISTING = 'lvdwcmc-admin-transaction-listing-css';
+
         const STYLE_LVDWCMC_DASHBOARD = 'lvdwcmc-dashboard-css';
 
         private $_refPluginsPath;
@@ -90,13 +92,23 @@
                 'path' => 'media/css/lvdwcmc-frontend-transaction-details.css',
                 'version' => LVD_WCMC_VERSION
             ),
+            self::STYLE_LVDWCMC_ADMIN_TRANSACTION_LISTING => array(
+                'alias' => self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS,
+                'deps' => array(
+                    self::STYLE_TOASTR,
+                    self::STYLE_LVDWCMC_COMMON
+                )
+            ),
             self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS => array(
                 'path' => 'media/css/lvdwcmc-admin-transaction-details.css',
                 'version' => LVD_WCMC_VERSION
             ),
             self::STYLE_LVDWCMC_DASHBOARD => array(
                 'path' => 'media/css/lvdwcmc-dashboards.css',
-                'version' => LVD_WCMC_VERSION
+                'version' => LVD_WCMC_VERSION,
+                'deps' => array(
+                    self::STYLE_LVDWCMC_COMMON
+                )
             )
         );
 
@@ -147,6 +159,7 @@
                     self::JS_JQUERY,
                     self::JS_URIJS,
                     self::JS_TOASTR,
+                    self::JS_KITE_JS,
                     self::JS_LVDWCMC_COMMON
                 )
             ),
@@ -169,16 +182,81 @@
             $this->_scriptsInFooter = $scriptsInFooter;
         }
 
+        private  function _hasScript($handle) {
+            return !empty($this->_scripts[$handle]);
+        }
+    
+        private function _hasStyle($handle) {
+            return !empty($this->_styles[$handle]);
+        }
+
+        private function _getActualElement($handle, array &$collection) {
+            $script = null;
+            $actual = null;
+    
+            if (isset($collection[$handle])) {
+                $script = $collection[$handle];
+                if (!empty($script['alias'])) {
+                    $handle = $script['alias'];
+                    $actual = isset($collection[$handle]) 
+                        ? $collection[$handle]
+                        : null;
+                }
+    
+                if (!empty($actual)) {
+                    $deps = isset($script['deps']) 
+                        ? $script['deps'] 
+                        : null;
+                    if (!empty($deps)) {
+                        $actual['deps'] = $deps;
+                    }
+                } else {
+                    $actual = $script;
+                }
+            }
+    
+            return $actual;
+        }
+    
+        private function _getActualScriptToInclude($handle) {
+            return $this->_getActualElement($handle, $this->_scripts);
+        }
+    
+        private function _getActualStyleToInclude($handle) {
+            return $this->_getActualElement($handle, $this->_styles);
+        }
+
+        private function _ensureScriptDependencies(array $deps) {
+            foreach ($deps as $depHandle) {
+                if ($this->_hasScript($depHandle)) {
+                    $this->_enqueueScript($depHandle);
+                }
+            }
+        }
+    
+        private  function _ensureStyleDependencies(array $deps) {
+            foreach ($deps as $depHandle) {
+                if ($this->_hasStyle($depHandle)) {
+                    $this->_enqueueStyle($depHandle);
+                }
+            }
+        }
+
         private function _enqueueScript($handle) {
             if (empty($handle)) {
                 return;
             }
             if (isset($this->_scripts[$handle])) {
                 if (!wp_script_is($handle, 'registered')) {
-                    $script = $this->_scripts[$handle];
+                    $script = $this->_getActualScriptToInclude($handle);
+
                     $deps = isset($script['deps']) && is_array($script['deps']) 
                         ? $script['deps'] 
                         : array();
+
+                    if (!empty($deps)) {
+                        $this->_ensureScriptDependencies($deps);
+                    }
     
                     wp_enqueue_script($handle, 
                         plugins_url($script['path'], $this->_refPluginsPath), 
@@ -202,13 +280,18 @@
                 return;
             }
             if (isset($this->_styles[$handle])) {
-                $style = $this->_styles[$handle];
+                $style = $this->_getActualStyleToInclude($handle);
+
+                if (!isset($style['media']) || !$style['media']) {
+                    $style['media'] = 'all';
+                }
+
                 $deps = isset($style['deps']) && is_array($style['deps']) 
                     ? $style['deps'] 
                     : array();
 
-                if (!isset($style['media']) || !$style['media']) {
-                    $style['media'] = 'all';
+                if (!empty($deps)) {
+                    $this->_ensureStyleDependencies($deps);
                 }
 
                 wp_enqueue_style($handle, 
@@ -222,36 +305,42 @@
         }
 
         public function includeScriptCommon() {
-            $this->_enqueueScript(self::JS_JQUERY);
-            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
             $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
         }
 
-        public function includeScriptSettings() {
-            $this->_enqueueScript(self::JS_URIJS);
-            $this->_enqueueScript(self::JS_JQUERY);
-            $this->_enqueueScript(self::JS_MOXIE);
-            $this->_enqueueScript(self::JS_PLUPLOAD);
-            $this->_enqueueScript(self::JS_TOASTR);
-            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
-            $this->_enqueueScript(self::JS_KITE_JS);
-            $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
+        public function includeScriptSettings($settingsScriptLocalization, $commonScriptLocalization) {
             $this->_enqueueScript(self::JS_LVDWCMC_SETTINGS);
+
+            if (!empty($commonScriptLocalization)) {
+                wp_localize_script(self::JS_LVDWCMC_COMMON,
+                    'lvdwcmcCommonScriptL10n', 
+                    $commonScriptLocalization);
+            }
+
+            if (!empty($settingsScriptLocalization)) {
+                wp_localize_script(self::JS_LVDWCMC_SETTINGS, 
+                    'lvdwcmcSettingsL10n', 
+                    $settingsScriptLocalization);
+            }
         }
 
-        public function includeScriptTransactionListing() {
-            $this->_enqueueScript(self::JS_JQUERY);
-            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
-            $this->_enqueueScript(self::JS_URIJS);
-            $this->_enqueueScript(self::JS_TOASTR);
-            $this->_enqueueScript(self::JS_KITE_JS);
-            $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
+        public function includeScriptTransactionListing($transactionsScriptLocalization, $commonScriptLocalization) {
             $this->_enqueueScript(self::JS_LVDWCMC_TRANSACTION_LISTING);
+            
+            if (!empty($commonScriptLocalization)) {
+                wp_localize_script(self::JS_LVDWCMC_COMMON,
+                    'lvdwcmcCommonScriptL10n', 
+                    $commonScriptLocalization);
+            }
+
+            if (!empty($transactionsScriptLocalization)) {
+                wp_localize_script(self::JS_LVDWCMC_TRANSACTION_LISTING, 
+                    'lvdwcmcTransactionsListL10n', 
+                    $transactionsScriptLocalization);
+            }
         }
 
         public function includeScriptPaymentInitiation() {
-            $this->_enqueueScript(self::JS_JQUERY);
-            $this->_enqueueScript(self::JS_JQUERY_BLOCKUI);
             $this->_enqueueScript(self::JS_LVDWCMC_PAYMENT_INITIATION);
         }
 
@@ -260,16 +349,12 @@
         }
 
         public function includeStyleSettings() {
-            $this->_enqueueStyle(self::STYLE_TOASTR);
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
             $this->_enqueueStyle(self::STYLE_LVDWCMC_SETTINGS);
         }
 
         public function includeStyleAdminTransactionListing() {
             wp_enqueue_style('woocommerce_admin_styles');
-            $this->_enqueueStyle(self::STYLE_TOASTR);
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS);
+            $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_LISTING);
         }
 
         public function includeStyleFrontendTransactionDetails() {
@@ -281,26 +366,7 @@
         }
 
         public function includeStyleDashboard() {
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
             $this->_enqueueStyle(self::STYLE_LVDWCMC_DASHBOARD);
-        }
-
-        public function localizeSettingsScript($translations) {
-            wp_localize_script(self::JS_LVDWCMC_SETTINGS, 
-                'lvdwcmcSettingsL10n', 
-    			$translations);
-        }
-
-        public function localizeTransactionListingScript($translations) {
-            wp_localize_script(self::JS_LVDWCMC_TRANSACTION_LISTING, 
-                'lvdwcmcTransactionsListL10n', 
-    			$translations);
-        }
-
-        public function localizeCommonScript($translations) {
-            wp_localize_script(self::JS_LVDWCMC_COMMON,
-                'lvdwcmcCommonScriptL10n', 
-                $translations);
         }
     }
 }
