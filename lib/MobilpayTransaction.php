@@ -85,15 +85,24 @@ namespace LvdWcMc {
         public function __construct(array $data, Env $env) {
             $this->_env = $env;
 
-            $this->_id = $data['tx_id'];
+            $this->_id = isset($data['tx_id']) 
+                ? intval(($data['tx_id'])) 
+                : 0;
+
             $this->_orderId = $data['tx_order_id'];
             $this->_orderUserId = $data['tx_order_user_id'];
             $this->_provider = $data['tx_provider'];
             $this->_transactionId = $data['tx_transaction_id'];
             $this->_providerTransactionId = $data['tx_provider_transaction_id'];
             $this->_status = $data['tx_status'];
-            $this->_errorCode = $data['tx_error_code'];
-            $this->_errorMessage = $data['tx_error_message'];
+            
+            $this->_errorCode = isset($data['tx_error_code']) 
+                ? $data['tx_error_code'] 
+                : null;
+            $this->_errorMessage = isset($data['tx_error_message']) 
+                ? $data['tx_error_message']
+                : null;
+            
             $this->_amount = $data['tx_amount'];
             $this->_processedAmount = $data['tx_processed_amount'];
             $this->_currency = $data['tx_currency'];
@@ -130,8 +139,12 @@ namespace LvdWcMc {
 
         public function save() {
             $db = $this->_env->getDb();
-            $db->where('tx_id', $this->_id);
-            $db->update($this->_env->getPaymentTransactionsTableName(), $this->_getData());
+            if ($this->_id > 0) {
+                $db->where('tx_id', $this->_id);
+                $db->update($this->_env->getPaymentTransactionsTableName(), $this->_getData());
+            } else {
+                $this->_id = $db->insert($this->_env->getPaymentTransactionsTableName(), $this->_getData());
+            }
         }
 
         public function isNew() {
@@ -175,7 +188,8 @@ namespace LvdWcMc {
         }
 
         public function setPaymentPending($action, $transactionId) {
-            if ($this->canBeSetPaymentPending()) {
+            if ($this->canBeSetPaymentPending() 
+                && ($action == self::STATUS_PAID_PENDING || $action == self::STATUS_CONFIRMED_PENDING)) {
                 $this->_status = $action;
                 $this->_providerTransactionId = $transactionId;
                 $this->_setLastUpdated();
