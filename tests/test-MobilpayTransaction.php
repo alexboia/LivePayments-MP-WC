@@ -111,7 +111,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
                 'tx_id' => 0
             ));
 
-            $tx = new MobilpayTransaction($txData, $this->_getEnv());
+            $tx = $this->_mobilpayTransactionFromData($txData);
             $tx->save();
 
             $this->assertTrue($tx->getId() > 0);
@@ -138,13 +138,13 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
                 'tx_error_message' => null
             ));
 
-            $tx = new MobilpayTransaction($txData, $this->_getEnv());
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertTrue($tx->canBeSetFailed());
 
             $providerTxId = $faker->sha1;
             $errorCode = $faker->numberBetween(1, 100);
             $errorMessage = $faker->sentence();
 
-            $this->assertTrue($tx->canBeSetFailed());
             $tx->setFailed($providerTxId, $errorCode, $errorMessage);
 
             $this->assertEquals($providerTxId, $tx->getProviderTransactionId());
@@ -152,14 +152,17 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
             $this->assertEquals($errorCode, $tx->getErrorCode());
             $this->assertEquals($errorMessage, $tx->getErrorMessage());
 
+            $this->assertTrue($tx->isFailed());
+
             $txId = $tx->getId();
-            $this->_assertMobilpayTransactionDbDataMatchesExpectedData($txId, array(
+            $this->_assertMobilpayTransactionDbDataMatchesExpectedData($txId, array_merge($txData, array(
                 'tx_id' => $txId,
                 'tx_provider_transaction_id' => $providerTxId,
                 'tx_status' => MobilpayTransaction::STATUS_FAILED,
                 'tx_error_code' => $errorCode,
-                'tx_error_message' => $errorMessage
-            ));
+                'tx_error_message' => $errorMessage,
+                'tx_timestamp_last_updated' => $tx->getTimestampLastUpdated()
+            )));
         }
     }
 
@@ -173,20 +176,23 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
         foreach ($statuses as $status) {
             $txData = $this->_generateRandomMobilpayTransactionData(array(
-                'tx_id' => $this->_generateMobilpayTransactionId(),
+                'tx_id' => $this->_generateRandomMobilpayTransactionId(),
                 'tx_status' => $status,
                 'tx_error_code' => null,
                 'tx_error_message' => null
             ));
 
-            $tx = new MobilpayTransaction($txData, $this->_getEnv());
+            $tx = $this->_mobilpayTransactionFromData($txData);
 
             $providerTxId = $faker->sha1;
             $errorCode = $faker->numberBetween(1, 100);
             $errorMessage = $faker->sentence();
 
             $this->assertFalse($tx->canBeSetFailed());
+
             $tx->setFailed($providerTxId, $errorCode, $errorMessage);
+
+            $this->assertFalse($tx->isFailed());
 
             $this->_assertMobilpayTransactionMatchesData($tx, $txData);
             $this->_assertMobilpayTransactionNotInDb($tx->getId());
@@ -208,7 +214,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
                 'tx_error_message' => null
             ));
 
-            $tx = new MobilpayTransaction($txData, $this->_getEnv());
+            $tx = $this->_mobilpayTransactionFromData($txData);
             $this->assertTrue($tx->canBeSetPaymentPending());
 
             $providerTxId = $faker->sha1;
@@ -219,15 +225,19 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
             }
 
             $tx->setPaymentPending($newStatus, $providerTxId);
+
             $this->assertEquals($providerTxId, $tx->getProviderTransactionId());
             $this->assertEquals($newStatus, $tx->getStatus());            
 
+            $this->assertTrue($tx->isPaymentPending());
+
             $txId = $tx->getId();
-            $this->_assertMobilpayTransactionDbDataMatchesExpectedData($txId, array(
+            $this->_assertMobilpayTransactionDbDataMatchesExpectedData($txId, array_merge($txData, array(
                 'tx_id' => $txId,
                 'tx_provider_transaction_id' => $providerTxId,
-                'tx_status' => $newStatus
-            ));
+                'tx_status' => $newStatus,
+                'tx_timestamp_last_updated' => $tx->getTimestampLastUpdated()
+            )));
         }
     }
 
@@ -243,13 +253,13 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
         foreach ($statuses as $status) {
             $txData = $this->_generateRandomMobilpayTransactionData(array(
-                'tx_id' => $this->_generateMobilpayTransactionId(),
+                'tx_id' => $this->_generateRandomMobilpayTransactionId(),
                 'tx_status' => $status,
                 'tx_error_code' => null,
                 'tx_error_message' => null
             ));
 
-            $tx = new MobilpayTransaction($txData, $this->_getEnv());
+            $tx = $this->_mobilpayTransactionFromData($txData);
             $this->assertFalse($tx->canBeSetPaymentPending());
 
             $providerTxId = $faker->sha1;
@@ -260,9 +270,329 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
             $tx->setPaymentPending($newStatus, $providerTxId);
 
+            if ($status != MobilpayTransaction::STATUS_CONFIRMED_PENDING) {
+                $this->assertFalse($tx->isPaymentPending());
+            } else {
+                $this->assertTrue($tx->isPaymentPending());
+            }
+
             $this->_assertMobilpayTransactionMatchesData($tx, $txData);
             $this->_assertMobilpayTransactionNotInDb($tx->getId());
         }
+    }
+
+    public function test_canSetConfirmed_validStatuses_entireAmountProcessed() {
+        $statuses = array(
+            MobilpayTransaction::STATUS_NEW,
+            MobilpayTransaction::STATUS_PAID_PENDING,
+            MobilpayTransaction::STATUS_CONFIRMED_PENDING,
+            MobilpayTransaction::STATUS_FAILED
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => 0,
+                'tx_status' => $status
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertTrue($tx->canBeSetConfirmed());
+
+            $processedAmount = $txData['tx_amount'];
+
+            $this->_runSetConfirmedTests($tx, 
+                $txData, 
+                $processedAmount, 
+                $processedAmount);
+        }
+    }
+
+    public function test_canSetConfirmed_validStatus_partialAmountProcessed() {
+        $faker = self::_getFaker();
+        $statuses = array(
+            MobilpayTransaction::STATUS_NEW,
+            MobilpayTransaction::STATUS_PAID_PENDING,
+            MobilpayTransaction::STATUS_CONFIRMED_PENDING,
+            MobilpayTransaction::STATUS_FAILED
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => 0,
+                'tx_status' => $status,
+                'tx_processed_amount' => 0
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertTrue($tx->canBeSetConfirmed());
+
+            $processedAmount = 0;
+            $processedAmountInc = round(0.1 * $txData['tx_amount'], 4);
+
+            while ($processedAmount < $txData['tx_amount']) {
+                $processedAmount += $processedAmountInc;
+                $processedAmount = min($processedAmount, $txData['tx_amount']);
+
+                $this->_runSetConfirmedTests($tx, 
+                    $txData, 
+                    $processedAmount, 
+                    $processedAmountInc);
+            }
+        }
+    }
+
+    private function _runSetConfirmedTests(MobilpayTransaction $tx, array $txData, $processedAmount, $processedAmountInc) {
+        $faker = self::_getFaker();
+        $providerTxId = $faker->sha1;
+        $panMasked = $faker->creditCardNumber;
+
+        $tx->setConfirmed($providerTxId, $processedAmountInc, $panMasked);
+
+        $this->assertEquals($providerTxId, $tx->getProviderTransactionId());
+        $this->assertEquals($processedAmount, $tx->getProcessedAmount(), null, 0.001);
+        $this->assertEquals($panMasked, $tx->getPANMasked());
+        $this->assertEquals(MobilpayTransaction::STATUS_CONFIRMED, $tx->getStatus());
+        $this->assertEmpty($tx->getErrorCode());
+        $this->assertEmpty($tx->getErrorMessage());
+
+        if ($processedAmount < $txData['tx_amount']) {
+            $this->assertFalse($tx->isAmountCompletelyProcessed());
+        } else {
+            $this->assertTrue($tx->isAmountCompletelyProcessed());
+        }
+
+        $this->assertTrue($tx->isConfirmed());
+
+        $txId = $tx->getId();
+        $this->_assertMobilpayTransactionDbDataMatchesExpectedData($txId, array_merge($txData, array(
+            'tx_id' => $txId,
+            'tx_provider_transaction_id' => $providerTxId,
+            'tx_status' => MobilpayTransaction::STATUS_CONFIRMED,
+            'tx_processed_amount' => $processedAmount,
+            'tx_pan_masked' => $panMasked,
+            'tx_error_code' => null,
+            'tx_error_message' => null,
+            'tx_timestamp_last_updated' => $tx->getTimestampLastUpdated()
+        )));
+    }
+
+    public function test_trySetConfirmed_invalidStatuses() {
+        $faker = self::_getFaker();
+        $statuses = array(
+            MobilpayTransaction::STATUS_CREDIT,
+            MobilpayTransaction::STATUS_CANCELLED
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => $this->_generateRandomMobilpayTransactionId(),
+                'tx_status' => $status
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertFalse($tx->canBeSetConfirmed());
+
+            $providerTxId = $faker->sha1;
+            $panMasked = $faker->creditCardNumber;
+            $processedAmount = $txData['tx_amount'];
+
+            $tx->setConfirmed($providerTxId, $processedAmount, $panMasked);
+
+            $this->assertFalse($tx->isConfirmed());
+
+            $this->_assertMobilpayTransactionMatchesData($tx, $txData);
+            $this->_assertMobilpayTransactionNotInDb($tx->getId());
+        }
+    }
+
+    public function test_canSetCancelled_validStatuses() {
+        $faker = self::_getFaker();
+        $statuses = array(
+            MobilpayTransaction::STATUS_NEW,
+            MobilpayTransaction::STATUS_CONFIRMED_PENDING,
+            MobilpayTransaction::STATUS_PAID_PENDING
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => 0,
+                'tx_status' => $status,
+                'tx_error_code' => null,
+                'tx_error_message' => null
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertTrue($tx->canBeSetCancelled());
+
+            $providerTxId = $faker->sha1;
+
+            $tx->setCancelled($providerTxId);
+
+            $this->assertEquals($providerTxId, $tx->getProviderTransactionId());
+            $this->assertEquals(MobilpayTransaction::STATUS_CANCELLED, $tx->getStatus());
+            $this->assertEquals(0, $tx->getProcessedAmount());
+
+            $this->assertTrue($tx->isCancelled());
+
+            $txId = $tx->getId();
+            $this->_assertMobilpayTransactionDbDataMatchesExpectedData($txId, array_merge($txData, array(
+                'tx_id' => $txId,
+                'tx_provider_transaction_id' => $providerTxId,
+                'tx_status' => MobilpayTransaction::STATUS_CANCELLED,
+                'tx_processed_amount' => 0,
+                'tx_timestamp_last_updated' => $tx->getTimestampLastUpdated()
+            )));
+        }
+    }
+
+    public function test_trySetCancelled_invalidStatuses() {
+        $faker = self::_getFaker();
+        $statuses = array(
+            MobilpayTransaction::STATUS_FAILED,
+            MobilpayTransaction::STATUS_CONFIRMED,
+            MobilpayTransaction::STATUS_CREDIT,
+            MobilpayTransaction::STATUS_CANCELLED
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => $this->_generateRandomMobilpayTransactionId(),
+                'tx_status' => $status,
+                'tx_error_code' => null,
+                'tx_error_message' => null
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertFalse($tx->canBeSetCancelled());
+
+            $providerTxId = $faker->sha1;
+            $tx->setCancelled($providerTxId);
+
+            if ($status == MobilpayTransaction::STATUS_CANCELLED) {
+                $this->assertTrue($tx->isCancelled());
+            } else {
+                $this->assertFalse($tx->isCancelled());
+            }
+
+            $this->_assertMobilpayTransactionMatchesData($tx, $txData);
+            $this->_assertMobilpayTransactionNotInDb($tx->getId());
+        }
+    }
+
+    public function test_canSetCredit_validStatuses_entireAmountProcessed() {
+        $statuses = array(
+            MobilpayTransaction::STATUS_NEW,
+            MobilpayTransaction::STATUS_PAID_PENDING,
+            MobilpayTransaction::STATUS_CONFIRMED_PENDING,
+            MobilpayTransaction::STATUS_CONFIRMED
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => 0,
+                'tx_status' => $status
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertTrue($tx->canBeSetCredited());
+
+            $processedAmount = $txData['tx_amount'];
+
+            $this->_runSetCreditedTests($tx, 
+                $txData, 
+                $processedAmount, 
+                $processedAmount);
+        }
+    }
+    
+    public function test_canSetCredit_validStatuses_partialAmountProcessed() {
+        $statuses = array(
+            MobilpayTransaction::STATUS_NEW,
+            MobilpayTransaction::STATUS_PAID_PENDING,
+            MobilpayTransaction::STATUS_CONFIRMED_PENDING,
+            MobilpayTransaction::STATUS_CONFIRMED
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => 0,
+                'tx_status' => $status
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertTrue($tx->canBeSetCredited());
+
+            $processedAmount = 0;
+            $processedAmountInc = round(0.1 * $txData['tx_amount'], 4);
+
+            while ($processedAmount < $txData['tx_amount']) {
+                $processedAmount += $processedAmountInc;
+                $processedAmount = min($processedAmount, $txData['tx_amount']);
+
+                $this->_runSetCreditedTests($tx, 
+                    $txData, 
+                    $processedAmount, 
+                    $processedAmountInc);
+            }
+        }
+    }
+
+    public function test_trySetCredit_invalidStatuses() {
+        $faker = self::_getFaker();
+        $statuses = array(
+            MobilpayTransaction::STATUS_CANCELLED,
+            MobilpayTransaction::STATUS_FAILED
+        );
+
+        foreach ($statuses as $status) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => $this->_generateRandomMobilpayTransactionId(),
+                'tx_status' => $status
+            ));
+
+            $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertFalse($tx->canBeSetCredited());
+
+            $providerTxId = $faker->sha1;
+
+            $tx->setCancelled($providerTxId);
+
+            $this->assertFalse($tx->isCredited());
+
+            $this->_assertMobilpayTransactionMatchesData($tx, $txData);
+            $this->_assertMobilpayTransactionNotInDb($tx->getId());
+        }
+    }
+
+    private function _runSetCreditedTests(MobilpayTransaction $tx, array $txData, $processedAmount, $processedAmountInc) {
+        $faker = self::_getFaker();
+        $providerTxId = $faker->sha1;
+        $panMasked = $faker->creditCardNumber;
+
+        $tx->setCredited($providerTxId, $processedAmountInc, $panMasked);
+
+        $this->assertEquals($providerTxId, $tx->getProviderTransactionId());
+        $this->assertEquals($processedAmount, $tx->getProcessedAmount(), null, 0.001);
+        $this->assertEquals($panMasked, $tx->getPANMasked());
+        $this->assertEquals(MobilpayTransaction::STATUS_CREDIT, $tx->getStatus());
+
+        if ($processedAmount < $txData['tx_amount']) {
+            $this->assertFalse($tx->isAmountCompletelyProcessed());
+        } else {
+            $this->assertTrue($tx->isAmountCompletelyProcessed());
+        }
+
+        $this->assertTrue($tx->isCredited());
+
+        $txId = $tx->getId();
+        $this->_assertMobilpayTransactionDbDataMatchesExpectedData($txId, array_merge($txData, array(
+            'tx_id' => $txId,
+            'tx_provider_transaction_id' => $providerTxId,
+            'tx_status' => MobilpayTransaction::STATUS_CREDIT,
+            'tx_processed_amount' => $processedAmount,
+            'tx_pan_masked' => $panMasked,
+            'tx_timestamp_last_updated' => $tx->getTimestampLastUpdated()
+        )));
     }
 
     private function _assertMobilpayTransactionNotInDb($txId) {
@@ -277,10 +607,22 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         $db->where('tx_id', $txId);
         $dbData = $db->getOne($this->_getEnv()->getPaymentTransactionsTableName());
 
+        $caller = debug_backtrace();
+        $caller = sprintf('%s::%s', 
+            $caller[1]['class'], 
+            $caller[1]['function']);
+
         $this->assertNotEmpty($dbData);
         foreach ($data as $key => $value) {
             $this->assertArrayHasKey($key, $dbData);
-            $this->assertEquals($value, $dbData[$key]);
+
+            $errorMessageIfFailed = sprintf('Comparison failed for key %s. Caller: %s.', $key, $caller);
+
+            if ($key == 'tx_amount' || $key == 'tx_processed_amount') {
+                $this->assertEquals($value, $dbData[$key], $errorMessageIfFailed, 0.001);
+            } else {
+                $this->assertEquals($value, $dbData[$key], $errorMessageIfFailed);
+            }
         }
     }
 
@@ -355,8 +697,12 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
     }
 
+    private function _mobilpayTransactionFromData($txData) {
+        return new MobilpayTransaction($txData, $this->_getEnv());
+    }
+
     private function _generateRandomMobilpayTransaction($override = array()) {
-        return new MobilpayTransaction($this->_generateRandomMobilpayTransactionData($override), $this->_getEnv());
+        return $this->_mobilpayTransactionFromData($this->_generateRandomMobilpayTransactionData($override));
     }
 
     private function _generateRandomMobilpayTransactionData($override = array()) {
@@ -368,8 +714,8 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
             'tx_provider' => 'mobilpay',
             'tx_transaction_id' => $faker->sha1,
             'tx_status' => $faker->randomElement($this->_getMobilpayTransactionStatuses()),
-            'tx_amount' => $faker->numberBetween(1, PHP_INT_MAX),
-            'tx_processed_amount' => $faker->numberBetween(0, PHP_INT_MAX),
+            'tx_amount' => $faker->randomFloat(4, 100, PHP_FLOAT_MAX),
+            'tx_processed_amount' => $faker->randomFloat(4, 0, PHP_FLOAT_MAX),
             'tx_currency' => 'RON',
             'tx_timestamp_initiated' => date('Y-m-d H:i:s'),
             'tx_timestamp_last_updated' => date('Y-m-d H:i:s'),
@@ -394,7 +740,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
     }
 
-    private function _generateMobilpayTransactionId($excludeAdditionalIds = array()) {
+    private function _generateRandomMobilpayTransactionId($excludeAdditionalIds = array()) {
         $excludeIds = array_keys($this->_testMobilpayTransactions);
         if (!empty($excludeAdditionalIds) && is_array($excludeAdditionalIds)) {
             $excludeIds = array_merge($excludeAdditionalIds);
