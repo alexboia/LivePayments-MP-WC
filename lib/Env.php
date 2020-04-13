@@ -240,6 +240,10 @@ namespace LvdWcMc {
             return $this->_dataDir;
         }
 
+        public function getViewDir() {
+            return $this->_viewsDir;
+        }
+
         public function getSetupDataDir() {
             return $this->_setupDataDir;
         }

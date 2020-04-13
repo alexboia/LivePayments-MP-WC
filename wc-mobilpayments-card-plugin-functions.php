@@ -127,6 +127,9 @@ function lvdwcmc_send_json(\stdClass $data, $die = true) {
    }
 }
 
+/**
+ * @return \LvdWcMc\Env
+ */
 function lvdwcmc_env() {
    static $env = null;
    
@@ -137,6 +140,9 @@ function lvdwcmc_env() {
    return $env;
 }
 
+/**
+ * @return \LvdWcMc\Plugin
+ */
 function lvdwcmc_plugin() {
    static $plugin = null;
    if ($plugin === null) {
