@@ -1,3 +1,5 @@
+<img align="left" width="210" height="200" src="https://raw.githubusercontent.com/alexboia/WC-MobilPayments-Card/master/logo.png" style="margin-bottom: 20px; margin-right: 20px;" />
+
 # WC-MobilPayments-Card
 Card WooCommerce Payment Gateway that uses the Romainan mobilPay™ payment processing gateway.  
 This plugin is meant to be used by merchants in Romania.
