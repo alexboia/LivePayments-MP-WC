@@ -17,8 +17,8 @@ LVDWCMC_BUILD_OUTDIR="$LVDWCMC_BUILD_ROOTDIR/output"
 LVDWCMC_BUILD_COMPATDIR="$LVDWCMC_BUILD_ROOTDIR/compat-info"
 LVDWCMC_BUILD_TMPDIR="$LVDWCMC_BUILD_ROOTDIR/tmp"
 
-LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./abp01-plugin-main.php | awk '{gsub(/\s+/,""); print $0}')
-LVDWCMC_BUILD_NAME="wp-trip-summary.$LVDWCMC_VERSION.zip"
+LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./wc-mobilpayments-card-plugin-main.php | awk '{gsub(/\s+/,""); print $0}')
+LVDWCMC_BUILD_NAME="wc-mobilpayments-card.$LVDWCMC_VERSION.zip"
 
 # Ensure all output directories exist
 ensure_out_dirs() {
@@ -53,8 +53,7 @@ make_compat_info() {
 
 # Ensure help contents is up to date
 regenerate_help() {
-	echo "Re-generating help contents..."
-	php ./help/tools/make-help.php
+	echo "No help contents to generate..."
 }
 
 clean_tmp_dir() {
@@ -74,10 +73,12 @@ clean_out_dirs() {
 # Copy over all files
 copy_source_files() {
 	echo "Copying all files..."
-	cp ./LICENSE.md "$LVDWCMC_BUILD_TMPDIR/license.txt"
+	cp ./LICENSE "$LVDWCMC_BUILD_TMPDIR/license.txt"
 	cp ./README.txt "$LVDWCMC_BUILD_TMPDIR/readme.txt"
 	cp ./index.php "$LVDWCMC_BUILD_TMPDIR"
-	cp ./abp01-plugin-main.php "$LVDWCMC_BUILD_TMPDIR"
+	cp ./wc-mobilpayments-card-plugin-header.php "$LVDWCMC_BUILD_TMPDIR"
+	cp ./wc-mobilpayments-card-plugin-functions.php "$LVDWCMC_BUILD_TMPDIR"
+	cp ./wc-mobilpayments-card-plugin-main.php "$LVDWCMC_BUILD_TMPDIR"
 	cp ./.htaccess "$LVDWCMC_BUILD_TMPDIR"
 
 	mkdir "$LVDWCMC_BUILD_TMPDIR/media" && cp -r ./media/* "$LVDWCMC_BUILD_TMPDIR/media"
@@ -86,11 +87,12 @@ copy_source_files() {
 	mkdir "$LVDWCMC_BUILD_TMPDIR/lang" && cp -r ./lang/* "$LVDWCMC_BUILD_TMPDIR/lang"
 
 	mkdir "$LVDWCMC_BUILD_TMPDIR/data"
-	mkdir "$LVDWCMC_BUILD_TMPDIR/data/cache" && mkdir "$LVDWCMC_BUILD_TMPDIR/data/storage"
-	mkdir "$LVDWCMC_BUILD_TMPDIR/data/help" && mkdir "$LVDWCMC_BUILD_TMPDIR/data/setup"
+	mkdir "$LVDWCMC_BUILD_TMPDIR/data/cache"
+	mkdir "$LVDWCMC_BUILD_TMPDIR/data/help"
+	mkdir "$LVDWCMC_BUILD_TMPDIR/data/setup"
 
 	cp -r ./data/help/* "$LVDWCMC_BUILD_TMPDIR/data/help" > /dev/null
-	cp -r ./data/dev/setup/* "$LVDWCMC_BUILD_TMPDIR/data/setup" > /dev/null
+	cp -r ./data/setup/* "$LVDWCMC_BUILD_TMPDIR/data/setup" > /dev/null
 }
 
 generate_package() {

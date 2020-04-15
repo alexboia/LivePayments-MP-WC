@@ -11,7 +11,7 @@ fi
 
 # Store some stuff for later use
 LVDWCMC_CDIR=$(pwd)
-LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./abp01-plugin-main.php)
+LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./wc-mobilpayments-card-plugin-main.php | awk '{gsub(/\s+/,""); print $0}')
 
 LVDWCMC_EXPORT_ROOT="$LVDWCMC_CDIR/build/wp-plugin-dir-svn"
 LVDWCMC_EXPORT_TRUNK_DIR="$LVDWCMC_EXPORT_ROOT/trunk"
@@ -49,10 +49,12 @@ regenerate_help() {
 
 copy_source_files() {
     echo "Copying all source files to $1..."
-	cp ./LICENSE.md "$1/license.txt"
+	cp ./LICENSE "$1/license.txt"
 	cp ./README.txt "$1/readme.txt"
 	cp ./index.php "$1"
-	cp ./abp01-plugin-main.php "$1"
+	cp ./wc-mobilpayments-card-plugin-header.php "$1"
+	cp ./wc-mobilpayments-card-plugin-functions.php "$1"
+	cp ./wc-mobilpayments-card-plugin-main.php "$1"
 	cp ./.htaccess "$1"
 
 	mkdir "$1/media" && cp -r ./media/* "$1/media"
@@ -61,11 +63,12 @@ copy_source_files() {
 	mkdir "$1/lang" && cp -r ./lang/* "$1/lang"
 
 	mkdir "$1/data"
-	mkdir "$1/data/cache" && mkdir "$1/data/storage"
-	mkdir "$1/data/help" && mkdir "$1/data/setup"
+	mkdir "$1/data/cache"
+	mkdir "$1/data/help"
+	mkdir "$1/data/setup"
 
 	cp -r ./data/help/* "$1/data/help" > /dev/null
-	cp -r ./data/dev/setup/* "$1/data/setup" > /dev/null
+	cp -r ./data/setup/* "$1/data/setup" > /dev/null
 }
 
 copy_asset_files() {
