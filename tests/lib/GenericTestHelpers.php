@@ -47,4 +47,12 @@ trait GenericTestHelpers {
     protected function _getDb() {
         return $this->_getEnv()->getDb();
     }
+
+    protected function _dontReportNotices() {
+        error_reporting(E_ALL & ~E_NOTICE);
+    }
+
+    protected function _reportAll() {
+        error_reporting(E_ALL);
+    }
 }

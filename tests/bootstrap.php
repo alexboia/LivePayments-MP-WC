@@ -32,6 +32,7 @@
 require_once 'faker/autoload.php';
 require_once 'lib/GenericTestHelpers.php';
 require_once 'lib/DbTestHelpers.php';
+require_once 'lib/MobilpayTransactionTestHelpers.php';
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 if ( ! $_tests_dir ) {
@@ -145,8 +146,8 @@ function _sync_wp_tests_config($testsDir) {
 }
 
 function _register_setup_actions() {
-	tests_add_filter( 'muplugins_loaded', '_manually_load_plugins' );
-	tests_add_filter( 'setup_theme', '_manually_install_plugins' );
+	tests_add_filter('muplugins_loaded', '_manually_load_plugins');
+	tests_add_filter('setup_theme', '_manually_install_plugins');
 }
 
 _sync_wp_tests_config($_tests_dir);

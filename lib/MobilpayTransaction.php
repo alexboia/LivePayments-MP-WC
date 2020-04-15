@@ -294,6 +294,14 @@ namespace LvdWcMc {
             return $this->_id;
         }
 
+        public function getOrderId() {
+            return $this->_orderId;
+        }
+
+        public function getOrderUserId() {
+            return $this->_orderUserId;
+        }
+
         public function getTransactionId() {
             return $this->_transactionId;
         }

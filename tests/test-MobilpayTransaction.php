@@ -32,7 +32,7 @@
 use LvdWcMc\MobilpayTransaction;
 
 class MobilpayTransactionTests extends WP_UnitTestCase {
-    use GenericTestHelpers;
+    use MobilpayTransactionTestHelpers;
     use DbTestHelpers;
 
     private $_testMobilpayTransactions = array();
@@ -626,31 +626,6 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         }
     }
 
-    private function _assertMobilpayTransactionMatchesData(MobilpayTransaction $tx, array $data) {
-        $this->assertEquals($data['tx_id'], 
-            $tx->getId());
-        $this->assertEquals($data['tx_transaction_id'], 
-            $tx->getTransactionId());
-        $this->assertEquals($data['tx_provider_transaction_id'], 
-            $tx->getProviderTransactionId());
-        $this->assertEquals($data['tx_amount'], 
-            $tx->getAmount());
-        $this->assertEquals($data['tx_processed_amount'], 
-            $tx->getProcessedAmount());
-        $this->assertEquals($data['tx_currency'], 
-            $tx->getCurrency());
-        $this->assertEquals($data['tx_error_code'], 
-            $tx->getErrorCode());
-        $this->assertEquals($data['tx_error_message'], 
-            $tx->getErrorMessage());
-        $this->assertEquals($data['tx_pan_masked'], 
-            $tx->getPANMasked());
-        $this->assertEquals($data['tx_timestamp_initiated'], 
-            $tx->getTimestampInitiated());
-        $this->assertEquals($data['tx_timestamp_last_updated'], 
-            $tx->getTimestampLastUpdated());
-    }
-
     private function _installTestData() {
         $db = $this->_getDb();
         $table = $this->_getEnv()->getPaymentTransactionsTableName();
@@ -699,45 +674,6 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
     private function _mobilpayTransactionFromData($txData) {
         return new MobilpayTransaction($txData, $this->_getEnv());
-    }
-
-    private function _generateRandomMobilpayTransaction($override = array()) {
-        return $this->_mobilpayTransactionFromData($this->_generateRandomMobilpayTransactionData($override));
-    }
-
-    private function _generateRandomMobilpayTransactionData($override = array()) {
-        $faker = self::_getFaker();
-        return array_merge(array(
-            'tx_id' => $faker->numerify(0, PHP_INT_MAX),
-            'tx_order_id' => $faker->numberBetween(1, PHP_INT_MAX),
-            'tx_order_user_id' => $faker->numberBetween(1, PHP_INT_MAX),
-            'tx_provider' => 'mobilpay',
-            'tx_transaction_id' => $faker->sha1,
-            'tx_status' => $faker->randomElement($this->_getMobilpayTransactionStatuses()),
-            'tx_amount' => $faker->randomFloat(4, 100, PHP_FLOAT_MAX),
-            'tx_processed_amount' => $faker->randomFloat(4, 0, PHP_FLOAT_MAX),
-            'tx_currency' => 'RON',
-            'tx_timestamp_initiated' => date('Y-m-d H:i:s'),
-            'tx_timestamp_last_updated' => date('Y-m-d H:i:s'),
-            'tx_ip_address' => $faker->ipv4,
-            'tx_provider_transaction_id' => $faker->sha1,
-            'tx_error_code' => $faker->numberBetween(1, 100),
-            'tx_error_message' => $faker->sentence(),
-            'tx_pan_masked' => $faker->creditCardNumber
-        ), $override);
-    }
-
-    private function _getMobilpayTransactionStatuses() {
-        return array(
-            MobilpayTransaction::STATUS_NEW,
-            MobilpayTransaction::STATUS_CANCELLED,
-            MobilpayTransaction::STATUS_CONFIRMED,
-            MobilpayTransaction::STATUS_CONFIRMED_PENDING,
-            MobilpayTransaction::STATUS_CREDIT,
-            MobilpayTransaction::STATUS_FAILED,
-            MobilpayTransaction::STATUS_NEW,
-            MobilpayTransaction::STATUS_PAID_PENDING
-        );
     }
 
     private function _generateRandomMobilpayTransactionId($excludeAdditionalIds = array()) {

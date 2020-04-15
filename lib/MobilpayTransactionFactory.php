@@ -68,25 +68,29 @@
                     throw new \InvalidArgumentException('Invalid order provided');
                 }
             }
+            
+            if ($order instanceof \WC_Order) {
+                $db = $this->_getDb();
+                $db->where('tx_order_id', $order->get_id());
 
-            $db = $this->_getDb();
-            $db->where('tx_order_id', $order->get_id());
-
-            $data = $db->getOne($this->_env->getPaymentTransactionsTableName());
-            if (!is_array($data)) {
-                if ($createIfNotExists) {
-                    $data = $this->_getTransactionData($order);
-                    $internalTxId = $db->insert($this->_env->getPaymentTransactionsTableName(), $data);
-                    if (is_numeric($internalTxId) && $internalTxId > 0) {
-                        $data = array_merge($data, array(
-                            'tx_id' => $internalTxId
-                        ));
+                $data = $db->getOne($this->_env->getPaymentTransactionsTableName());
+                if (!is_array($data)) {   
+                    if ($createIfNotExists) {
+                        $data = $this->_getTransactionData($order);
+                        $internalTxId = $db->insert($this->_env->getPaymentTransactionsTableName(), $data);
+                        if (is_numeric($internalTxId) && $internalTxId > 0) {
+                            $data = array_merge($data, array(
+                                'tx_id' => $internalTxId
+                            ));
+                        } else {
+                            $data = null;
+                        }
                     } else {
                         $data = null;
                     }
-                } else {
-                    $data = null;
                 }
+            } else {
+                $data = null;
             }
 
             return $data != null 
@@ -98,6 +102,9 @@
          * @return \LvdWcMc\MobilpayTransaction The corresponding transaction or null if not found
          */
         public function newFromOrder($order) {
+            if (empty($order)) {
+                return null;
+            }
             return $this->_fromOrder($order, true);
         }
 
@@ -105,6 +112,9 @@
          * @return \LvdWcMc\MobilpayTransaction The corresponding transaction or null if not found
          */
         public function existingFromOrder($order) {
+            if (empty($order)) {
+                return null;
+            }
             return $this->_fromOrder($order, false);
         }
 
@@ -112,6 +122,10 @@
          * @return \LvdWcMc\MobilpayTransaction The corresponding transaction or null if not found
          */
         public function fromTransactionId($transactionId) {
+            if (empty($transactionId)) {
+                return null;
+            }
+
             $db = $this->_getDb();
             $db->where('tx_id', $transactionId);
 

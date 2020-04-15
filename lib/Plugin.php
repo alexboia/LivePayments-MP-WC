@@ -530,8 +530,9 @@ class Plugin {
         }
 
         public function onFormatWooCommerceLogMessage($entry, $args) {
+            //TODO: proper dump of context data
             return $this->_shouldFormatWooCommerceLogMessage($args)
-                ? $entry . ' Additional context: ' . var_export($args['context'], true) 
+                ? $entry . ' Additional context: ' . print_r($args['context'], true) 
                 : $entry;
         }
 

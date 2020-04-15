@@ -1,4 +1,4 @@
-<img align="left" width="210" height="200" src="https://raw.githubusercontent.com/alexboia/WC-MobilPayments-Card/master/logo.png?v=2" style="margin-bottom: 20px; margin-right: 20px;" />
+<img align="left" width="210" height="210" src="https://raw.githubusercontent.com/alexboia/WC-MobilPayments-Card/master/logo.png?v=2" style="margin-bottom: 20px; margin-right: 20px;" />
 
 # WC-MobilPayments-Card
 Card WooCommerce Payment Gateway that uses the Romainan mobilPay™ payment processing gateway.  
