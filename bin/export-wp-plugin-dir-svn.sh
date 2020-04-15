@@ -39,7 +39,7 @@ ensure_tag_dir() {
 clean_trunk_dir() {
 	echo "Ensuring trunk directory is clean..."
 	rm -rf $LVDWCMC_EXPORT_TRUNK_DIR/* > /dev/null
-    rm -rf $LVDWCMC_EXPORT_TRUNK_DIR/.htaccess > /dev/null
+	rm -rf $LVDWCMC_EXPORT_TRUNK_DIR/.htaccess > /dev/null
 }
 
 regenerate_help() {
