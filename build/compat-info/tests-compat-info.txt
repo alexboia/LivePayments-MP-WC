@@ -1,0 +1,750 @@
+
+Data Source Analysed
+
+Directories                                         73
+Files                                              336
+Errors                                               0
+
+
+Extensions Analysis
+
+    Extension  Matches REF        EXT min/Max PHP min/Max PHP all 
+    Core               Core       5.3.0       5.3.0               
+    Reflection         Reflection 5.0.0       5.0.0               
+    curl               curl       4.0.2       4.0.2               
+    date               date       5.2.0       5.2.0               
+    hash               hash       1.1         4.0.0               
+ C  mbstring           user       4.3.0       4.3.0               
+    pcre               pcre       4.0.5       4.0.5               
+    spl                spl        5.1.2       5.1.2               
+    standard           standard   5.2.1       5.2.1               
+    Total [9]                                 5.3.0               
+
+Namespaces Analysis
+
+    Namespace                 Matches REF  EXT min/Max PHP min/Max PHP all 
+    +global                           Core             5.4.0               
+    Faker                             user             5.3.0               
+    Faker\Calculator                  user             5.3.0               
+    Faker\Guesser                     user             5.3.0               
+    Faker\ORM\CakePHP                 user             5.4.0               
+    Faker\ORM\Doctrine                user             5.3.0               
+    Faker\ORM\Mandango                user             5.3.0               
+    Faker\ORM\Propel                  user             5.3.0               
+    Faker\Provider                    user             5.3.0               
+    Faker\Provider\ar_JO              user             5.3.0               
+    Faker\Provider\at_AT              user             5.3.0               
+    Faker\Provider\be_BE              user             5.3.0               
+    Faker\Provider\bg_BG              user             5.3.0               
+    Faker\Provider\bn_BD              user             5.3.0               
+    Faker\Provider\cs_CZ              user             5.3.0               
+    Faker\Provider\da_DK              user             5.3.0               
+    Faker\Provider\de_AT              user             5.3.0               
+    Faker\Provider\de_DE              user             5.3.0               
+    Faker\Provider\el_GR              user             5.3.0               
+    Faker\Provider\en_AU              user             5.3.0               
+    Faker\Provider\en_CA              user             5.3.0               
+    Faker\Provider\en_GB              user             5.3.0               
+    Faker\Provider\en_NZ              user             5.3.0               
+    Faker\Provider\en_PH              user             5.3.0               
+    Faker\Provider\en_UG              user             5.3.0               
+    Faker\Provider\en_US              user             5.3.0               
+    Faker\Provider\en_ZA              user             5.3.0               
+    Faker\Provider\es_AR              user             5.3.0               
+    Faker\Provider\es_ES              user             5.3.0               
+    Faker\Provider\es_PE              user             5.3.0               
+    Faker\Provider\es_VE              user             5.3.0               
+    Faker\Provider\fa_IR              user             5.3.0               
+    Faker\Provider\fi_FI              user             5.3.0               
+    Faker\Provider\fr_BE              user             5.3.0               
+    Faker\Provider\fr_CA              user             5.3.0               
+    Faker\Provider\fr_FR              user             5.3.0               
+    Faker\Provider\hu_HU              user             5.3.0               
+    Faker\Provider\hy_AM              user             5.3.0               
+    Faker\Provider\id_ID              user             5.3.0               
+    Faker\Provider\is_IS              user             5.3.0               
+    Faker\Provider\it_IT              user             5.3.0               
+    Faker\Provider\ja_JP              user             5.3.0               
+    Faker\Provider\ka_GE              user             5.3.0               
+    Faker\Provider\kk_KZ              user             5.3.0               
+    Faker\Provider\ko_KR              user             5.3.0               
+    Faker\Provider\lv_LV              user             5.3.0               
+    Faker\Provider\me_ME              user             5.3.0               
+    Faker\Provider\ne_NP              user             5.3.0               
+    Faker\Provider\nl_BE              user             5.3.0               
+    Faker\Provider\nl_NL              user             5.3.0               
+    Faker\Provider\no_NO              user             5.3.0               
+    Faker\Provider\pl_PL              user             5.3.0               
+    Faker\Provider\pt_BR              user             5.3.0               
+    Faker\Provider\pt_PT              user             5.3.0               
+    Faker\Provider\ro_MD              user             5.3.0               
+    Faker\Provider\ro_RO              user             5.3.0               
+    Faker\Provider\ru_RU              user             5.3.0               
+    Faker\Provider\sk_SK              user             5.3.0               
+    Faker\Provider\sl_SI              user             5.3.0               
+    Faker\Provider\sr_Cyrl_RS         user             5.3.0               
+    Faker\Provider\sr_Latn_RS         user             5.3.0               
+    Faker\Provider\sr_RS              user             5.3.0               
+    Faker\Provider\sv_SE              user             5.3.0               
+    Faker\Provider\tr_TR              user             5.3.0               
+    Faker\Provider\uk_UA              user             5.3.0               
+    Faker\Provider\vi_VN              user             5.3.0               
+    Faker\Provider\zh_CN              user             5.3.0               
+    Faker\Provider\zh_TW              user             5.3.0               
+    Total [68]                                         5.4.0               
+
+Interfaces Analysis
+
+    Interface         Matches REF  EXT min/Max PHP min/Max PHP all 
+    PHPUnit_Exception         user             5.0.0               
+    Total [1]                                  5.0.0               
+
+Traits Analysis
+
+    Trait                          Matches REF  EXT min/Max PHP min/Max PHP all 
+    DbTestHelpers                          user             5.4.0               
+    GenericTestHelpers                     user             5.4.0               
+    MobilpayTransactionTestHelpers         user             5.4.0               
+    Total [3]                                               5.4.0               
+
+Classes Analysis
+
+    Class                                             Matches REF        EXT min/Max PHP min/Max PHP all 
+  U Cake\ORM\TableRegistry                            1       user                   5.3.0               
+  U ColumnMap                                         2       user                   4.0.0               
+    DOMElement                                        2       dom        5.0.0       5.0.0               
+    DateTime                                          10      date       5.2.0       5.2.0               
+    DateTimeZone                                      2       date       5.2.0       5.2.0               
+  U Doctrine\Common\Persistence\Mapping\ClassMetadata 1       user                   5.3.0               
+  U Doctrine\Common\Persistence\ObjectManager         2       user                   5.3.0               
+  U Doctrine\ORM\EntityManagerInterface               1       user                   5.3.0               
+  U Doctrine\ORM\Mapping\ClassMetadata                1       user                   5.3.0               
+    EnvTests                                                  user                   5.4.0               
+    Exception                                         2       Core       5.1.0       5.1.0               
+    Faker\Calculator\Luhn                             5       user                   5.3.0               
+    Faker\DefaultGenerator                            1       user                   5.3.0               
+    Faker\Documentor                                          user                   5.3.0               
+    Faker\Factory                                     4       user                   5.3.0               
+    Faker\Generator                                   17      user                   5.3.0               
+    Faker\Guesser\Name                                3       user                   5.3.0               
+    Faker\ORM\CakePHP\ColumnTypeGuesser               1       user                   5.3.0               
+    Faker\ORM\CakePHP\EntityPopulator                 1       user                   5.4.0               
+    Faker\ORM\CakePHP\Populator                               user                   5.4.0               
+    Faker\ORM\Doctrine\ColumnTypeGuesser              1       user                   5.3.0               
+    Faker\ORM\Doctrine\EntityPopulator                1       user                   5.3.0               
+    Faker\ORM\Doctrine\Populator                              user                   5.3.0               
+    Faker\ORM\Mandango\ColumnTypeGuesser              1       user                   5.3.0               
+    Faker\ORM\Mandango\EntityPopulator                1       user                   5.3.0               
+    Faker\ORM\Mandango\Populator                              user                   5.3.0               
+    Faker\ORM\Propel\ColumnTypeGuesser                1       user                   5.3.0               
+    Faker\ORM\Propel\EntityPopulator                  1       user                   5.3.0               
+    Faker\ORM\Propel\Populator                                user                   5.3.0               
+    Faker\Provider\Address                            52      user                   5.3.0               
+    Faker\Provider\Barcode                                    user                   5.3.0               
+    Faker\Provider\Base                               26      user                   5.3.0               
+    Faker\Provider\Biased                                     user                   5.3.0               
+    Faker\Provider\Color                              7       user                   5.3.0               
+    Faker\Provider\Company                            34      user                   5.3.0               
+    Faker\Provider\DateTime                           9       user                   5.3.0               
+    Faker\Provider\File                                       user                   5.3.0               
+    Faker\Provider\Image                                      user                   5.3.0               
+    Faker\Provider\Internet                           38      user                   5.3.0               
+    Faker\Provider\Lorem                                      user                   5.3.0               
+    Faker\Provider\Miscellaneous                              user                   5.3.0               
+    Faker\Provider\Payment                            30      user                   5.3.0               
+    Faker\Provider\Person                             53      user                   5.3.0               
+    Faker\Provider\PhoneNumber                        49      user                   5.3.0               
+    Faker\Provider\Text                               14      user                   5.3.0               
+    Faker\Provider\UserAgent                                  user                   5.3.0               
+    Faker\Provider\Uuid                               1       user                   5.3.0               
+    Faker\Provider\ar_JO\Address                              user                   5.3.0               
+    Faker\Provider\ar_JO\Company                              user                   5.3.0               
+    Faker\Provider\ar_JO\Internet                             user                   5.3.0               
+    Faker\Provider\ar_JO\Person                               user                   5.3.0               
+    Faker\Provider\ar_JO\Text                                 user                   5.3.0               
+    Faker\Provider\at_AT\Payment                              user                   5.3.0               
+    Faker\Provider\be_BE\Payment                              user                   5.3.0               
+    Faker\Provider\bg_BG\Internet                             user                   5.3.0               
+    Faker\Provider\bg_BG\Payment                              user                   5.3.0               
+    Faker\Provider\bg_BG\Person                               user                   5.3.0               
+    Faker\Provider\bg_BG\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\bn_BD\Address                              user                   5.3.0               
+    Faker\Provider\bn_BD\Company                              user                   5.3.0               
+    Faker\Provider\bn_BD\Person                               user                   5.3.0               
+    Faker\Provider\bn_BD\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\bn_BD\Utils                        2       user                   5.3.0               
+    Faker\Provider\cs_CZ\Address                              user                   5.3.0               
+    Faker\Provider\cs_CZ\Company                              user                   5.3.0               
+    Faker\Provider\cs_CZ\DateTime                             user                   5.3.0               
+    Faker\Provider\cs_CZ\Internet                             user                   5.3.0               
+    Faker\Provider\cs_CZ\Payment                              user                   5.3.0               
+    Faker\Provider\cs_CZ\Person                               user                   5.3.0               
+    Faker\Provider\cs_CZ\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\cs_CZ\Text                                 user                   5.3.0               
+    Faker\Provider\da_DK\Address                              user                   5.3.0               
+    Faker\Provider\da_DK\Company                              user                   5.3.0               
+    Faker\Provider\da_DK\Internet                             user                   5.3.0               
+    Faker\Provider\da_DK\Payment                              user                   5.3.0               
+    Faker\Provider\da_DK\Person                               user                   5.3.0               
+    Faker\Provider\da_DK\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\de_AT\Address                              user                   5.3.0               
+    Faker\Provider\de_AT\Company                              user                   5.3.0               
+    Faker\Provider\de_AT\Internet                             user                   5.3.0               
+    Faker\Provider\de_AT\Payment                              user                   5.3.0               
+    Faker\Provider\de_AT\Person                               user                   5.3.0               
+    Faker\Provider\de_AT\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\de_DE\Address                              user                   5.3.0               
+    Faker\Provider\de_DE\Company                              user                   5.3.0               
+    Faker\Provider\de_DE\Internet                             user                   5.3.0               
+    Faker\Provider\de_DE\Payment                              user                   5.3.0               
+    Faker\Provider\de_DE\Person                               user                   5.3.0               
+    Faker\Provider\de_DE\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\de_DE\Text                                 user                   5.3.0               
+    Faker\Provider\el_GR\Address                              user                   5.3.0               
+    Faker\Provider\el_GR\Payment                              user                   5.3.0               
+    Faker\Provider\el_GR\Person                               user                   5.3.0               
+    Faker\Provider\el_GR\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\en_AU\Address                              user                   5.3.0               
+    Faker\Provider\en_AU\Internet                             user                   5.3.0               
+    Faker\Provider\en_AU\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\en_CA\Address                              user                   5.3.0               
+    Faker\Provider\en_CA\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\en_GB\Address                              user                   5.3.0               
+    Faker\Provider\en_GB\Internet                             user                   5.3.0               
+    Faker\Provider\en_GB\Payment                              user                   5.3.0               
+    Faker\Provider\en_GB\Person                               user                   5.3.0               
+    Faker\Provider\en_GB\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\en_NZ\Address                              user                   5.3.0               
+    Faker\Provider\en_NZ\Internet                             user                   5.3.0               
+    Faker\Provider\en_NZ\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\en_PH\Address                              user                   5.3.0               
+    Faker\Provider\en_UG\Address                              user                   5.3.0               
+    Faker\Provider\en_UG\Internet                             user                   5.3.0               
+    Faker\Provider\en_UG\Person                               user                   5.3.0               
+    Faker\Provider\en_UG\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\en_US\Address                      2       user                   5.3.0               
+    Faker\Provider\en_US\Company                              user                   5.3.0               
+    Faker\Provider\en_US\Person                               user                   5.3.0               
+    Faker\Provider\en_US\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\en_US\Text                                 user                   5.3.0               
+    Faker\Provider\en_ZA\Address                              user                   5.3.0               
+    Faker\Provider\en_ZA\Internet                             user                   5.3.0               
+    Faker\Provider\en_ZA\Person                               user                   5.3.0               
+    Faker\Provider\en_ZA\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\es_AR\Address                              user                   5.3.0               
+    Faker\Provider\es_AR\Company                              user                   5.3.0               
+    Faker\Provider\es_AR\Person                               user                   5.3.0               
+    Faker\Provider\es_AR\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\es_ES\Address                              user                   5.3.0               
+    Faker\Provider\es_ES\Company                              user                   5.3.0               
+    Faker\Provider\es_ES\Internet                             user                   5.3.0               
+    Faker\Provider\es_ES\Payment                              user                   5.3.0               
+    Faker\Provider\es_ES\Person                               user                   5.3.0               
+    Faker\Provider\es_ES\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\es_PE\Address                              user                   5.3.0               
+    Faker\Provider\es_PE\Company                              user                   5.3.0               
+    Faker\Provider\es_PE\Person                               user                   5.3.0               
+    Faker\Provider\es_PE\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\es_VE\Address                              user                   5.3.0               
+    Faker\Provider\es_VE\Company                              user                   5.3.0               
+    Faker\Provider\es_VE\Internet                             user                   5.3.0               
+    Faker\Provider\es_VE\Person                               user                   5.3.0               
+    Faker\Provider\es_VE\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\fa_IR\Internet                             user                   5.3.0               
+    Faker\Provider\fa_IR\Person                               user                   5.3.0               
+    Faker\Provider\fa_IR\Text                                 user                   5.3.0               
+    Faker\Provider\fi_FI\Address                              user                   5.3.0               
+    Faker\Provider\fi_FI\Company                              user                   5.3.0               
+    Faker\Provider\fi_FI\Internet                             user                   5.3.0               
+    Faker\Provider\fi_FI\Person                               user                   5.3.0               
+    Faker\Provider\fi_FI\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\fr_BE\Address                              user                   5.3.0               
+    Faker\Provider\fr_BE\Company                              user                   5.3.0               
+    Faker\Provider\fr_BE\Internet                             user                   5.3.0               
+    Faker\Provider\fr_BE\Payment                              user                   5.3.0               
+    Faker\Provider\fr_BE\Person                               user                   5.3.0               
+    Faker\Provider\fr_BE\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\fr_CA\Address                              user                   5.3.0               
+    Faker\Provider\fr_CA\Person                               user                   5.3.0               
+    Faker\Provider\fr_FR\Address                              user                   5.3.0               
+    Faker\Provider\fr_FR\Company                              user                   5.3.0               
+    Faker\Provider\fr_FR\Internet                             user                   5.3.0               
+    Faker\Provider\fr_FR\Payment                              user                   5.3.0               
+    Faker\Provider\fr_FR\Person                               user                   5.3.0               
+    Faker\Provider\fr_FR\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\fr_FR\Text                                 user                   5.3.0               
+    Faker\Provider\hu_HU\Address                              user                   5.3.0               
+    Faker\Provider\hu_HU\Company                              user                   5.3.0               
+    Faker\Provider\hu_HU\Person                               user                   5.3.0               
+    Faker\Provider\hu_HU\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\hu_HU\Text                                 user                   5.3.0               
+    Faker\Provider\hy_AM\Address                              user                   5.3.0               
+    Faker\Provider\hy_AM\Company                              user                   5.3.0               
+    Faker\Provider\hy_AM\Internet                             user                   5.3.0               
+    Faker\Provider\hy_AM\Person                               user                   5.3.0               
+    Faker\Provider\hy_AM\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\id_ID\Address                              user                   5.3.0               
+    Faker\Provider\id_ID\Company                              user                   5.3.0               
+    Faker\Provider\id_ID\Internet                             user                   5.3.0               
+    Faker\Provider\id_ID\Person                               user                   5.3.0               
+    Faker\Provider\id_ID\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\is_IS\Address                              user                   5.3.0               
+    Faker\Provider\is_IS\Company                              user                   5.3.0               
+    Faker\Provider\is_IS\Internet                             user                   5.3.0               
+    Faker\Provider\is_IS\Payment                              user                   5.3.0               
+    Faker\Provider\is_IS\Person                               user                   5.3.0               
+    Faker\Provider\is_IS\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\it_IT\Address                              user                   5.3.0               
+    Faker\Provider\it_IT\Company                              user                   5.3.0               
+    Faker\Provider\it_IT\Internet                             user                   5.3.0               
+    Faker\Provider\it_IT\Payment                              user                   5.3.0               
+    Faker\Provider\it_IT\Person                               user                   5.3.0               
+    Faker\Provider\it_IT\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\it_IT\Text                                 user                   5.3.0               
+    Faker\Provider\ja_JP\Address                              user                   5.3.0               
+    Faker\Provider\ja_JP\Company                              user                   5.3.0               
+    Faker\Provider\ja_JP\Internet                             user                   5.3.0               
+    Faker\Provider\ja_JP\Person                               user                   5.3.0               
+    Faker\Provider\ja_JP\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\ka_GE\Person                               user                   5.3.0               
+    Faker\Provider\ka_GE\Text                                 user                   5.3.0               
+    Faker\Provider\kk_KZ\Address                              user                   5.3.0               
+    Faker\Provider\kk_KZ\Color                                user                   5.3.0               
+    Faker\Provider\kk_KZ\Company                              user                   5.3.0               
+    Faker\Provider\kk_KZ\Internet                             user                   5.3.0               
+    Faker\Provider\kk_KZ\Payment                              user                   5.3.0               
+    Faker\Provider\kk_KZ\Person                               user                   5.3.0               
+    Faker\Provider\kk_KZ\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\kk_KZ\Text                                 user                   5.3.0               
+    Faker\Provider\ko_KR\Address                              user                   5.3.0               
+    Faker\Provider\ko_KR\Company                              user                   5.3.0               
+    Faker\Provider\ko_KR\Internet                             user                   5.3.0               
+    Faker\Provider\ko_KR\Person                               user                   5.3.0               
+    Faker\Provider\ko_KR\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\lv_LV\Address                              user                   5.3.0               
+    Faker\Provider\lv_LV\Internet                             user                   5.3.0               
+    Faker\Provider\lv_LV\Payment                              user                   5.3.0               
+    Faker\Provider\lv_LV\Person                               user                   5.3.0               
+    Faker\Provider\lv_LV\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\me_ME\Address                              user                   5.3.0               
+    Faker\Provider\me_ME\Company                              user                   5.3.0               
+    Faker\Provider\me_ME\Payment                              user                   5.3.0               
+    Faker\Provider\me_ME\Person                               user                   5.3.0               
+    Faker\Provider\me_ME\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\ne_NP\Address                              user                   5.3.0               
+    Faker\Provider\ne_NP\Internet                             user                   5.3.0               
+    Faker\Provider\ne_NP\Person                               user                   5.3.0               
+    Faker\Provider\ne_NP\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\nl_BE\Address                              user                   5.3.0               
+    Faker\Provider\nl_BE\Company                              user                   5.3.0               
+    Faker\Provider\nl_BE\Internet                             user                   5.3.0               
+    Faker\Provider\nl_BE\Payment                              user                   5.3.0               
+    Faker\Provider\nl_BE\Person                               user                   5.3.0               
+    Faker\Provider\nl_BE\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\nl_NL\Address                              user                   5.3.0               
+    Faker\Provider\nl_NL\Color                                user                   5.3.0               
+    Faker\Provider\nl_NL\Company                              user                   5.3.0               
+    Faker\Provider\nl_NL\Internet                             user                   5.3.0               
+    Faker\Provider\nl_NL\Payment                              user                   5.3.0               
+    Faker\Provider\nl_NL\Person                               user                   5.3.0               
+    Faker\Provider\nl_NL\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\no_NO\Address                              user                   5.3.0               
+    Faker\Provider\no_NO\Company                              user                   5.3.0               
+    Faker\Provider\no_NO\Person                               user                   5.3.0               
+    Faker\Provider\no_NO\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\pl_PL\Address                              user                   5.3.0               
+    Faker\Provider\pl_PL\Company                              user                   5.3.0               
+    Faker\Provider\pl_PL\Internet                             user                   5.3.0               
+    Faker\Provider\pl_PL\Payment                              user                   5.3.0               
+    Faker\Provider\pl_PL\Person                               user                   5.3.0               
+    Faker\Provider\pl_PL\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\pl_PL\Text                                 user                   5.3.0               
+    Faker\Provider\pt_BR\Address                              user                   5.3.0               
+    Faker\Provider\pt_BR\Company                              user                   5.3.0               
+    Faker\Provider\pt_BR\Internet                             user                   5.3.0               
+    Faker\Provider\pt_BR\Payment                              user                   5.3.0               
+    Faker\Provider\pt_BR\Person                               user                   5.3.0               
+    Faker\Provider\pt_BR\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\pt_PT\Address                              user                   5.3.0               
+    Faker\Provider\pt_PT\Payment                              user                   5.3.0               
+    Faker\Provider\pt_PT\Person                               user                   5.3.0               
+    Faker\Provider\pt_PT\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\ro_MD\Address                              user                   5.3.0               
+    Faker\Provider\ro_MD\Person                               user                   5.3.0               
+    Faker\Provider\ro_MD\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\ro_RO\Address                              user                   5.3.0               
+    Faker\Provider\ro_RO\Person                               user                   5.3.0               
+    Faker\Provider\ro_RO\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\ru_RU\Address                              user                   5.3.0               
+    Faker\Provider\ru_RU\Color                                user                   5.3.0               
+    Faker\Provider\ru_RU\Company                              user                   5.3.0               
+    Faker\Provider\ru_RU\Internet                             user                   5.3.0               
+    Faker\Provider\ru_RU\Payment                              user                   5.3.0               
+    Faker\Provider\ru_RU\Person                               user                   5.3.0               
+    Faker\Provider\ru_RU\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\ru_RU\Text                                 user                   5.3.0               
+    Faker\Provider\sk_SK\Address                              user                   5.3.0               
+    Faker\Provider\sk_SK\Company                              user                   5.3.0               
+    Faker\Provider\sk_SK\Internet                             user                   5.3.0               
+    Faker\Provider\sk_SK\Payment                              user                   5.3.0               
+    Faker\Provider\sk_SK\Person                               user                   5.3.0               
+    Faker\Provider\sk_SK\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\sl_SI\Address                              user                   5.3.0               
+    Faker\Provider\sl_SI\Internet                             user                   5.3.0               
+    Faker\Provider\sl_SI\Payment                              user                   5.3.0               
+    Faker\Provider\sl_SI\Person                               user                   5.3.0               
+    Faker\Provider\sl_SI\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\sr_Cyrl_RS\Address                         user                   5.3.0               
+    Faker\Provider\sr_Cyrl_RS\Payment                         user                   5.3.0               
+    Faker\Provider\sr_Cyrl_RS\Person                          user                   5.3.0               
+    Faker\Provider\sr_Latn_RS\Address                         user                   5.3.0               
+    Faker\Provider\sr_Latn_RS\Payment                         user                   5.3.0               
+    Faker\Provider\sr_Latn_RS\Person                          user                   5.3.0               
+    Faker\Provider\sr_RS\Address                              user                   5.3.0               
+    Faker\Provider\sr_RS\Payment                              user                   5.3.0               
+    Faker\Provider\sr_RS\Person                               user                   5.3.0               
+    Faker\Provider\sv_SE\Address                              user                   5.3.0               
+    Faker\Provider\sv_SE\Company                              user                   5.3.0               
+    Faker\Provider\sv_SE\Person                               user                   5.3.0               
+    Faker\Provider\sv_SE\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\tr_TR\Address                              user                   5.3.0               
+    Faker\Provider\tr_TR\Color                                user                   5.3.0               
+    Faker\Provider\tr_TR\DateTime                             user                   5.3.0               
+    Faker\Provider\tr_TR\Internet                             user                   5.3.0               
+    Faker\Provider\tr_TR\Payment                              user                   5.3.0               
+    Faker\Provider\tr_TR\Person                               user                   5.3.0               
+    Faker\Provider\tr_TR\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\uk_UA\Address                              user                   5.3.0               
+    Faker\Provider\uk_UA\Color                                user                   5.3.0               
+    Faker\Provider\uk_UA\Company                              user                   5.3.0               
+    Faker\Provider\uk_UA\Internet                             user                   5.3.0               
+    Faker\Provider\uk_UA\Person                               user                   5.3.0               
+    Faker\Provider\uk_UA\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\uk_UA\Text                                 user                   5.3.0               
+    Faker\Provider\vi_VN\Address                              user                   5.3.0               
+    Faker\Provider\vi_VN\Color                                user                   5.3.0               
+    Faker\Provider\vi_VN\Internet                             user                   5.3.0               
+    Faker\Provider\vi_VN\Person                               user                   5.3.0               
+    Faker\Provider\vi_VN\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\zh_CN\Address                              user                   5.3.0               
+    Faker\Provider\zh_CN\Company                              user                   5.3.0               
+    Faker\Provider\zh_CN\Internet                             user                   5.3.0               
+    Faker\Provider\zh_CN\Person                               user                   5.3.0               
+    Faker\Provider\zh_CN\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\zh_TW\Address                              user                   5.3.0               
+    Faker\Provider\zh_TW\Color                                user                   5.3.0               
+    Faker\Provider\zh_TW\Company                              user                   5.3.0               
+    Faker\Provider\zh_TW\DateTime                             user                   5.3.0               
+    Faker\Provider\zh_TW\Internet                             user                   5.3.0               
+    Faker\Provider\zh_TW\Payment                              user                   5.3.0               
+    Faker\Provider\zh_TW\Person                               user                   5.3.0               
+    Faker\Provider\zh_TW\PhoneNumber                          user                   5.3.0               
+    Faker\Provider\zh_TW\Text                                 user                   5.3.0               
+    Faker\UniqueGenerator                             1       user                   5.3.0               
+    InvalidArgumentException                          24      spl        5.1.0       5.1.0               
+    LengthException                                   2       spl        5.1.0       5.1.0               
+  U LvdWcMc\Installer                                 1       user                   5.3.0               
+  U LvdWcMc\MobilpayTransaction                       3       user                   5.3.0               
+  U LvdWcMc\MobilpayTransactionFactory                13      user                   5.3.0               
+  U Mandango\Mandango                                 3       user                   5.3.0               
+    MobilpayTransactionFactoryTests                           user                   5.4.0               
+    MobilpayTransactionTests                                  user                   5.4.0               
+  U MysqliDb                                          1       user                   4.0.0               
+    OverflowException                                 1       spl        5.1.0       5.1.0               
+    PHPUnit_Framework_Assert                          1       user                   5.0.0               
+  U PHPUnit_Framework_Constraint                      1       user                   4.0.0               
+    PHPUnit_Framework_TestCase                        1       user                   5.0.0               
+  U Propel                                            4       user                   4.0.0               
+    ReflectionObject                                  1       Reflection 5.0.0       5.0.0               
+    RuntimeException                                  3       spl        5.1.0       5.1.0               
+    Transliterator                                    1       intl       2.0.0b1     5.2.4               
+  U WC_Install                                        1       user                   4.0.0               
+  U WC_Order                                          1       user                   4.0.0               
+    WP_UnitTestCase                                   3       user                   5.0.0               
+    parent                                            8       Core       5.0.0       5.0.0               
+    self                                              32      Core       5.0.0       5.0.0               
+    static                                            777     Core       5.0.0       5.0.0               
+    Total [354]                                                                      5.4.0               
+
+Functions Analysis
+
+    Function                              Matches REF      EXT min/Max PHP min/Max  
+    Faker\Provider\pt_BR\check_digit              user                 5.3.0        
+    _get_3rdparty_plugin_base_dir         2       user                 4.0.0        
+    _get_own_plugin_base_dir              2       user                 5.3.0        
+    _get_own_plugin_path                  1       user                 4.0.0        
+    _get_plugins_root                     1       user                 4.0.0        
+    _get_tests_base_dir                   2       user                 5.3.0        
+    _get_tests_file_path                  4       user                 4.0.0        
+    _get_woocommerce_plugin_path          1       user                 4.0.0        
+    _has_own_plugin_been_installed_before 1       user                 4.0.0        
+    _has_wc_been_installed_before         1       user                 4.0.0        
+    _manually_install_own_plugin          1       user                 5.3.0        
+    _manually_install_plugins                     user                 4.0.0        
+    _manually_install_woocommerce         1       user                 4.0.7        
+    _manually_load_plugins                        user                 4.0.0        
+    _register_setup_actions               1       user                 4.0.0        
+    _set_own_plugin_installed             1       user                 5.0.0        
+    _set_wc_installed                     1       user                 5.0.0        
+    _sync_wp_tests_config                 1       user                 5.0.0        
+    array_diff                            1       standard 4.0.1       4.0.1        
+    array_filter                          1       standard 4.0.6       4.0.6        
+    array_key_exists                      2       standard 4.0.7       4.0.7        
+    array_keys                            10      standard 4.0.0       4.0.0        
+    array_map                             1       standard 4.0.6       4.0.6        
+    array_merge                           19      standard 4.0.0       4.0.0        
+    array_pop                             6       standard 4.0.0       4.0.0        
+    array_rand                            1       standard 4.0.0       4.0.0        
+    array_reverse                         1       standard 4.0.0       4.0.0        
+    array_shift                           7       standard 4.0.0       4.0.0        
+    array_sum                             2       standard 4.0.4       4.0.4        
+    array_unshift                         1       standard 4.0.0       4.0.0        
+    array_values                          6       standard 4.0.0       4.0.0        
+    array_walk                            1       standard 4.0.0       4.0.0        
+    call_user_func                        4       standard 4.0.0       4.0.0        
+    call_user_func_array                  2       standard 4.0.4       4.0.4        
+    check_digit                           5       user                 4.0.0        
+    chr                                   2       standard 4.0.0       4.0.0        
+    class_exists                          2       Core     5.0.0       5.0.0        
+    closure-10-27                                 user                 5.3.0        
+    closure-115-130                               user                 5.3.0        
+    closure-130-138                               user                 5.3.0        
+    closure-141-144                               user                 5.3.0        
+    closure-19-21                                 user                 5.3.0        
+    closure-21-23                                 user                 5.3.0        
+    closure-22-24                                 user                 5.3.0        
+    closure-23-25                                 user                 5.3.0        
+    closure-25-27                                 user                 5.3.0        
+    closure-26-28                                 user                 5.3.0        
+    closure-27-29                                 user                 5.3.0        
+    closure-28-30                                 user                 5.3.0        
+    closure-29-31                                 user                 5.3.0        
+    closure-31-33                                 user                 5.3.0        
+    closure-32-34                                 user                 5.3.0        
+    closure-33-35                                 user                 5.3.0        
+    closure-34-36                                 user                 5.3.0        
+    closure-35-37                                 user                 5.3.0        
+    closure-36-38                                 user                 5.3.0        
+    closure-38-40                                 user                 5.3.0        
+    closure-40-42                                 user                 5.3.0        
+    closure-411-413                               user                 5.3.0        
+    closure-415-417                               user                 5.3.0        
+    closure-419-421                               user                 5.3.0        
+    closure-42-44                                 user                 5.3.0        
+    closure-423-425                               user                 5.3.0        
+    closure-427-431                               user                 5.3.0        
+    closure-428-430                               user                 5.3.0        
+    closure-43-45                                 user                 5.3.0        
+    closure-433-435                               user                 5.3.0        
+    closure-44-46                                 user                 5.3.0        
+    closure-46-48                                 user                 5.3.0        
+    closure-47-49                                 user                 5.3.0        
+    closure-48-50                                 user                 5.3.0        
+    closure-48-55                                 user                 5.3.0        
+    closure-50-52                                 user                 5.3.0        
+    closure-53-55                                 user                 5.3.0        
+    closure-54-56                                 user                 5.3.0        
+    closure-55-57                                 user                 5.3.0        
+    closure-57-59                                 user                 5.3.0        
+    closure-58-60                                 user                 5.3.0        
+    closure-587-589                               user                 5.3.0        
+    closure-60-62                                 user                 5.3.0        
+    closure-61-63                                 user                 5.3.0        
+    closure-62-64                                 user                 5.3.0        
+    closure-65-67                                 user                 5.3.0        
+    closure-654-656                               user                 5.4.0        
+    closure-657-659                               user                 5.4.0        
+    closure-660-662                               user                 5.4.0        
+    closure-663-665                               user                 5.4.0        
+    closure-666-668                               user                 5.4.0        
+    closure-669-671                               user                 5.4.0        
+    closure-67-69                                 user                 5.3.0        
+    closure-70-72                                 user                 5.3.0        
+    closure-73-77                                 user                 5.3.0        
+    closure-74-76                                 user                 5.3.0        
+    closure-76-78                                 user                 5.3.0        
+    closure-78-80                                 user                 5.3.0        
+    closure-81-105                                user                 5.3.0        
+    closure-82-84                                 user                 5.3.0        
+    closure-84-86                                 user                 5.3.0        
+    closure-87-89                                 user                 5.3.0        
+    closure-90-92                                 user                 5.3.0        
+    closure-91-93                                 user                 5.3.0        
+    constant                              1       standard 4.0.4       4.0.4        
+    copy                                  2       standard 4.0.0       4.0.0        
+    count                                 19      standard 4.0.0       4.0.0        
+    curl_close                            1       curl     4.0.2       4.0.2        
+ C  curl_exec                             1       curl     4.0.2       4.0.2        
+    curl_init                             1       curl     4.0.2       4.0.2        
+    curl_setopt                           1       curl     4.0.2       4.0.2        
+    date                                  3       user                 4.0.0        
+    date_default_timezone_get             1       date     5.1.0       5.1.0        
+    debug_backtrace                       1       Core     4.3.0       4.3.0        
+    dechex                                3       standard 4.0.0       4.0.0        
+    define                                25      Core     4.0.0       4.0.0        
+    defined                               1       Core     4.0.0       4.0.0        
+    dirname                               3       standard 4.0.0       4.0.0        
+    each                                  1       Core     4.0.0       4.0.0        
+    end                                   1       standard 4.0.0       4.0.0        
+    error_reporting                       4       Core     4.0.0       4.0.0        
+    explode                               4       standard 4.0.0       4.0.0        
+    extension_loaded                      2       Core     4.0.0       4.0.0        
+    fclose                                1       standard 4.0.0       4.0.0        
+    file_exists                           3       standard 4.0.0       4.0.0        
+    file_get_contents                     1       standard 4.3.0       4.3.0        
+    file_put_contents                     3       standard 5.0.0       5.0.0        
+    floor                                 1       standard 4.0.0       4.0.0        
+    fopen                                 1       standard 4.0.0       4.0.0        
+    func_get_arg                          1       Core     4.0.0       4.0.0        
+    func_num_args                         1       Core     4.0.0       4.0.0        
+    function_exists                       6       Core     4.0.0       4.0.0        
+    get_bloginfo                          1       user                 4.0.0        
+    get_class                             4       Core     4.0.0       4.0.0        
+    getenv                                1       standard 4.0.0       4.0.0        
+    hash                                  1       hash     1.1         4.0.0        
+    hexdec                                3       standard 4.0.0       4.0.0        
+    implode                               13      standard 4.0.0       4.0.0        
+    in_array                              8       standard 4.0.0       4.0.0        
+    ini_get                               1       standard 4.0.0       4.0.0        
+    intval                                13      standard 4.0.0       4.0.0        
+    is_array                              5       standard 4.0.0       4.0.0        
+    is_bool                               1       standard 4.0.0       4.0.0        
+    is_callable                           4       standard 4.0.6       4.0.6        
+    is_dir                                4       standard 4.0.0       4.0.0        
+    is_file                               1       standard 4.0.0       4.0.0        
+    is_null                               5       standard 4.0.4       4.0.4        
+    is_numeric                            1       standard 4.0.0       4.0.0        
+    is_object                             1       standard 4.0.0       4.0.0        
+    is_readable                           2       standard 4.0.0       4.0.0        
+    is_string                             1       standard 4.0.0       4.0.0        
+    is_wp_error                           2       user                 4.0.0        
+    is_writable                           1       standard 4.0.0       4.0.0        
+    join                                  30      standard 4.0.0       4.0.0        
+    key                                   1       standard 4.0.0       4.0.0        
+    long2ip                               3       standard 4.0.0       4.0.0        
+    ltrim                                 1       standard 4.0.0       4.0.0        
+    lvdwcmc_env                           16      user                 4.0.0        
+    max                                   3       standard 4.0.0       4.0.0        
+ C  mb_strlen                             4       mbstring 4.0.6       4.0.6        
+    mb_strtolower                         1       mbstring 4.3.0       4.3.0        
+    mb_strtoupper                         1       mbstring 4.3.0       4.3.0        
+ C  mb_substr                             2       mbstring 4.0.6       4.0.6        
+    md5                                   3       standard 5.0.0       5.0.0        
+    method_exists                         2       Core     4.0.0       4.0.0        
+    min                                   3       standard 4.0.0       4.0.0        
+    mt_getrandmax                         6       standard 4.0.0       4.0.0        
+    mt_rand                               101     standard 4.0.0       4.0.0        
+    mt_srand                              2       standard 4.0.0       4.0.0        
+    number_format                         4       standard 4.0.0       4.0.0        
+    ord                                   3       standard 4.0.0       4.0.0        
+    pack                                  2       standard 4.0.0       4.0.0        
+    pathinfo                              1       standard 4.0.3       4.0.3        
+    pow                                   2       standard 4.0.0       4.0.0        
+    preg_match                            5       pcre     4.0.0       4.0.0        
+    preg_replace                          13      pcre     4.0.0       4.0.0        
+    preg_replace_callback                 16      pcre     4.0.5       4.0.5        
+    preg_split                            1       pcre     4.0.0       4.0.0        
+    rand                                  2       standard 4.0.0       4.0.0        
+    rand_long_str                                 user                 4.0.0        
+    rand_str                                      user                 4.0.0        
+    range                                 6       standard 4.0.0       4.0.0        
+    reset                                 1       standard 4.0.0       4.0.0        
+    round                                 4       standard 4.0.0       4.0.0        
+    scandir                               1       standard 5.0.0       5.0.0        
+    sha1                                  1       standard 4.3.0       4.3.0        
+    spl_autoload_register                 1       spl      5.1.2       5.1.2        
+    sprintf                               28      standard 4.0.0       4.0.0        
+    str_pad                               4       standard 4.0.1       4.0.1        
+    str_repeat                            7       standard 4.0.0       4.0.0        
+    str_replace                           11      standard 4.0.0       4.0.0        
+    str_split                             11      standard 5.0.0       5.0.0        
+    strip_ws                                      user                 4.0.0        
+    strlen                                18      Core     4.0.0       4.0.0        
+    strpos                                1       standard 4.0.0       4.0.0        
+    strripos                              1       standard 5.0.0       5.0.0        
+    strrpos                               1       standard 4.0.0       4.0.0        
+    strtolower                            2       standard 4.0.0       4.0.0        
+    strtotime                             3       date     4.0.0       4.0.0        
+    strtoupper                            4       standard 4.0.0       4.0.0        
+    strtr                                 2       standard 4.0.0       4.0.0        
+    substr                                26      standard 4.0.0       4.0.0        
+    sys_get_temp_dir                      1       standard 5.2.1       5.2.1        
+    tests_add_filter                      2       user                 4.0.0        
+    tests_reset__SERVER                           user                 4.0.0        
+    time                                  3       date     4.0.0       4.0.0        
+ C  transliterator_transliterate                  intl     2.0.0b1     5.2.4        
+    ucfirst                               3       standard 4.0.0       4.0.0        
+    ucwords                               1       standard 4.0.0       4.0.0        
+    uniqid                                1       standard 4.0.0       4.0.0        
+    unpack                                1       standard 4.0.0       4.0.0        
+    var_export                            2       standard 4.2.0       4.2.0        
+    version_compare                       1       standard 4.0.7       4.0.7        
+    vsprintf                              3       standard 4.0.7       4.0.7        
+    wc_create_new_customer                1       user                 4.0.0        
+    wc_create_order                       1       user                 4.0.0        
+    wc_generate_order_key                 1       user                 4.0.0        
+    wc_get_order_statuses                 1       user                 4.0.0        
+    wp_normalize_path                     2       user                 4.0.0        
+    wp_roles                              1       user                 4.0.0        
+    wp_upload_dir                         1       user                 4.0.0        
+    Total [218]                                                        5.4.0        
+
+Constants Analysis
+
+    Constant            Matches REF      EXT min/Max PHP min/Max  
+    ABSPATH                     user                 4.0.0        
+    AUTH_KEY                    user                 4.0.0        
+    AUTH_SALT                   user                 4.0.0        
+    CURLOPT_FILE        1       curl     4.0.2       4.0.2        
+    DB_CHARSET                  user                 4.0.0        
+    DB_COLLATE                  user                 4.0.0        
+    DB_HOST             1       user                 4.0.0        
+    DB_NAME             1       user                 4.0.0        
+    DB_PASSWORD         1       user                 4.0.0        
+    DB_USER             1       user                 4.0.0        
+    DIRECTORY_SEPARATOR 8       standard 4.0.6       4.0.6        
+    E_ALL               4       Core     4.0.0       4.0.0        
+    E_NOTICE            2       Core     4.0.0       4.0.0        
+    LOGGED_IN_KEY               user                 4.0.0        
+    LOGGED_IN_SALT              user                 4.0.0        
+    LVD_WCMC_DATA_DIR   1       user                 4.0.0        
+    LVD_WCMC_VIEWS_DIR  1       user                 4.0.0        
+    NONCE_KEY                   user                 4.0.0        
+    NONCE_SALT                  user                 4.0.0        
+    PATHINFO_EXTENSION  1       standard 4.0.0       4.0.0        
+    PHP_EOL             8       Core     4.3.10      4.3.10       
+    PHP_FLOAT_MAX       3       user                 4.0.0        
+    PHP_INT_MAX         4       Core     4.4.0       4.4.0        
+    PHP_VERSION         1       Core     4.0.0       4.0.0        
+    SECURE_AUTH_KEY             user                 4.0.0        
+    SECURE_AUTH_SALT            user                 4.0.0        
+    STR_PAD_LEFT        4       standard 4.0.0       4.0.0        
+    WC_REMOVE_ALL_DATA          user                 4.0.0        
+    WPLANG                      user                 4.0.0        
+    WP_DEBUG                    user                 4.0.0        
+    WP_DEFAULT_THEME            user                 4.0.0        
+    WP_PHP_BINARY               user                 4.0.0        
+ C  WP_RUN_CORE_TESTS           user                 4.0.0        
+    WP_TESTS_DOMAIN             user                 4.0.0        
+    WP_TESTS_EMAIL              user                 4.0.0        
+    WP_TESTS_TITLE              user                 4.0.0        
+    WP_UNINSTALL_PLUGIN         user                 4.0.0        
+    __DIR__             3       Core     5.3.0       5.3.0        
+    __FILE__            1       Core     4.0.0       4.0.0        
+    false               54      Core     4.0.0       4.0.0        
+    null                133     Core     4.0.0       4.0.0        
+    true                55      Core     4.0.0       4.0.0        
+    Total [42]                                       5.3.0        
+
+Conditions Analysis
+
+    Condition                                     Matches REF      EXT min/Max PHP min/Max  
+    defined(WP_RUN_CORE_TESTS)                    1       user                 4.0.0        
+    extension_loaded(mbstring)                    2       user                 4.0.0        
+    function_exists(curl_exec)                    1       curl     4.0.2       4.0.2        
+    function_exists(mb_strlen)                    3       mbstring 4.0.6       4.0.6        
+    function_exists(mb_substr)                    1       mbstring 4.0.6       4.0.6        
+    function_exists(transliterator_transliterate) 1       intl     2.0.0b1     5.2.4        
+    Total [6]                                                                  5.2.4        
+
+Requires PHP 5.4.0 (min), PHP 5.4.0 (all)
