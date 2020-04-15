@@ -8,6 +8,8 @@
  * License: New BSD License
  * Plugin URI: https://github.com/alexboia/WC-MobilPayments-Card
  * Text Domain: wc-mobilpayments-card
+ * WC requires at least: 3.2.0
+ * WC tested up to: 4.0.1
  */
 
 /**

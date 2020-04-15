@@ -71,13 +71,13 @@ copy_source_files() {
 copy_asset_files() {
     echo "Copying all asset files to $LVDWCMC_EXPORT_ASSETS_DIR..."
 
-    cp ./assets/en_US/viewer-summary.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-1.png" > /dev/null
-    cp ./assets/en_US/viewer-map.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-2.png" > /dev/null
-    cp ./assets/en_US/viewer-teaser-top.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-3.png" > /dev/null
-    cp ./assets/en_US/admin-edit-map.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-4.png" > /dev/null
-    cp ./assets/en_US/admin-edit-summary-bike.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-5.png" > /dev/null
-    cp ./assets/en_US/admin-edit-summary-empty.png  "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-6.png" > /dev/null
-    cp ./assets/en_US/admin-settings.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-7.png" > /dev/null
+    cp ./assets/en_US/lvdwcmc-frontend-order-page.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-1.png" > /dev/null
+    cp ./assets/en_US/lvdwcmc-order-page.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-2.png" > /dev/null
+    cp ./assets/en_US/lvdwcmc-settings.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-3.png" > /dev/null
+    cp ./assets/en_US/lvdwcmc-thank-you-page.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-4.png" > /dev/null
+    cp ./assets/en_US/lvdwcmc-tx-dashboard-widget.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-5.png" > /dev/null
+    cp ./assets/en_US/lvdwcmc-tx-details.png  "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-6.png" > /dev/null
+    cp ./assets/en_US/lvdwcmc-tx-history.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-7.png" > /dev/null
 
     cp ./assets/banner-772x250.jpg    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-772x250.jpg" > /dev/null
     cp ./assets/banner-1544x500.jpg    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-1544x500.jpg" > /dev/null

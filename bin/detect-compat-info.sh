@@ -15,10 +15,6 @@ fi
  phpcompatinfo analyser:run --alias ctests --output=../build/compat-info/tests-compat-info.txt > /dev/null
  popd > /dev/null
 
- pushd ./help > /dev/null
- phpcompatinfo analyser:run --alias chelp --output=../build/compat-info/help-compat-info.txt > /dev/null
- popd > /dev/null
-
 if [ "$COMPAT_RESTORE_DIR" = true ]
 then
 	popd > /dev/null
