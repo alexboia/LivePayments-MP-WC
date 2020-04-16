@@ -55,7 +55,10 @@ namespace LvdWcMc {
         
 					ob_start();
                     require $this->_env->getViewFilePath('lvdwcmc-payment-status.php');
-					$content = ob_get_clean();
+                    $content = ob_get_clean();
+                    if (!$content) {
+                        $content = null;
+                    }
                 }
             }
 			return $content;
