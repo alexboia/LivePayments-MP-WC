@@ -52,7 +52,11 @@ trait GenericTestHelpers {
         error_reporting(E_ALL & ~E_NOTICE);
     }
 
-    protected function _reportAll() {
+    protected function _reportAllErrors() {
         error_reporting(E_ALL);
+    }
+
+    protected function _writeLine($message) {
+        echo PHP_EOL . $message . PHP_EOL;
     }
 }
