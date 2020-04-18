@@ -2,7 +2,7 @@
     <img align="center" width="800" height="324" src="https://raw.githubusercontent.com/alexboia/LivePayments-MP-WC/master/logo.png?v=3" style="margin-bottom: 20px; margin-right: 20px;" />
 </p>
 
-# LivePayments - mobilPay Card WooCommerce Payment Gateway (LivePayments-MP-WC)
+# LivePayments - mobilPay Card WooCommerce Payment Gateway
 LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the Romanian mobilPay payment processor.
 This plugin is meant to be used by merchants in Romania.
 
