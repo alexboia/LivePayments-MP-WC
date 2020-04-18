@@ -42,7 +42,7 @@
     function showPleaseWait() {
         $.blockUI({
             message: [
-                '<img class="lvdwcmc-please-wait-spinner" src="/wp-content/plugins/livepayments-mp-wc/media/img/lvdwcmc-wait.svg" alt="' + lvdwcmcCommonScriptL10n.lblLoading + '" />',
+                '<img class="lvdwcmc-please-wait-spinner" src="' + lvdwcmcCommonSettings.pluginMediaImgRootDir + '/lvdwcmc-wait.svg" alt="' + lvdwcmcCommonScriptL10n.lblLoading + '" />',
                 '<p class="lvdwcmc-please-wait-txt">' + lvdwcmcCommonScriptL10n.lblLoading + '</p>'
             ],
             css: {

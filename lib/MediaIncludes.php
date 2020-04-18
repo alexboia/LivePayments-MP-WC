@@ -149,6 +149,7 @@
                     self::JS_PLUPLOAD,
                     self::JS_TOASTR,
                     self::JS_URIJS,
+                    self::JS_KITE_JS,
                     self::JS_LVDWCMC_COMMON
                 )
             ),
@@ -304,8 +305,10 @@
             }
         }
 
-        public function includeScriptCommon() {
-            $this->_enqueueScript(self::JS_LVDWCMC_COMMON);
+        public function _includeCommonScriptSettings() {
+            wp_localize_script(self::JS_LVDWCMC_COMMON, 'lvdwcmcCommonSettings', array(
+                'pluginMediaImgRootDir' => plugins_url('media/img', $this->_refPluginsPath)
+            ));
         }
 
         public function includeScriptSettings($settingsScriptLocalization, $commonScriptLocalization) {
@@ -322,6 +325,8 @@
                     'lvdwcmcSettingsL10n', 
                     $settingsScriptLocalization);
             }
+
+            $this->_includeCommonScriptSettings();
         }
 
         public function includeScriptTransactionListing($transactionsScriptLocalization, $commonScriptLocalization) {
@@ -338,6 +343,8 @@
                     'lvdwcmcTransactionsListL10n', 
                     $transactionsScriptLocalization);
             }
+
+            $this->_includeCommonScriptSettings();
         }
 
         public function includeScriptPaymentInitiation() {
