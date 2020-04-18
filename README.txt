@@ -1,7 +1,7 @@
-=== WC MobilPayments Card ===
+=== LivePayments - mobilPay Card WooCommerce Payment Gateway ===
 Contributors: alexandruboia
 Donate link: https://ko-fi.com/alexandruboia
-Tags: mobilpay, creditcard, woocommerce, payment, card
+Tags: payment, card, mobilpay, creditcard, woocommerce
 Requires at least: 5.0
 Tested up to: 5.4.0
 Stable tag: 0.1.0
@@ -9,7 +9,7 @@ Requires PHP: 5.6.2
 License: BSD New License
 License URI: https://opensource.org/licenses/BSD-3-Clause
 
-Card WooCommerce Payment Gateway that uses the Romainan mobilPay payment processing gateway.
+LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the Romanian mobilPay payment processor.
 
 == Description ==
 
@@ -53,7 +53,7 @@ No, the plug-in only supports the mobilPay payment processing gateway.
 No, the plug-in only supports credit or debit card payments.
 
 = How can I contribute? =
-Head over to the plug-in's GitHub page (https://github.com/alexboia/WC-MobilPayments-Card) and let's talk!
+Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments-MP-WC) and let's talk!
 
 == Screenshots ==
 
@@ -67,11 +67,11 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/WC-MobilPaym
 
 == Installation ==
 
-1. Using your favourite FTP client, upload the plugin files to the /wp-content/plugins/wc-mobilpayments-card directory, or install the plugin through the WordPress plugins screen directly (recommended).
+1. Using your favourite FTP client, upload the plugin files to the /wp-content/plugins/livepayments-mp-wc directory, or install the plugin through the WordPress plugins screen directly (recommended).
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Retrieve your security assets from mobilPay™'s management interface (see here: https://github.com/alexboia/WC-MobilPayments-Card#retrieving-mobilpay-security-assets).
+3. Retrieve your security assets from mobilPay™'s management interface (see here: https://github.com/alexboia/LivePayments-MP-WC#retrieving-mobilpay-security-assets).
 4. Use the WooCommerce -> Settings -> Payments -> mobilPay™ Card Gateway sidebar menu item to access the plug-in configuration page.
-5. Fill in the required fields as instructed here: https://github.com/alexboia/WC-MobilPayments-Card#setting-up-and-configuring-your-plug-in.
+5. Fill in the required fields as instructed here: https://github.com/alexboia/LivePayments-MP-WC#setting-up-and-configuring-your-plug-in.
 
 == Changelog ==
 

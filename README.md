@@ -1,9 +1,9 @@
 <p align="center">
-    <img align="center" width="210" height="210" src="https://raw.githubusercontent.com/alexboia/WC-MobilPayments-Card/master/logo.png?v=2" style="margin-bottom: 20px; margin-right: 20px;" />
+    <img align="center" width="800" height="324" src="https://raw.githubusercontent.com/alexboia/LivePayments-MP-WC/master/logo.png?v=3" style="margin-bottom: 20px; margin-right: 20px;" />
 </p>
 
-# WC-MobilPayments-Card
-Card WooCommerce Payment Gateway that uses the Romainan mobilPay™ payment processing gateway.  
+# LivePayments - mobilPay Card WooCommerce Payment Gateway (LivePayments-MP-WC)
+LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the Romanian mobilPay payment processor.
 This plugin is meant to be used by merchants in Romania.
 
 ## Contents
@@ -52,7 +52,7 @@ If you are a WordPress solution developer and  working on implementing a WooComm
 ## Installation
 <a name="lvdwcmc-installation"></a>  
 
-1. Using your favourite FTP client, upload the plugin files to the `/wp-content/plugins/wc-mobilpayments-card` directory, or install the plugin through the WordPress plugins screen directly (recommended).
+1. Using your favourite FTP client, upload the plugin files to the `/wp-content/plugins/livepayments-mp-wc` directory, or install the plugin through the WordPress plugins screen directly (recommended).
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 
 ## Setting up and configuring your plug-in
@@ -103,7 +103,7 @@ Then you can go on to the sandbox environment and download your sandbox assets:
 A return URL is the absolute URL (starting with the `http://` or `https://` thingy) to a page where your customer is being redirected after completing the payment process.  
 The payment gateway sends the customer here, but it is your job to set up such page to, at the very least, thank him for his business.
 
-`WC-MobilPayments-Card` offers a shortcode that you can embed into one of your WordPress pages (post type=`page`, created via `Pages -> Add new`): `[lvdwcmc_display_mobilpay_order_status]`.  
+`LivePayments-MP-WC` offers a shortcode that you can embed into one of your WordPress pages (post type=`page`, created via `Pages -> Add new`): `[lvdwcmc_display_mobilpay_order_status]`.  
 After that, you can copy the absolute URL (ex. `http://uberstorethebestintown.com/thank-you-dude`) of that page and place it in the `Return URL field` [mentioned above](#lvdwcmc-setup).
 
 However, I only mention this manual and rather unfriendly procedure because you might already have a page defined for this purpose, and just want to embed the status in it. But, if you do not, then let the plug-in handle this for you and click the `Geneate it for me` [mentioned above](#lvdwcmc-setup), which will generate this page for you, with the following attributes:
