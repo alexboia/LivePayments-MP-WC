@@ -17,8 +17,8 @@ LVDWCMC_BUILD_OUTDIR="$LVDWCMC_BUILD_ROOTDIR/output"
 LVDWCMC_BUILD_COMPATDIR="$LVDWCMC_BUILD_ROOTDIR/compat-info"
 LVDWCMC_BUILD_TMPDIR="$LVDWCMC_BUILD_ROOTDIR/tmp"
 
-LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./wc-mobilpayments-card-plugin-main.php | awk '{gsub(/\s+/,""); print $0}')
-LVDWCMC_BUILD_NAME="wc-mobilpayments-card.$LVDWCMC_VERSION.zip"
+LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./lvdwcmc-plugin-main.php | awk '{gsub(/\s+/,""); print $0}')
+LVDWCMC_BUILD_NAME="livepayments-mp-wc.$LVDWCMC_VERSION.zip"
 
 # Ensure all output directories exist
 ensure_out_dirs() {
@@ -76,9 +76,7 @@ copy_source_files() {
 	cp ./LICENSE "$LVDWCMC_BUILD_TMPDIR/license.txt"
 	cp ./README.txt "$LVDWCMC_BUILD_TMPDIR/readme.txt"
 	cp ./index.php "$LVDWCMC_BUILD_TMPDIR"
-	cp ./wc-mobilpayments-card-plugin-header.php "$LVDWCMC_BUILD_TMPDIR"
-	cp ./wc-mobilpayments-card-plugin-functions.php "$LVDWCMC_BUILD_TMPDIR"
-	cp ./wc-mobilpayments-card-plugin-main.php "$LVDWCMC_BUILD_TMPDIR"
+	cp ./lvdwcmc-plugin-*.php "$LVDWCMC_BUILD_TMPDIR"
 	cp ./.htaccess "$LVDWCMC_BUILD_TMPDIR"
 
 	mkdir "$LVDWCMC_BUILD_TMPDIR/media" && cp -r ./media/* "$LVDWCMC_BUILD_TMPDIR/media"

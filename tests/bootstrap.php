@@ -59,7 +59,7 @@ function _get_plugins_root() {
 }
 
 function _get_own_plugin_path() {
-	return _get_own_plugin_base_dir() . '/wc-mobilpayments-card-plugin-main.php';
+	return _get_own_plugin_base_dir() . '/lvdwcmc-plugin-main.php';
 }
 
 function _get_3rdparty_plugin_base_dir($plugin) {

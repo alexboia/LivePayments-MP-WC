@@ -127,20 +127,20 @@ namespace LvdWcMc {
             $this->_processor = new MobilpayCardPaymentProcessor();
             $this->_transactionFactory = new MobilpayTransactionFactory();
 
-            $this->method_title = __('mobilPay&trade; Card Gateway', 'wc-mobilpayments-card');
-            $this->method_description = __('mobilPay&trade; Payment Gateway for WooCommerce', 'wc-mobilpayments-card');
+            $this->method_title = __('LivePayments Card Gateway via mobilPay', 'livepayments-mp-wc');
+            $this->method_description = __('LivePayments - mobilPay Payment Gateway for WooCommerce', 'livepayments-mp-wc');
 
             /**
              * Filters the absolute URL for the payment gateway icon.
              * Default value is the absolute URL to media/img/mobilpay.png.
              * 
              * @hook lvdwcmc_payment_gateway_icon
-             * @param string $url The current URL, initially provided by WC-MobilPayments-Card
+             * @param string $url The current URL, initially provided by LivePayments-MP-WC
              * @return string The actual and final URL, as returned by the registered filters
              */
             $this->icon = apply_filters('lvdwcmc_payment_gateway_icon', $this->_env->getPublicAssetUrl('media/img/mobilpay.png'));
             
-            $this->title = __('mobilPay&trade; Card Gateway', 'wc-mobilpayments-card');
+            $this->title = __('mobilPay&trade; Card Gateway', 'livepayments-mp-wc');
 
             $this->supports = array(
                 'products', 
@@ -307,78 +307,78 @@ namespace LvdWcMc {
 
             $coreFields = array(
                 'enabled' => array(
-                    'title' => __('Enable / Disable', 'wc-mobilpayments-card'),
-                    'label' => __('Enable this payment gateway', 'wc-mobilpayments-card'),
+                    'title' => __('Enable / Disable', 'livepayments-mp-wc'),
+                    'label' => __('Enable this payment gateway', 'livepayments-mp-wc'),
                     'type' => 'checkbox',
                     'default' => 'no'
                 ),
                 'mobilpay_environment' => array(
-                    'title' => __('mobilPay&trade; Sandbox / Test Mode', 'wc-mobilpayments-card'),
-                    'label' => __('Enable Test Mode', 'wc-mobilpayments-card'),
+                    'title' => __('mobilPay&trade; Sandbox / Test Mode', 'livepayments-mp-wc'),
+                    'label' => __('Enable Test Mode', 'livepayments-mp-wc'),
                     'type' => 'checkbox',
-                    'description' => __('Place the payment gateway in test mode.', 'wc-mobilpayments-card'),
+                    'description' => __('Place the payment gateway in test mode.', 'livepayments-mp-wc'),
                     'default' => 'no'
                 ),
                 'title' => array(
-                    'title' => __('Title', 'wc-mobilpayments-card'),
+                    'title' => __('Title', 'livepayments-mp-wc'),
                     'type' => 'text',
-                    'desc_tip' => __('Payment title the customer will see during the checkout process.', 'wc-mobilpayments-card'),
-                    'default' => __('MobilPay', 'wc-mobilpayments-card')
+                    'desc_tip' => __('Payment title the customer will see during the checkout process.', 'livepayments-mp-wc'),
+                    'default' => __('LivePayments via mobilPay', 'livepayments-mp-wc')
                 ),
                 'description' => array(
-                    'title' => __('Description', 'wc-mobilpayments-card'),
+                    'title' => __('Description', 'livepayments-mp-wc'),
                     'type' => 'textarea',
-                    'desc_tip' => __('Payment description the customer will see during the checkout process.', 'wc-mobilpayments-card'),
+                    'desc_tip' => __('Payment description the customer will see during the checkout process.', 'livepayments-mp-wc'),
                     'css' => 'max-width:350px;'
                 ),
                 'mobilpay_account_id' => array(
-                    'title'	=> __('Seller Account ID', 'wc-mobilpayments-card'),
+                    'title'	=> __('Seller Account ID', 'livepayments-mp-wc'),
                     'type'	=> 'text',
-                    'description' => __('This is Account ID provided by MobilPay when you signed up for an account. Unique key for your seller account for the payment process.', 'wc-mobilpayments-card')
+                    'description' => __('This is Account ID provided by MobilPay when you signed up for an account. Unique key for your seller account for the payment process.', 'livepayments-mp-wc')
                 ),
                 'mobilpay_return_url' => array(
-                    'title'	=> __('Return URL', 'wc-mobilpayments-card'),
+                    'title'	=> __('Return URL', 'livepayments-mp-wc'),
                     'type'	=> 'return_url',
-                    'description' => __('You must create a new page and in the content field enter the shortcode [lvdwcmc_display_mobilpay_order_status] so that the user can see the message that is returned by the Mobilpay server regarding their transaction. Or any content you want to thank for buying.', 'wc-mobilpayments-card'),
+                    'description' => __('You must create a new page and in the content field enter the shortcode [lvdwcmc_display_mobilpay_order_status] so that the user can see the message that is returned by the Mobilpay server regarding their transaction. Or any content you want to thank for buying.', 'livepayments-mp-wc'),
                     'desc_tip' => true
                 ),
                 'mobilpay_live_public_cert' => array(
-                    'title' => __('mobilPay&trade; digital certificate for the live environment', 'wc-mobilpayments-card'),
-                    'description' => __('The public key used for securing communication with the mobilPay&trade; gateway in the live environment.', 'wc-mobilpayments-card'),
+                    'title' => __('mobilPay&trade; digital certificate for the live environment', 'livepayments-mp-wc'),
+                    'description' => __('The public key used for securing communication with the mobilPay&trade; gateway in the live environment.', 'livepayments-mp-wc'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
-                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.cer'),
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.cer'),
                     '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
                     '_is_live_mode' => true
                 ),
                 'mobilpay_live_private_key' => array(
-                    'title' => __('The private key for the live environment', 'wc-mobilpayments-card'),
-                    'description' => __('The private key used for securing communication with the mobilPay&trade; gateway in the live environment.', 'wc-mobilpayments-card'),
+                    'title' => __('The private key for the live environment', 'livepayments-mp-wc'),
+                    'description' => __('The private key used for securing communication with the mobilPay&trade; gateway in the live environment.', 'livepayments-mp-wc'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
-                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.key'),
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.key'),
                     '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
                     '_is_live_mode' => true
                 ),
                 'mobilpay_sandbox_public_cert' => array(
-                    'title' => __('mobilPay&trade; digital certificate for the sandbox environment', 'wc-mobilpayments-card'),
-                    'description' => __('The public key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).', 'wc-mobilpayments-card'),
+                    'title' => __('mobilPay&trade; digital certificate for the sandbox environment', 'livepayments-mp-wc'),
+                    'description' => __('The public key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).', 'livepayments-mp-wc'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
-                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.cer'),
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.cer'),
                     '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
                     '_is_live_mode' => false
                 ),
                 'mobilpay_sandbox_private_key' => array(
-                    'title' => __('The private key for the sandbox environment', 'wc-mobilpayments-card'),
-                    'description' => __('The private key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).', 'wc-mobilpayments-card'),
+                    'title' => __('The private key for the sandbox environment', 'livepayments-mp-wc'),
+                    'description' => __('The private key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when "MobilPay Sandbox / Test Mode"  is checked).', 'livepayments-mp-wc'),
                     'type' => 'mobilpay_asset_upload',
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
-                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'wc-mobilpayments-card'), '.key'),
+                    'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.key'),
                     '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
                     '_is_live_mode' => false
                 )
@@ -390,8 +390,8 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_additional_gateway_settings_fields
              * 
-             * @param array $additionalFields The current list of additional fields, initially provided by WC-MobilPayments-Card
-             * @param array $coreFields The list of core fields provided by WC-MobilPayments-Card
+             * @param array $additionalFields The current list of additional fields, initially provided by LivePayments-MP-WC
+             * @param array $coreFields The list of core fields provided by LivePayments-MP-WC
              * @return array The actual list of additional fields, as returned by the registered filters
              */
             $additionalFields = apply_filters('lvdwcmc_additional_gateway_settings_fields', 
@@ -456,7 +456,7 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_inline_js_settings_data
              * 
-             * @param array $additionalData The initial set of additional data fields, as provided by WC-MobilPayments-Card
+             * @param array $additionalData The initial set of additional data fields, as provided by LivePayments-MP-WC
              * @param array $settings The current settings form values
              * @return array The actual set of additional data fields, as returned by the registered filters
              */
@@ -623,8 +623,8 @@ namespace LvdWcMc {
             $result = lvdwcmc_get_ajax_response();
             $result->success = !file_exists($destination);
             $result->message = $result->success
-                ? __('Payment asset file successfully removed.', 'wc-mobilpayments-card')
-                : __('Payment asset file could not be removed.', 'wc-mobilpayments-card');
+                ? __('Payment asset file successfully removed.', 'livepayments-mp-wc')
+                : __('Payment asset file could not be removed.', 'livepayments-mp-wc');
 
             /**
              * Fires after a payment asset has been removed.
@@ -657,7 +657,7 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_generate_return_url_slug
              * 
-             * @param string $slug The current slug, initially provided by WC-MobilPayments-Card
+             * @param string $slug The current slug, initially provided by LivePayments-MP-WC
              * @param string The actual & final page slug, as returned by the registered filters
              */
             $slug = apply_filters('lvdwcmc_generate_return_url_slug', 'lvdwcmc-thank-you');
@@ -670,13 +670,13 @@ namespace LvdWcMc {
                  * 
                  * @hook lvdwcmc_generate_return_url_data
                  * 
-                 * @param array $pagePostInfo The curent page info, initially provided by WC-MobilPayments-Card
+                 * @param array $pagePostInfo The curent page info, initially provided by LivePayments-MP-WC
                  * @return array The actual & final page post info, as returned by the registered filters
                  */
                 $pagePostInfo = apply_filters('lvdwcmc_generate_return_url_page_info', array(
                     'post_author' => get_current_user_id(),
                     'post_content' => '[lvdwcmc_display_mobilpay_order_status]',
-                    'post_title' => __('Thank you for your order', 'wc-mobilpayments-card'),
+                    'post_title' => __('Thank you for your order', 'livepayments-mp-wc'),
                     'post_name' => $slug,
                     'post_status' => 'publish',
                     'post_type' => 'page',
@@ -716,7 +716,7 @@ namespace LvdWcMc {
              * @hook lvdwcmc_gateway_needs_setup
              * @see \WC_Ajax::toggle_gateway_enabled()
              * 
-             * @param boolean $needsSetup Whether or not setup is needed, initially determined by default by WC-MobilPayments-Card
+             * @param boolean $needsSetup Whether or not setup is needed, initially determined by default by LivePayments-MP-WC
              * @param array $settings The current settings values
              * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
              * 
@@ -739,7 +739,7 @@ namespace LvdWcMc {
              * @hook lvdwcmc_gateway_is_available
              * @see \WC_Payment_Gateways::get_available_payment_gateways().
              * 
-             * @param boolean $isAvailable The current availability status, initially computed by WC-MobilPayments-Card 
+             * @param boolean $isAvailable The current availability status, initially computed by LivePayments-MP-WC
              * @param array $settings The current settings values
              * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
              * 
@@ -827,7 +827,7 @@ namespace LvdWcMc {
 
                 $this->logDebug('Done processing payment for order', $context);
             } catch (\Exception $exc) {
-                wc_add_notice(__('Error initiating MobilPay card payment.', 'wc-mobilpayments-card'), 'error');
+                wc_add_notice(__('Error initiating MobilPay card payment.', 'livepayments-mp-wc'), 'error');
                 $this->logException('Error initiating MobilPay card payment', 
                     $exc, 
                     $context);
@@ -970,7 +970,7 @@ namespace LvdWcMc {
                      * 
                      * @hook lvdwcmc_get_email_transaction_details_data
                      * 
-                     * @param array $additionalData The initial set of additional data fields, as provided by WC-MobilPayments-Card
+                     * @param array $additionalData The initial set of additional data fields, as provided by LivePayments-MP-WC
                      * @param \WC_Order $order The target order
                      * @param \LvdWcMc\MobilpayTransaction $transaction The corresponding payment transaction
                      * @param array $args Additional arguments that establish the context in which the e-mail is being sent
@@ -1079,7 +1079,7 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_payment_request_info
              * 
-             * @param array $requestInfo The current payment request information, initially provided by WC-MobilPayments-Card 
+             * @param array $requestInfo The current payment request information, initially provided by LivePayments-MP-WC
              * @param \WC_Order $order The order for which the payment request needs to be generated
              * @return array The actual & final payment request information, as returned by the registered filters
              */
@@ -1089,7 +1089,7 @@ namespace LvdWcMc {
                     'invoice' => array(
                         'currency' => $order->get_currency(),
                         'amount' => sprintf('%.2f', $order->get_total()),
-                        'details' => sprintf(__('Payment for order #%s.', 'wc-mobilpayments-card'), $order->get_order_key())
+                        'details' => sprintf(__('Payment for order #%s.', 'livepayments-mp-wc'), $order->get_order_key())
                     ),
                     'billing' => array(
                         'type' => 'person',
@@ -1326,7 +1326,7 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_payment_assets_file_descriptor
              * 
-             * @param string $descripor The current descriptor, initially provided by WC-MobilPayments-Card
+             * @param string $descripor The current descriptor, initially provided by LivePayments-MP-WC
              * @param boolean $isLiveMode Whether the descriptor belongs to the live environment (true) or the sandbox environment (false)
              * @return string The actual & final descriptor, as returned by the registered filters
              */
@@ -1370,7 +1370,7 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_payment_assets_storage_dir
              * 
-             * @param string $assetsDir The current asset directory, initially provided by WC-MobilPayments-Card
+             * @param string $assetsDir The current asset directory, initially provided by LivePayments-MP-WC
              * @return string The actual & final asset directory, as returned by the registered filters
              */
             return apply_filters('lvdwcmc_get_payment_assets_storage_dir', 
@@ -1403,7 +1403,7 @@ namespace LvdWcMc {
              * 
              * @hook lvdwcmc_get_payment_assets_file_templates
              * 
-             * @param array $fileNameTemplates The current file name templates, intially provided by WC-MobilPayments-Card
+             * @param array $fileNameTemplates The current file name templates, intially provided by LivePayments-MP-WC
              * @return array The actual & final templates, as returned by the registered filters
              */
             return apply_filters('lvdwcmc_get_payment_assets_file_templates', 

@@ -11,7 +11,7 @@ fi
 
 # Store some stuff for later use
 LVDWCMC_CDIR=$(pwd)
-LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./wc-mobilpayments-card-plugin-main.php | awk '{gsub(/\s+/,""); print $0}')
+LVDWCMC_VERSION=$(awk '{IGNORECASE=1}/Version:/{print $NF}' ./lvdwcmc-plugin-main.php | awk '{gsub(/\s+/,""); print $0}')
 
 LVDWCMC_EXPORT_ROOT="$LVDWCMC_CDIR/build/wp-plugin-dir-svn"
 LVDWCMC_EXPORT_TRUNK_DIR="$LVDWCMC_EXPORT_ROOT/trunk"
@@ -24,7 +24,7 @@ ensure_root_dir() {
 	if [ ! -d $LVDWCMC_EXPORT_ROOT ]
 	then
 		mkdir $LVDWCMC_EXPORT_ROOT
-		svn co https://plugins.svn.wordpress.org/wc-mobilpayments-card/ $LVDWCMC_EXPORT_ROOT
+		svn co https://plugins.svn.wordpress.org/livepayments-mp-wc/ $LVDWCMC_EXPORT_ROOT
 	fi
 }
 
@@ -52,9 +52,7 @@ copy_source_files() {
 	cp ./LICENSE "$1/license.txt"
 	cp ./README.txt "$1/readme.txt"
 	cp ./index.php "$1"
-	cp ./wc-mobilpayments-card-plugin-header.php "$1"
-	cp ./wc-mobilpayments-card-plugin-functions.php "$1"
-	cp ./wc-mobilpayments-card-plugin-main.php "$1"
+	cp ./lvdwcmc-plugin-*.php "$1"
 	cp ./.htaccess "$1"
 
 	mkdir "$1/media" && cp -r ./media/* "$1/media"

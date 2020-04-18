@@ -42,16 +42,16 @@
     </th>
     <td class="forminp" id="<?php echo esc_attr($data->fieldId); ?>_asset_container">
         <?php if ($data->hasAsset): ?>
-            <span class="lvdwcmc-payment-asset-file-exists"><?php echo esc_html__('The file has already been uploaded.', 'wc-mobilpayments-card'); ?></span>
+            <span class="lvdwcmc-payment-asset-file-exists"><?php echo esc_html__('The file has already been uploaded.', 'livepayments-mp-wc'); ?></span>
             <a href="javascript:void(0);" 
                 id="<?php echo esc_attr($data->fieldId); ?>_file_removal"
                 data-asset-id="<?php echo esc_attr($data->fieldId); ?>"
-                class="lvdwcmc-payment-asset-file-removal"><?php echo esc_html__('Remove', 'wc-mobilpayments-card'); ?></a>
+                class="lvdwcmc-payment-asset-file-removal"><?php echo esc_html__('Remove', 'livepayments-mp-wc'); ?></a>
         <?php else: ?>
             <a href="javascript:void(0);" 
                 id="<?php echo esc_attr($data->fieldId); ?>_file_selector"
                 data-asset-id="<?php echo esc_attr($data->fieldId); ?>"
-                class="lvdwcmc-payment-asset-file-selector"><?php echo esc_html__('Chose a file from disk', 'wc-mobilpayments-card'); ?></a>
+                class="lvdwcmc-payment-asset-file-selector"><?php echo esc_html__('Chose a file from disk', 'livepayments-mp-wc'); ?></a>
         <?php endif; ?>
     </td>
 </tr>

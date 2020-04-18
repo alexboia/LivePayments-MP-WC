@@ -134,16 +134,16 @@ class Plugin {
                 $errors = $this->_getInstallationErrorTranslations();
                 $message = isset($errors[$test]) 
                     ? $errors[$test] 
-                    : __('Could not activate plug-in: requirements not met.', 'wc-mobilpayments-card');
+                    : __('Could not activate plug-in: requirements not met.', 'livepayments-mp-wc');
 
                 deactivate_plugins(plugin_basename(LVD_WCMC_MAIN));
-                wp_die(lvdwcmc_append_error($message, $this->_installer->getLastError()),  __('Activation error', 'wc-mobilpayments-card'));
+                wp_die(lvdwcmc_append_error($message, $this->_installer->getLastError()),  __('Activation error', 'livepayments-mp-wc'));
             } else {
                 if (!$this->_installer->activate()) {
                     wp_die(lvdwcmc_append_error(
-                        __('Could not activate plug-in: activation failure.', 'wc-mobilpayments-card'), 
+                        __('Could not activate plug-in: activation failure.', 'livepayments-mp-wc'), 
                         $this->_installer->getLastError()), 
-                        __('Activation error', 'wc-mobilpayments-card'));
+                        __('Activation error', 'livepayments-mp-wc'));
                 }
             }
         }
@@ -193,8 +193,8 @@ class Plugin {
         public function onAddAdminMenuEntries() {
             if ($this->_canManageWooCommerce()) {
                 add_submenu_page('woocommerce', 
-                    __('mobilPay&trade; Card Transactions', 'wc-mobilpayments-card'), 
-                    __('mobilPay&trade; Card Transactions', 'wc-mobilpayments-card'), 
+                    __('LivePayments Card Transactions', 'livepayments-mp-wc'), 
+                    __('LivePayments Card Transactions', 'livepayments-mp-wc'), 
                     'manage_woocommerce', 
                     'lvdwcmc-card-transactions-listing',
                     array($this, 'showAdminTransactionsListing'));
@@ -295,7 +295,7 @@ class Plugin {
              * 
              * @hook lvdwcmc_register_order_payment_details_metabox
              * 
-             * @param boolean $registerMetabox Whether or not to register the metabox, initially provided by WC-MobilPayments-Card
+             * @param boolean $registerMetabox Whether or not to register the metabox, initially provided by LivePayments-MP-WC
              * @param array $args Additional arguments that establish the context of the operation
              * @return boolean Whether or not to register the metabox, as established by the registered filters
              */
@@ -308,7 +308,7 @@ class Plugin {
 
             if ($registerMetabox) {
                 add_meta_box('lvdwcmc-transaction-details-metabox', 
-                    __('Payment transaction details', 'wc-mobilpayments-card'), 
+                    __('Payment transaction details', 'livepayments-mp-wc'), 
                     array($this, 'addTransactionDetailsOnAdminOrderDetails'), 
                     'shop_order', 
                     'side', 
@@ -381,7 +381,7 @@ class Plugin {
                  * 
                  * @hook lvdwcmc_get_admin_transansactions_listing_item
                  * 
-                 * @param array $tx The view model, initially provided by WC-MobilPayments-Card
+                 * @param array $tx The view model, initially provided by LivePayments-MP-WC
                  * @param array $args Additional arguments to establish the context of the operation
                  * 
                  * @return array The view model, as returned by the registered filters
@@ -410,8 +410,8 @@ class Plugin {
             $data->paginateLinksArgs = array(
                 'base' => add_query_arg('page_num', '%#%'),
                 'format' => '',
-                'prev_text' => __('&laquo;', 'wc-mobilpayments-card'),
-                'next_text' => __('&raquo;', 'wc-mobilpayments-card'),
+                'prev_text' => __('&laquo;', 'livepayments-mp-wc'),
+                'next_text' => __('&raquo;', 'livepayments-mp-wc'),
                 'total' => $data->totalPages,
                 'current' => $data->currentPage
             );
@@ -422,7 +422,7 @@ class Plugin {
              * 
              * @hook lvdwcmc_get_admin_transansactions_listing_data
              * 
-             * @param \stdClass $data The view model, initially provided by WC-MobilPayments-Card
+             * @param \stdClass $data The view model, initially provided by LivePayments-MP-WC
              * @param array $args Additional arguments to establish the context of the operation
              * 
              * @return \stdClass The view model, as returned by the registered filters
@@ -471,7 +471,7 @@ class Plugin {
              * 
              * @hook lvdwcmc_add_status_dashboard_widget
              * 
-             * @param boolean $addDashboardWidget Whether to add the widget or not, initially provided by WC-MobilPayments-Card
+             * @param boolean $addDashboardWidget Whether to add the widget or not, initially provided by LivePayments-MP-WC
              * @return boolean Whether to add the widget or not, as returned by the registered filters
              */
             $addDashboardWidget = apply_filters('lvdwcmc_add_status_dashboard_widget', 
@@ -479,7 +479,7 @@ class Plugin {
 
             if ($addDashboardWidget) {
                 wp_add_dashboard_widget('lvdwcmc-transactions-status', 
-                    __('mobilPay&trade; Card Transaction Status', 'wc-mobilpayments-card'), 
+                    __('mobilPay&trade; Card Transaction Status', 'livepayments-mp-wc'), 
                     array($this, 'renderTransactionsStatusWidget'), 
                         null,
                         null);
@@ -520,7 +520,7 @@ class Plugin {
              * 
              * @hook lvdwcmc_get_dashboard_widget_status_data
              * 
-             * @param \stdClass $data The view model, initially provided by WC-MobilPayments-Card
+             * @param \stdClass $data The view model, initially provided by LivePayments-MP-WC
              * @return \stdClass The view model, as returned by the registered filters
              */
             $data = apply_filters('lvdwcmc_get_dashboard_widget_status_data', 
@@ -544,7 +544,7 @@ class Plugin {
         }
 
         public function isActive() {
-            return $this->_env->isPluginActive('wc-mobilpayments-card/wc-mobilpayments-card-plugin-main.php');
+            return $this->_env->isPluginActive('livepayments-mp-wc/lvdwcmc-plugin-main.php');
         }
 
         public function getEnv() {
@@ -608,7 +608,7 @@ class Plugin {
              * 
              * @hook lvdwcmc_get_displayable_transaction_details
              * 
-             * @param \stdClass $data The initial view model, as provided by WC-MobilPayments-Card
+             * @param \stdClass $data The initial view model, as provided by LivePayments-MP-WC
              * @param \LvdWcMc\MobilpayTransaction $transaction The source transaction
              * @return \stdClass The actual view model, as returned by the registered filters
              */
@@ -664,58 +664,58 @@ class Plugin {
         public function getSettingsScriptTranslations() {
             return array(
                 'errPluploadTooLarge' 
-                    => __('The selected file is too large. Maximum allowed size is 10MB', 'wc-mobilpayments-card'), 
+                    => __('The selected file is too large. Maximum allowed size is 10MB', 'livepayments-mp-wc'), 
                 'errPluploadFileType' 
-                    => __('The selected file type is not valid.', 'wc-mobilpayments-card'), 
+                    => __('The selected file type is not valid.', 'livepayments-mp-wc'), 
                 'errPluploadIoError' 
-                    => __('The file could not be read', 'wc-mobilpayments-card'), 
+                    => __('The file could not be read', 'livepayments-mp-wc'), 
                 'errPluploadSecurityError' 
-                    => __('The file could not be read', 'wc-mobilpayments-card'), 
+                    => __('The file could not be read', 'livepayments-mp-wc'), 
                 'errPluploadInitError' 
-                    => __('The uploader could not be initialized', 'wc-mobilpayments-card'), 
+                    => __('The uploader could not be initialized', 'livepayments-mp-wc'), 
                 'errPluploadHttp' 
-                    => __('The file could not be uploaded', 'wc-mobilpayments-card'), 
+                    => __('The file could not be uploaded', 'livepayments-mp-wc'), 
                 'errServerUploadFileType' 
-                    => __('The selected file type is not valid.', 'wc-mobilpayments-card'), 
+                    => __('The selected file type is not valid.', 'livepayments-mp-wc'), 
                 'errServerUploadTooLarge' 
-                    => __('The selected file is too large. Maximum allowed size is 10MB', 'wc-mobilpayments-card'), 
+                    => __('The selected file is too large. Maximum allowed size is 10MB', 'livepayments-mp-wc'), 
                 'errServerUploadNoFile' 
-                    => __('No file was uploaded', 'wc-mobilpayments-card'), 
+                    => __('No file was uploaded', 'livepayments-mp-wc'), 
                 'errServerUploadInternal' 
-                    => __('The file could not be uploaded due to a possible internal server issue', 'wc-mobilpayments-card'), 
+                    => __('The file could not be uploaded due to a possible internal server issue', 'livepayments-mp-wc'), 
                 'errServerUploadFail' 
-                    => __('The file could not be uploaded', 'wc-mobilpayments-card'),
+                    => __('The file could not be uploaded', 'livepayments-mp-wc'),
                 'warnRemoveAssetFile' 
-                    => __('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!', 'wc-mobilpayments-card'),
+                    => __('Remove asset file? This action cannot be undone and you will have to re-upload the asset again!', 'livepayments-mp-wc'),
                 'errAssetFileCannotBeRemoved' 
-                    => __('The asset file could not be removed', 'wc-mobilpayments-card'),
+                    => __('The asset file could not be removed', 'livepayments-mp-wc'),
                 'errAssetFileCannotBeRemovedNetwork' 
-                    => __('The asset file could not be removed due to a possible network issue', 'wc-mobilpayments-card'),
+                    => __('The asset file could not be removed due to a possible network issue', 'livepayments-mp-wc'),
                 'assetUploadOk' 
-                    => __('The file has been successfully uploaded', 'wc-mobilpayments-card'),
+                    => __('The file has been successfully uploaded', 'livepayments-mp-wc'),
                 'assetRemovalOk' 
-                    => __('The file has been successfulyl removed', 'wc-mobilpayments-card'),
+                    => __('The file has been successfulyl removed', 'livepayments-mp-wc'),
                 'returnURLGenerationOk'
-                    => __('The return URL has been successfully generated.','wc-mobilpayments-card'),
+                    => __('The return URL has been successfully generated.','livepayments-mp-wc'),
                 'errReturnURLCannotBeGenerated'
-                    => __('The return URL could not generated.', 'wc-mobilpayments-card'),
+                    => __('The return URL could not generated.', 'livepayments-mp-wc'),
                 'errReturnURLCannotBeGeneratedNetwork'
-                    => __('The return URL could not be generated due to a possible network issue', 'wc-mobilpayments-card')
+                    => __('The return URL could not be generated due to a possible network issue', 'livepayments-mp-wc')
             );
         }
 
         public function getTransactionsListingScriptTranslations() {
             return array(
                 'errCannotLoadTransactionDetails' 
-                    => __('Could not load transaction details data', 'wc-mobilpayments-card'),
+                    => __('Could not load transaction details data', 'livepayments-mp-wc'),
                 'errCannotLoadTransactionDetailsNetwork' 
-                    => __('Could not load transaction details data due to a possible network issue', 'wc-mobilpayments-card')
+                    => __('Could not load transaction details data due to a possible network issue', 'livepayments-mp-wc')
             );
         }
 
         public function getCommonScriptTranslations() {
             return array(
-                'lblLoading' => __('Please wait...', 'wc-mobilpayments-card')
+                'lblLoading' => __('Please wait...', 'livepayments-mp-wc')
             );
         }
 
@@ -723,34 +723,34 @@ class Plugin {
             $this->_loadTextDomain();
             return array(
                 Installer::INCOMPATIBLE_PHP_VERSION 
-                    => sprintf(__('Minimum required PHP version is %s.', 'wc-mobilpayments-card'), $this->_env->getRequiredPhpVersion()),
+                    => sprintf(__('Minimum required PHP version is %s.', 'livepayments-mp-wc'), $this->_env->getRequiredPhpVersion()),
                 Installer::INCOMPATIBLE_WP_VERSION 
-                    => sprintf(__('Minimum required WordPress version is %s.', 'wc-mobilpayments-card'), $this->_env->getRequiredWpVersion()),
+                    => sprintf(__('Minimum required WordPress version is %s.', 'livepayments-mp-wc'), $this->_env->getRequiredWpVersion()),
                 Installer::SUPPORT_MYSQLI_NOT_FOUND 
-                    => __('Mysqli extension was not found on your system or is not fully compatible.', 'wc-mobilpayments-card'),
+                    => __('Mysqli extension was not found on your system or is not fully compatible.', 'livepayments-mp-wc'),
                 Installer::SUPPORT_OPENSSL_NOT_FOUND 
-                    => __('Openssl extension was not found on your system or is not fully compatible.', 'wc-mobilpayments-card'),
+                    => __('Openssl extension was not found on your system or is not fully compatible.', 'livepayments-mp-wc'),
                 Installer::GENERIC_ERROR 
-                    => __('The installation failed.', 'wc-mobilpayments-card')
+                    => __('The installation failed.', 'livepayments-mp-wc')
             );
         }
 
         private function _getTransactionStatusLabel($status) {
             $labelsForCodes = array(
                 MobilpayTransaction::STATUS_CANCELLED 
-                    => __('Cancelled', 'wc-mobilpayments-card'),
+                    => __('Cancelled', 'livepayments-mp-wc'),
                 MobilpayTransaction::STATUS_CONFIRMED 
-                    => __('Confirmed. Payment successful', 'wc-mobilpayments-card'),
+                    => __('Confirmed. Payment successful', 'livepayments-mp-wc'),
                 MobilpayTransaction::STATUS_CONFIRMED_PENDING 
-                    => __('Pending confirmation', 'wc-mobilpayments-card'),
+                    => __('Pending confirmation', 'livepayments-mp-wc'),
                 MobilpayTransaction::STATUS_CREDIT 
-                    => __('Credited', 'wc-mobilpayments-card'),
+                    => __('Credited', 'livepayments-mp-wc'),
                 MobilpayTransaction::STATUS_FAILED 
-                    => __('Failed', 'wc-mobilpayments-card'),
+                    => __('Failed', 'livepayments-mp-wc'),
                 MobilpayTransaction::STATUS_NEW 
-                    => __('Started', 'wc-mobilpayments-card'),
+                    => __('Started', 'livepayments-mp-wc'),
                 MobilpayTransaction::STATUS_PAID_PENDING 
-                    => __('Pending payment', 'wc-mobilpayments-card')
+                    => __('Pending payment', 'livepayments-mp-wc')
             );
 
             return isset($labelsForCodes[$status]) 

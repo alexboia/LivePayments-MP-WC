@@ -27,10 +27,10 @@ fi
 
 if [[ ! $LVDWCMC_TEXT_DOMAIN ]]
 then
-	LVDWCMC_TEXT_DOMAIN="wc-mobilpayments-card"
+	LVDWCMC_TEXT_DOMAIN="livepayments-mp-wc"
 fi
 
-wp i18n make-pot "$LVDWCMC_PLUGIN_DIR" "$LVDWCMC_PLUGIN_DIR/lang/$LVDWCMC_TEXT_DOMAIN.pot" --slug="wc-mobilpayments-card" --domain=$LVDWCMC_TEXT_DOMAIN --exclude="build,bin,assets,data,.github,.vscode,help"
+wp i18n make-pot "$LVDWCMC_PLUGIN_DIR" "$LVDWCMC_PLUGIN_DIR/lang/$LVDWCMC_TEXT_DOMAIN.pot" --slug="livepayments-mp-wc" --domain=$LVDWCMC_TEXT_DOMAIN --exclude="build,bin,assets,data,.github,.vscode,help"
 
 if [ "$LVDWCMC_RESTORE_DIR" = true ]
 then

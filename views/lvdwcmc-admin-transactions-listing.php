@@ -58,17 +58,17 @@
         <table id="lvdwcmc-tx-listing" class="wp-list-table widefat fixed striped posts lvdwcmc-tx-listing">
             <thead>
                 <tr>
-                    <th class="lvdwcmc-order-id-column"><?php echo esc_html__('Order Id', 'wc-mobilpayments-card'); ?></th>
-                    <th><?php echo esc_html__('Date initiated', 'wc-mobilpayments-card'); ?></th>
-                    <th><?php echo esc_html__('Status', 'wc-mobilpayments-card'); ?></th>
-                    <th><?php echo esc_html__('Amount', 'wc-mobilpayments-card'); ?></th>
-                    <th><?php echo esc_html__('Processed amount', 'wc-mobilpayments-card'); ?></th>
+                    <th class="lvdwcmc-order-id-column"><?php echo esc_html__('Order Id', 'livepayments-mp-wc'); ?></th>
+                    <th><?php echo esc_html__('Date initiated', 'livepayments-mp-wc'); ?></th>
+                    <th><?php echo esc_html__('Status', 'livepayments-mp-wc'); ?></th>
+                    <th><?php echo esc_html__('Amount', 'livepayments-mp-wc'); ?></th>
+                    <th><?php echo esc_html__('Processed amount', 'livepayments-mp-wc'); ?></th>
 
                     <?php foreach ($data->additionalColumns as $column): ?>
                         <th <?php echo !empty($column['class']) ? 'class="' . esc_attr($column['class']) . '"' : '' ?>><?php echo esc_html($column['header']); ?></th>
                     <?php endforeach; ?>
 
-                    <th><?php echo esc_html__('Actions', 'wc-mobilpayments-card'); ?></th>
+                    <th><?php echo esc_html__('Actions', 'livepayments-mp-wc'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -105,7 +105,7 @@
                         <?php endforeach; ?>
 
                         <td>
-                            <a href="javascript:void(0)" class="lvdwcmc-tx-action" data-transactionId="<?php echo esc_attr($tx['tx_id']); ?>"><?php echo esc_html__('Details', 'wc-mobilpayments-card'); ?></a>
+                            <a href="javascript:void(0)" class="lvdwcmc-tx-action" data-transactionId="<?php echo esc_attr($tx['tx_id']); ?>"><?php echo esc_html__('Details', 'livepayments-mp-wc'); ?></a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -117,7 +117,7 @@
         </div>
     <?php else: ?>
         <div class="lvdwcmc-admin-notice">
-            <?php echo esc_html__('There are no transactions matching your criteria', 'wc-mobilpayments-card'); ?>
+            <?php echo esc_html__('There are no transactions matching your criteria', 'livepayments-mp-wc'); ?>
         </div>
     <?php endif; ?>
 
@@ -138,7 +138,7 @@
 <script id="lvdwcmc-tpl-transaction-details" type="text/x-kite">
     <div class="lvdwcmc-admin-transaction-details-wnd">
         <div class="lvdwcmc-admin-transaction-details-wnd-header">
-            <h3><?php echo esc_html__('Transaction details', 'wc-mobilpayments-card'); ?></h3>
+            <h3><?php echo esc_html__('Transaction details', 'livepayments-mp-wc'); ?></h3>
         </div>
         <div class="lvdwcmc-admin-transaction-details-wnd-content">
 
@@ -155,7 +155,7 @@
             <table class="lvdwcmc-admin-transaction-details-list">
                 <tbody>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Transaction Id', 'wc-mobilpayments-card'); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Transaction Id', 'livepayments-mp-wc'); ?>:</th>
                         <td>
                             {{? !!transaction.providerTransactionId }}
                                 {{transaction.providerTransactionId}}
@@ -165,11 +165,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Transaction status', 'wc-mobilpayments-card'); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Transaction status', 'livepayments-mp-wc'); ?>:</th>
                         <td>{{transaction.status}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Card number', 'wc-mobilpayments-card'); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Card number', 'livepayments-mp-wc'); ?>:</th>
                         <td>
                             {{? !!transaction.panMasked}}
                                 {{transaction.panMasked}}
@@ -179,34 +179,34 @@
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Original amount', 'wc-mobilpayments-card'); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Original amount', 'livepayments-mp-wc'); ?>:</th>
                         <td>{{transaction.amount}} {{transaction.currency}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Actually processed amount', 'wc-mobilpayments-card'); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Actually processed amount', 'livepayments-mp-wc'); ?>:</th>
                         <td>{{transaction.processedAmount}} {{transaction.currency}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Date initiated', 'wc-mobilpayments-card'); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Date initiated', 'livepayments-mp-wc'); ?>:</th>
                         <td>{{transaction.timestampInitiated}}</td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Date of last activity', 'wc-mobilpayments-card'); ?>:</th>
+                        <th scope="row"><?php echo esc_html__('Date of last activity', 'livepayments-mp-wc'); ?>:</th>
                         <td>{{transaction.timestampLastUpdated}}</td>
                     </tr>
                     {{? transaction.errorCode > 0 }}
                         <tr>
-                            <th scope="row"><?php echo esc_html__('Transaction error code', 'wc-mobilpayments-card'); ?>:</th>
+                            <th scope="row"><?php echo esc_html__('Transaction error code', 'livepayments-mp-wc'); ?>:</th>
                             <td>{{transaction.errorCode}}</td>
                         </tr>
                         <tr>
-                            <th scope="row"><?php echo esc_html__('Transaction error message', 'wc-mobilpayments-card'); ?>:</th>
+                            <th scope="row"><?php echo esc_html__('Transaction error message', 'livepayments-mp-wc'); ?>:</th>
                             <td>{{transaction.errorMessage}}</td>
                         </tr>
                     {{/?}}
                     {{? transaction.clientIpAddress }}
                         <tr>
-                            <th scope="row"><?php echo esc_html__('Client IP Address', 'wc-mobilpayments-card'); ?>:</th>
+                            <th scope="row"><?php echo esc_html__('Client IP Address', 'livepayments-mp-wc'); ?>:</th>
                             <td>{{transaction.clientIpAddress}}</td>
                         </tr>
                     {{/?}}
@@ -227,7 +227,7 @@
         <div class="lvdwcmc-admin-transaction-details-wnd-footer">
             <a href="javascript:void(0)" 
                 id="lvdwcmc-admin-transaction-details-close" 
-                class="lvdwcmc-generic-close-btn"><?php echo esc_html__('Close', 'wc-mobilpayments-card'); ?></a>
+                class="lvdwcmc-generic-close-btn"><?php echo esc_html__('Close', 'livepayments-mp-wc'); ?></a>
             <div class="lvdwcmc-clear"></div>
         </div>
     </div>

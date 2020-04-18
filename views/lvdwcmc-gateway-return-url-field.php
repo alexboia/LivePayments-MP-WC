@@ -51,7 +51,7 @@
                 placeholder="">
             <a href="javascript:void(0);" 
                 id="mobilpay_return_url_generate"
-                class="lvdwcmc-return-url-generate"><?php echo esc_html__('Generate it for me', 'wc-mobilpayments-card') ?></a>
+                class="lvdwcmc-return-url-generate"><?php echo esc_html__('Generate it for me', 'livepayments-mp-wc') ?></a>
         </fieldset>
     </td>
 </tr>

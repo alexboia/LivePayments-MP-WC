@@ -497,30 +497,30 @@ namespace LvdWcMc {
 
         private function _getMobilpayPaymentMessageError($errorCode) {
             $standardErrors = array(
-                '16' => __('Card has a risk (i.e. stolen card)', 'wc-mobilpayments-card'), 
-                '17' => __('Card number is incorrect', 'wc-mobilpayments-card'), 
-                '18' => __('Closed card', 'wc-mobilpayments-card'), 
-                '19' => __('Card is expired', 'wc-mobilpayments-card'), 
-                '20' => __('Insufficient funds', 'wc-mobilpayments-card'), 
-                '21' => __('CVV2 code incorrect', 'wc-mobilpayments-card'), 
-                '22' => __('Issuer is unavailable', 'wc-mobilpayments-card'), 
-                '32' => __('Amount is incorrect', 'wc-mobilpayments-card'), 
-                '33' => __('Currency is incorrect', 'wc-mobilpayments-card'), 
-                '34' => __('Transaction not permitted to cardholder', 'wc-mobilpayments-card'), 
-                '35' => __('Transaction declined', 'wc-mobilpayments-card'), 
-                '36' => __('Transaction rejected by antifraud filters', 'wc-mobilpayments-card'), 
-                '37' => __('Transaction declined (breaking the law)', 'wc-mobilpayments-card'), 
-                '38' => __('Transaction declined', 'wc-mobilpayments-card'), 
-                '48' => __('Invalid request', 'wc-mobilpayments-card'), 
-                '49' => __('Duplicate PREAUTH', 'wc-mobilpayments-card'), 
-                '50' => __('Duplicate AUTH', 'wc-mobilpayments-card'), 
-                '51' => __('You can only CANCEL a preauth order', 'wc-mobilpayments-card'), 
-                '52' => __('You can only CONFIRM a preauth order', 'wc-mobilpayments-card'), 
-                '53' => __('You can only CREDIT a confirmed order', 'wc-mobilpayments-card'), 
-                '54' => __('Credit amount is higher than auth amount', 'wc-mobilpayments-card'), 
-                '55' => __('Capture amount is higher than preauth amount', 'wc-mobilpayments-card'), 
-                '56' => __('Duplicate request', 'wc-mobilpayments-card'), 
-                '99' => __('Generic error', 'wc-mobilpayments-card')
+                '16' => __('Card has a risk (i.e. stolen card)', 'livepayments-mp-wc'), 
+                '17' => __('Card number is incorrect', 'livepayments-mp-wc'), 
+                '18' => __('Closed card', 'livepayments-mp-wc'), 
+                '19' => __('Card is expired', 'livepayments-mp-wc'), 
+                '20' => __('Insufficient funds', 'livepayments-mp-wc'), 
+                '21' => __('CVV2 code incorrect', 'livepayments-mp-wc'), 
+                '22' => __('Issuer is unavailable', 'livepayments-mp-wc'), 
+                '32' => __('Amount is incorrect', 'livepayments-mp-wc'), 
+                '33' => __('Currency is incorrect', 'livepayments-mp-wc'), 
+                '34' => __('Transaction not permitted to cardholder', 'livepayments-mp-wc'), 
+                '35' => __('Transaction declined', 'livepayments-mp-wc'), 
+                '36' => __('Transaction rejected by antifraud filters', 'livepayments-mp-wc'), 
+                '37' => __('Transaction declined (breaking the law)', 'livepayments-mp-wc'), 
+                '38' => __('Transaction declined', 'livepayments-mp-wc'), 
+                '48' => __('Invalid request', 'livepayments-mp-wc'), 
+                '49' => __('Duplicate PREAUTH', 'livepayments-mp-wc'), 
+                '50' => __('Duplicate AUTH', 'livepayments-mp-wc'), 
+                '51' => __('You can only CANCEL a preauth order', 'livepayments-mp-wc'), 
+                '52' => __('You can only CONFIRM a preauth order', 'livepayments-mp-wc'), 
+                '53' => __('You can only CREDIT a confirmed order', 'livepayments-mp-wc'), 
+                '54' => __('Credit amount is higher than auth amount', 'livepayments-mp-wc'), 
+                '55' => __('Capture amount is higher than preauth amount', 'livepayments-mp-wc'), 
+                '56' => __('Duplicate request', 'livepayments-mp-wc'), 
+                '99' => __('Generic error', 'livepayments-mp-wc')
             );
     
             return isset($standardErrors[$errorCode]) 
@@ -529,107 +529,107 @@ namespace LvdWcMc {
         }
 
         private function _getGenericRefundOrderAdminNote($transactionId) {
-            return sprintf(__('The amount you paid has been refuned. The order has been marked as refunded as well. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('The amount you paid has been refuned. The order has been marked as refunded as well. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
 
         private function _getGenericRefundOrderCustomerNote($transactionId) {
-            return sprintf(__('The paid amount has been refuned. The order has been marked as refunded as well. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('The paid amount has been refuned. The order has been marked as refunded as well. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
 
         private function _getGenericRefundOrderStatusNote() {
-            return __('The paid amount has been refuned. The order has been marked as refunded as well.', 'wc-mobilpayments-card');
+            return __('The paid amount has been refuned. The order has been marked as refunded as well.', 'livepayments-mp-wc');
         }
 
         private function _getPartialRefundReason($transactionId) {
-            return sprintf(__('Partial refund notification received from MobilPay gateway. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('Partial refund notification received from MobilPay gateway. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
 
         private function _getGenericCancelledOrderAdminNote($transactionId) {
-            return sprintf(__('The payment has been cancelled. The order has been cancelled as well. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('The payment has been cancelled. The order has been cancelled as well. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
 
         private function _getGenericCancelledOrderCustomerNote($transactionId) {
-            return sprintf(__('Your payment has been cancelled. The order has been cancelled as well. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('Your payment has been cancelled. The order has been cancelled as well. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
 
         private function _getGenericCancelledOrderStatusNote() {
-            return __('Your payment has been cancelled. The order has been cancelled as well.', 'wc-mobilpayments-card');
+            return __('Your payment has been cancelled. The order has been cancelled as well.', 'livepayments-mp-wc');
         }
 
         private function _getGenericOnHoldOrderAdminNote($transactionId) {
-            return sprintf(__('Order payment is currently being processed. The order has been placed on-hold. Transaction id: %s', 'wc-mobilpayments-card'),
+            return sprintf(__('Order payment is currently being processed. The order has been placed on-hold. Transaction id: %s', 'livepayments-mp-wc'),
                 $transactionId);
         }
 
         private function _getGenericOnHoldOrderCustomerNote($transactionId) {
-            return sprintf(__('Your payment is currently being processed. Your order has been placed on-hold. Transaction id: %s', 'wc-mobilpayments-card'),
+            return sprintf(__('Your payment is currently being processed. Your order has been placed on-hold. Transaction id: %s', 'livepayments-mp-wc'),
                 $transactionId);
         }
 
         public function _getGenericOnHoldOrderStatusNote() {
-            return __('Your payment is currently being processed and the order has been placed on-hold', 'wc-mobilpayments-card');
+            return __('Your payment is currently being processed and the order has been placed on-hold', 'livepayments-mp-wc');
         }
 
         private function _getDifferentAmountsOnHoldOrderAdminNote($transactionId, $originalAmount, $processedAmount) {
-            return sprintf(__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s vs. %s). Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s vs. %s). Transaction id: %s', 'livepayments-mp-wc'), 
                 $originalAmount, 
                 $processedAmount, 
                 $transactionId);
         }
     
         private function _getDifferentAmountsOnHoldOrderCustomerNote($transactionId, $originalAmount, $processedAmount) {
-            return sprintf(__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s RON vs. %s RON). Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('The order has been placed on hold as the processed amount is smaller than the total order amount (%s RON vs. %s RON). Transaction id: %s', 'livepayments-mp-wc'), 
                 $originalAmount, 
                 $processedAmount, 
                 $transactionId);
         }
 
         private function _getDifferentAmountsOnHoldOrderStatusNote() {
-            return __('The order has been placed on hold as the processed amount is smaller than the total order amount', 'wc-mobilpayments-card');
+            return __('The order has been placed on hold as the processed amount is smaller than the total order amount', 'livepayments-mp-wc');
         }
     
         private function _getFailedPaymentOrderGenericNote($transactionId, $errorCode, $errorMessage) {
-            return sprintf(__('Error processing payment: %s (code: %s). Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('Error processing payment: %s (code: %s). Transaction id: %s', 'livepayments-mp-wc'), 
                 $errorMessage, 
                 $errorCode, 
                 $transactionId);
         }
     
         private function _getFailedPaymentOrderStatusNote() {
-            return __('The payment has failed. See order notes for additional details', 'wc-mobilpayments-card');
+            return __('The payment has failed. See order notes for additional details', 'livepayments-mp-wc');
         }
 
         private function _getGenericOrderCompletedCustomerNote($transactionId) {
-            return sprintf(__('Your payment has been successfully received. Your order is now completed. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('Your payment has been successfully received. Your order is now completed. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
 
         private function _getGenericOrderCompletedAdminNote($transactionId) {
-            return sprintf(__('The payment has been successfully received. The order is now completed. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('The payment has been successfully received. The order is now completed. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
     
         private function _getOrderCompletedOrderStatusNote() {
-            return __('The payment has been successfully received. The order is now completed', 'wc-mobilpayments-card');
+            return __('The payment has been successfully received. The order is now completed', 'livepayments-mp-wc');
         }
 
         private function _getGenericOrderProcessingCustomerNote($transactionId) {
-            return sprintf(__('Your payment has been successfully received. Your order is currently being processed. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('Your payment has been successfully received. Your order is currently being processed. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
 
         private function _getGenericOrderProcessingAdminNote($transactionId) {
-            return sprintf(__('The payment has been successfully received. The order is currently being processed. Transaction id: %s', 'wc-mobilpayments-card'), 
+            return sprintf(__('The payment has been successfully received. The order is currently being processed. Transaction id: %s', 'livepayments-mp-wc'), 
                 $transactionId);
         }
     
         private function _getOrderProcessingStatusNote() {
-            return __('The payment has been successfully received. The order is currently being processed.', 'wc-mobilpayments-card');
+            return __('The payment has been successfully received. The order is currently being processed.', 'livepayments-mp-wc');
         }
 
         public function getLogger() {

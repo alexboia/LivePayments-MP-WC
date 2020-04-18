@@ -32,18 +32,18 @@
 ?>
 
 <script id="lvdwcmc-tpl-asset-file-removal" type="text/x-kite">
-    <span class="lvdwcmc-payment-asset-file-exists"><?php echo esc_html__('The file has already been uploaded.', 'wc-mobilpayments-card'); ?></span>
+    <span class="lvdwcmc-payment-asset-file-exists"><?php echo esc_html__('The file has already been uploaded.', 'livepayments-mp-wc'); ?></span>
     <a href="javascript:void(0);" 
         id="{{assetId}}_file_removal"
         data-asset-id="{{assetId}}"
-        class="lvdwcmc-payment-asset-file-removal"><?php echo esc_html__('Remove', 'wc-mobilpayments-card'); ?></a>
+        class="lvdwcmc-payment-asset-file-removal"><?php echo esc_html__('Remove', 'livepayments-mp-wc'); ?></a>
 </script>
 
 <script id="lvdwcmc-tpl-asset-file-upload" type="text/x-kite">
     <a href="javascript:void(0);" 
         id="{{assetId}}_file_selector"
         data-asset-id="{{assetId}}"
-        class="lvdwcmc-payment-asset-file-selector"><?php echo esc_html__('Chose a file from disk', 'wc-mobilpayments-card'); ?></a>
+        class="lvdwcmc-payment-asset-file-selector"><?php echo esc_html__('Chose a file from disk', 'livepayments-mp-wc'); ?></a>
 </script>
 
 <script type="text/javascript">

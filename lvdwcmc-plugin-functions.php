@@ -47,11 +47,11 @@ function lvd_wcmc_init_autoloader() {
 function lvdwcmc_get_datetime_format() {
    $dateTimeFormat = get_option('date_format') . ' ' . get_option('time_format');
    /**
-    * Filters the format used by WC-MobilPayments-Card to format dates
+    * Filters the format used by LivePayments-MP-WC to format dates
     * 
     * @hook lvdwcmc_datetime_format
     * 
-    * @param string $dateTimeFormat The current date time format, initially provided by WC-MobilPayments-Card
+    * @param string $dateTimeFormat The current date time format, initially provided by LivePayments-MP-WC
     * @return string The actual & final date time format, as returned by the registered filters
     */
    return apply_filters('lvdwcmc_datetime_format', 
@@ -66,11 +66,11 @@ function lvdwcmc_get_amount_format() {
    );
 
    /** 
-    * Filters the format used by WC-MobilPayments-Card to format money amounts
+    * Filters the format used by LivePayments-MP-WC to format money amounts
     * 
     * @hook lvdwcmc_amount_format
     * 
-    * @param array $amountFormat The current amount format, initially provided by WC-MobilPayments-Card
+    * @param array $amountFormat The current amount format, initially provided by LivePayments-MP-WC
     * @return array The actual & final amount format, as returned by the registered filters
     */
    return apply_filters('lvdwcmc_amount_format', 

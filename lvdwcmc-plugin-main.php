@@ -1,5 +1,18 @@
 <?php
 /**
+ * Plugin Name: LivePayments - mobilPay Card WooCommerce Payment Gateway
+ * Author: Alexandru Boia
+ * Author URI: http://alexboia.net
+ * Version: 0.1.0
+ * Description: LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the Romanian mobilPay payment processor.
+ * License: New BSD License
+ * Plugin URI: https://github.com/alexboia/LivePayments-MP-WC
+ * Text Domain: livepayments-mp-wc
+ * WC requires at least: 3.2.0
+ * WC tested up to: 4.0.1
+ */
+
+/**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -29,30 +42,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- define('LVD_WCMC_LOADED', true);
- define('LVD_WCMC_PLUGIN_ID', 'lvd_wc_mc');
- define('LVD_WCMC_VERSION', '0.1.0');
- define('LVD_WCMC_HEADER', __FILE__);
- define('LVD_WCMC_FUNCTIONS', __DIR__ . DIRECTORY_SEPARATOR . 'wc-mobilpayments-card-plugin-functions.php');
- define('LVD_WCMC_MAIN', __DIR__ . DIRECTORY_SEPARATOR .  'wc-mobilpayments-card-plugin-main.php');
- define('LVD_WCMC_ROOT_DIR', __DIR__);
- define('LVD_WCMC_LIB_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'lib');
- define('LVD_WCMC_LIB_3RDPARTY_DIR', LVD_WCMC_LIB_DIR . DIRECTORY_SEPARATOR . '3rdParty');
- define('LVD_WCMC_VIEWS_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'views');
- define('LVD_WCMC_LANG_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'lang');
- define('LVD_WCMC_DATA_DIR', LVD_WCMC_ROOT_DIR . DIRECTORY_SEPARATOR . 'data');
- define('LVD_WCMC_TEXT_DOMAIN', 'wc-mobilpayments-card');
+ require_once __DIR__ . '/lvdwcmc-plugin-header.php';
+ require_once __DIR__ . '/lvdwcmc-plugin-functions.php';
 
-define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY', 'payment_asset_file');
-
-if (!defined('LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE')) {
-    define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE', 102400);
-}
-
-if (!defined('LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE')) {
-    define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE', max(wp_max_upload_size(), 10485760));
-}
-
-if (!defined('LVD_WCMC_RECORDS_PER_PAGE')) {
-    define('LVD_WCMC_RECORDS_PER_PAGE', 25);
-}
+ lvd_wcmc_init_autoloader();
+ lvd_wcmc_run();

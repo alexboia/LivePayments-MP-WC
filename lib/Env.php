@@ -109,7 +109,7 @@ namespace LvdWcMc {
         private function _initStorageAndDataDirs() {
             $wpUploadsDirInfo = wp_upload_dir();
 
-            $this->_rootStorageDir = wp_normalize_path(sprintf('%s/wc-mobilpayments-card', 
+            $this->_rootStorageDir = wp_normalize_path(sprintf('%s/livepayments-mp-wc', 
                 $wpUploadsDirInfo['basedir']));
 
             $this->_paymentAssetsStorageDir = wp_normalize_path(sprintf('%s/mobilpay-assets', 

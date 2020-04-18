@@ -1,29 +1,29 @@
 # Copyright (C) 2020 Alexandru Boia
-# This file is distributed under the same license as the WC MobilPayments Card plugin.
+# This file is distributed under the same license as the LivePayments - mobilPay Card WooCommerce Payment Gateway plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC MobilPayments Card 0.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-mobilpayments-card\n"
+"Project-Id-Version: LivePayments - mobilPay Card WooCommerce Payment Gateway 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/livepayments-mp-wc\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-04-11T20:46:18+00:00\n"
+"POT-Creation-Date: 2020-04-18T12:34:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.3.0\n"
-"X-Domain: wc-mobilpayments-card\n"
+"X-Domain: livepayments-mp-wc\n"
 
 #. Plugin Name of the plugin
-msgid "WC MobilPayments Card"
+msgid "LivePayments - mobilPay Card WooCommerce Payment Gateway"
 msgstr ""
 
 #. Plugin URI of the plugin
-msgid "https://github.com/alexboia/WC-MobilPayments-Card"
+msgid "https://github.com/alexboia/LivePayments-MP-WC"
 msgstr ""
 
 #. Description of the plugin
-msgid "Card WooCommerce Payment Gateway that uses the Romainan mobilPay payment processing gateway"
+msgid "LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the Romanian mobilPay payment processor."
 msgstr ""
 
 #. Author of the plugin
@@ -212,285 +212,288 @@ msgid "The payment has been successfully received. The order is currently being 
 msgstr ""
 
 #: lib/MobilpayCreditCardGateway.php:130
+msgid "LivePayments Card Gateway via mobilPay"
+msgstr ""
+
+#: lib/MobilpayCreditCardGateway.php:131
+msgid "LivePayments - mobilPay Payment Gateway for WooCommerce"
+msgstr ""
+
 #: lib/MobilpayCreditCardGateway.php:143
 msgid "mobilPay&trade; Card Gateway"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:131
-msgid "mobilPay&trade; Payment Gateway for WooCommerce"
-msgstr ""
-
-#: lib/MobilpayCreditCardGateway.php:312
+#: lib/MobilpayCreditCardGateway.php:310
 msgid "Enable / Disable"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:313
+#: lib/MobilpayCreditCardGateway.php:311
 msgid "Enable this payment gateway"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:318
+#: lib/MobilpayCreditCardGateway.php:316
 msgid "mobilPay&trade; Sandbox / Test Mode"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:319
+#: lib/MobilpayCreditCardGateway.php:317
 msgid "Enable Test Mode"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:321
+#: lib/MobilpayCreditCardGateway.php:319
 msgid "Place the payment gateway in test mode."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:325
+#: lib/MobilpayCreditCardGateway.php:323
 msgid "Title"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:327
+#: lib/MobilpayCreditCardGateway.php:325
 msgid "Payment title the customer will see during the checkout process."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:328
-msgid "MobilPay"
+#: lib/MobilpayCreditCardGateway.php:326
+msgid "LivePayments via mobilPay"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:331
+#: lib/MobilpayCreditCardGateway.php:329
 msgid "Description"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:333
+#: lib/MobilpayCreditCardGateway.php:331
 msgid "Payment description the customer will see during the checkout process."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:337
+#: lib/MobilpayCreditCardGateway.php:335
 msgid "Seller Account ID"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:339
+#: lib/MobilpayCreditCardGateway.php:337
 msgid "This is Account ID provided by MobilPay when you signed up for an account. Unique key for your seller account for the payment process."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:342
+#: lib/MobilpayCreditCardGateway.php:340
 msgid "Return URL"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:344
+#: lib/MobilpayCreditCardGateway.php:342
 msgid "You must create a new page and in the content field enter the shortcode [lvdwcmc_display_mobilpay_order_status] so that the user can see the message that is returned by the Mobilpay server regarding their transaction. Or any content you want to thank for buying."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:348
+#: lib/MobilpayCreditCardGateway.php:346
 msgid "mobilPay&trade; digital certificate for the live environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:349
+#: lib/MobilpayCreditCardGateway.php:347
 msgid "The public key used for securing communication with the mobilPay&trade; gateway in the live environment."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:353
-#: lib/MobilpayCreditCardGateway.php:363
-#: lib/MobilpayCreditCardGateway.php:373
-#: lib/MobilpayCreditCardGateway.php:383
+#: lib/MobilpayCreditCardGateway.php:351
+#: lib/MobilpayCreditCardGateway.php:361
+#: lib/MobilpayCreditCardGateway.php:371
+#: lib/MobilpayCreditCardGateway.php:381
 msgid "allowed file types: %s"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:358
+#: lib/MobilpayCreditCardGateway.php:356
 msgid "The private key for the live environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:359
+#: lib/MobilpayCreditCardGateway.php:357
 msgid "The private key used for securing communication with the mobilPay&trade; gateway in the live environment."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:368
+#: lib/MobilpayCreditCardGateway.php:366
 msgid "mobilPay&trade; digital certificate for the sandbox environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:369
+#: lib/MobilpayCreditCardGateway.php:367
 msgid "The public key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:378
+#: lib/MobilpayCreditCardGateway.php:376
 msgid "The private key for the sandbox environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:379
+#: lib/MobilpayCreditCardGateway.php:377
 msgid "The private key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:628
+#: lib/MobilpayCreditCardGateway.php:626
 msgid "Payment asset file successfully removed."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:629
+#: lib/MobilpayCreditCardGateway.php:627
 msgid "Payment asset file could not be removed."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:681
+#: lib/MobilpayCreditCardGateway.php:679
 msgid "Thank you for your order"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:832
+#: lib/MobilpayCreditCardGateway.php:830
 msgid "Error initiating MobilPay card payment."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:1094
+#: lib/MobilpayCreditCardGateway.php:1092
 msgid "Payment for order #%s."
 msgstr ""
 
-#: lib/Plugin.php:129
+#: lib/Plugin.php:137
 msgid "Could not activate plug-in: requirements not met."
 msgstr ""
 
-#: lib/Plugin.php:132
-#: lib/Plugin.php:138
+#: lib/Plugin.php:140
+#: lib/Plugin.php:146
 msgid "Activation error"
 msgstr ""
 
-#: lib/Plugin.php:136
+#: lib/Plugin.php:144
 msgid "Could not activate plug-in: activation failure."
 msgstr ""
 
-#: lib/Plugin.php:188
-#: lib/Plugin.php:189
-msgid "mobilPay&trade; Card Transactions"
+#: lib/Plugin.php:196
+#: lib/Plugin.php:197
+msgid "LivePayments Card Transactions"
 msgstr ""
 
-#: lib/Plugin.php:303
+#: lib/Plugin.php:311
 #: views/lvdwcmc-frontend-transaction-details.php:35
 msgid "Payment transaction details"
 msgstr ""
 
-#: lib/Plugin.php:405
+#: lib/Plugin.php:413
 msgid "&laquo;"
 msgstr ""
 
-#: lib/Plugin.php:406
+#: lib/Plugin.php:414
 msgid "&raquo;"
 msgstr ""
 
-#: lib/Plugin.php:474
+#: lib/Plugin.php:482
 msgid "mobilPay&trade; Card Transaction Status"
 msgstr ""
 
-#: lib/Plugin.php:658
-#: lib/Plugin.php:672
+#: lib/Plugin.php:667
+#: lib/Plugin.php:681
 msgid "The selected file is too large. Maximum allowed size is 10MB"
 msgstr ""
 
-#: lib/Plugin.php:660
-#: lib/Plugin.php:670
+#: lib/Plugin.php:669
+#: lib/Plugin.php:679
 msgid "The selected file type is not valid."
 msgstr ""
 
-#: lib/Plugin.php:662
-#: lib/Plugin.php:664
+#: lib/Plugin.php:671
+#: lib/Plugin.php:673
 msgid "The file could not be read"
 msgstr ""
 
-#: lib/Plugin.php:666
+#: lib/Plugin.php:675
 msgid "The uploader could not be initialized"
 msgstr ""
 
-#: lib/Plugin.php:668
-#: lib/Plugin.php:678
+#: lib/Plugin.php:677
+#: lib/Plugin.php:687
 msgid "The file could not be uploaded"
 msgstr ""
 
-#: lib/Plugin.php:674
+#: lib/Plugin.php:683
 msgid "No file was uploaded"
 msgstr ""
 
-#: lib/Plugin.php:676
+#: lib/Plugin.php:685
 msgid "The file could not be uploaded due to a possible internal server issue"
 msgstr ""
 
-#: lib/Plugin.php:680
+#: lib/Plugin.php:689
 msgid "Remove asset file? This action cannot be undone and you will have to re-upload the asset again!"
 msgstr ""
 
-#: lib/Plugin.php:682
+#: lib/Plugin.php:691
 msgid "The asset file could not be removed"
 msgstr ""
 
-#: lib/Plugin.php:684
+#: lib/Plugin.php:693
 msgid "The asset file could not be removed due to a possible network issue"
 msgstr ""
 
-#: lib/Plugin.php:686
+#: lib/Plugin.php:695
 msgid "The file has been successfully uploaded"
 msgstr ""
 
-#: lib/Plugin.php:688
+#: lib/Plugin.php:697
 msgid "The file has been successfulyl removed"
 msgstr ""
 
-#: lib/Plugin.php:690
+#: lib/Plugin.php:699
 msgid "The return URL has been successfully generated."
 msgstr ""
 
-#: lib/Plugin.php:692
+#: lib/Plugin.php:701
 msgid "The return URL could not generated."
 msgstr ""
 
-#: lib/Plugin.php:694
+#: lib/Plugin.php:703
 msgid "The return URL could not be generated due to a possible network issue"
 msgstr ""
 
-#: lib/Plugin.php:701
+#: lib/Plugin.php:710
 msgid "Could not load transaction details data"
 msgstr ""
 
-#: lib/Plugin.php:703
+#: lib/Plugin.php:712
 msgid "Could not load transaction details data due to a possible network issue"
 msgstr ""
 
-#: lib/Plugin.php:709
+#: lib/Plugin.php:718
 msgid "Please wait..."
 msgstr ""
 
-#: lib/Plugin.php:717
+#: lib/Plugin.php:726
 msgid "Minimum required PHP version is %s."
 msgstr ""
 
-#: lib/Plugin.php:719
+#: lib/Plugin.php:728
 msgid "Minimum required WordPress version is %s."
 msgstr ""
 
-#: lib/Plugin.php:721
+#: lib/Plugin.php:730
 msgid "Mysqli extension was not found on your system or is not fully compatible."
 msgstr ""
 
-#: lib/Plugin.php:723
+#: lib/Plugin.php:732
 msgid "Openssl extension was not found on your system or is not fully compatible."
 msgstr ""
 
-#: lib/Plugin.php:725
+#: lib/Plugin.php:734
 msgid "The installation failed."
 msgstr ""
 
-#: lib/Plugin.php:732
+#: lib/Plugin.php:741
 msgid "Cancelled"
 msgstr ""
 
-#: lib/Plugin.php:734
+#: lib/Plugin.php:743
 msgid "Confirmed. Payment successful"
 msgstr ""
 
-#: lib/Plugin.php:736
+#: lib/Plugin.php:745
 msgid "Pending confirmation"
 msgstr ""
 
-#: lib/Plugin.php:738
+#: lib/Plugin.php:747
 msgid "Credited"
 msgstr ""
 
-#: lib/Plugin.php:740
+#: lib/Plugin.php:749
 msgid "Failed"
 msgstr ""
 
-#: lib/Plugin.php:742
+#: lib/Plugin.php:751
 msgid "Started"
 msgstr ""
 
-#: lib/Plugin.php:744
+#: lib/Plugin.php:753
 msgid "Pending payment"
 msgstr ""
 

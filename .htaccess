@@ -5,6 +5,6 @@ Deny from all
 	Allow from all
 </FilesMatch>
 
-<FilesMatch "^(.+)\.(png|gif|jpg|jpeg)$">
+<FilesMatch "^(.+)\.(png|gif|jpg|jpeg|svg)$">
 	Allow from all
 </FilesMatch>

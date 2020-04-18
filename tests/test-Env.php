@@ -90,9 +90,9 @@ class EnvTests extends WP_UnitTestCase {
         $this->assertEquals(LVD_WCMC_DATA_DIR, $env->getDataDir());
         $this->assertEquals(LVD_WCMC_VIEWS_DIR, $env->getViewDir());
 
-        $this->assertEquals(wp_normalize_path(sprintf('%s/wc-mobilpayments-card', $wpUploadsDirInfo['basedir'])), 
+        $this->assertEquals(wp_normalize_path(sprintf('%s/livepayments-mp-wc', $wpUploadsDirInfo['basedir'])), 
             $env->getRootStorageDir());
-        $this->assertEquals(wp_normalize_path(sprintf('%s/wc-mobilpayments-card/mobilpay-assets', $wpUploadsDirInfo['basedir'])), 
+        $this->assertEquals(wp_normalize_path(sprintf('%s/livepayments-mp-wc/mobilpay-assets', $wpUploadsDirInfo['basedir'])), 
             $env->getPaymentAssetsStorageDir());
     }
 

@@ -3,9 +3,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WC MobilPayments Card 0.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-mobilpayments-card\n"
-"POT-Creation-Date: 2020-04-11 23:46+0300\n"
-"PO-Revision-Date: 2020-04-11 23:47+0300\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/livepayments-mp-wc\n"
+"POT-Creation-Date: 2020-04-18 15:34+0300\n"
+"PO-Revision-Date: 2020-04-18 15:34+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ro_RO\n"
@@ -13,25 +13,25 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.5\n"
-"X-Domain: wc-mobilpayments-card\n"
+"X-Domain: livepayments-mp-wc\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1));\n"
 
 #. Plugin Name of the plugin
-msgid "WC MobilPayments Card"
-msgstr "WC MobilPayments Card"
+msgid "LivePayments - mobilPay Card WooCommerce Payment Gateway"
+msgstr "LivePayments - mobilPay Card WooCommerce Payment Gateway"
 
 #. Plugin URI of the plugin
-msgid "https://github.com/alexboia/WC-MobilPayments-Card"
-msgstr "https://github.com/alexboia/WC-MobilPayments-Card"
+msgid "https://github.com/alexboia/LivePayments-MP-WC"
+msgstr "https://github.com/alexboia/LivePayments-MP-WC"
 
 #. Description of the plugin
 msgid ""
-"Card WooCommerce Payment Gateway that uses the Romainan mobilPay payment processing "
-"gateway"
+"LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the "
+"Romanian mobilPay payment processor."
 msgstr ""
-"Un modul de plată pentru WooCommerce care permite integrarea cu procesatorul de "
-"plăți mobilPay."
+"LivePayments este un gateway de plată prin card de credit și debit, pentru "
+"WooCommerce, care se integrează cu procesatorul mobilPay"
 
 #. Author of the plugin
 msgid "Alexandru Boia"
@@ -272,59 +272,63 @@ msgid ""
 "The payment has been successfully received. The order is currently being processed."
 msgstr "Plata a fost efectuată și procesată cu succes. Comanda este în procesare."
 
-#: lib/MobilpayCreditCardGateway.php:130 lib/MobilpayCreditCardGateway.php:143
+#: lib/MobilpayCreditCardGateway.php:130
+msgid "LivePayments Card Gateway via mobilPay"
+msgstr "LivePayments Card Gateway via mobilPay"
+
+#: lib/MobilpayCreditCardGateway.php:131
+msgid "LivePayments - mobilPay Payment Gateway for WooCommerce"
+msgstr "LivePayments - Gateway de plată pentru WooCommerce via mobilPay"
+
+#: lib/MobilpayCreditCardGateway.php:143
 msgid "mobilPay&trade; Card Gateway"
 msgstr "mobilPay&trade; Card Gateway"
 
-#: lib/MobilpayCreditCardGateway.php:131
-msgid "mobilPay&trade; Payment Gateway for WooCommerce"
-msgstr "mobilPay&trade; Gateway de plată pentru WooCommerce"
-
-#: lib/MobilpayCreditCardGateway.php:312
+#: lib/MobilpayCreditCardGateway.php:310
 msgid "Enable / Disable"
 msgstr "Activează / Dezactivează"
 
-#: lib/MobilpayCreditCardGateway.php:313
+#: lib/MobilpayCreditCardGateway.php:311
 msgid "Enable this payment gateway"
 msgstr "Activează acest gateway de plată"
 
-#: lib/MobilpayCreditCardGateway.php:318
+#: lib/MobilpayCreditCardGateway.php:316
 msgid "mobilPay&trade; Sandbox / Test Mode"
 msgstr "mobilPay&trade; Sandbox / Mod testare"
 
-#: lib/MobilpayCreditCardGateway.php:319
+#: lib/MobilpayCreditCardGateway.php:317
 msgid "Enable Test Mode"
 msgstr "Activează modul de testare"
 
-#: lib/MobilpayCreditCardGateway.php:321
+#: lib/MobilpayCreditCardGateway.php:319
 msgid "Place the payment gateway in test mode."
 msgstr "Plasează gateway-ul de plată în modul de testare"
 
-#: lib/MobilpayCreditCardGateway.php:325
+#: lib/MobilpayCreditCardGateway.php:323
 msgid "Title"
 msgstr "Titlu"
 
-#: lib/MobilpayCreditCardGateway.php:327
+#: lib/MobilpayCreditCardGateway.php:325
 msgid "Payment title the customer will see during the checkout process."
 msgstr "Titlul afișat clientului în timpul procesului de finalizare a comenzii"
 
-#: lib/MobilpayCreditCardGateway.php:328
-msgid "MobilPay"
-msgstr "MobilPay"
+#: lib/MobilpayCreditCardGateway.php:326
+msgid "LivePayments via mobilPay"
+msgstr "LivePayments via mobilPay"
 
-#: lib/MobilpayCreditCardGateway.php:331
+#: lib/MobilpayCreditCardGateway.php:329
 msgid "Description"
 msgstr "Descriere"
 
-#: lib/MobilpayCreditCardGateway.php:333
+#: lib/MobilpayCreditCardGateway.php:331
 msgid "Payment description the customer will see during the checkout process."
 msgstr "Descrierea afișată clientului în timpul procesului de finalizare a comenzii"
 
-#: lib/MobilpayCreditCardGateway.php:337
+#: lib/MobilpayCreditCardGateway.php:335
 msgid "Seller Account ID"
 msgstr "Identificator cont comerciant"
 
-#: lib/MobilpayCreditCardGateway.php:339
+#: lib/MobilpayCreditCardGateway.php:337
 msgid ""
 "This is Account ID provided by MobilPay when you signed up for an account. Unique "
 "key for your seller account for the payment process."
@@ -333,11 +337,11 @@ msgstr ""
 "Reprezintă în mod unic contul tău de comerciant folosit în timpul procesului de "
 "plată."
 
-#: lib/MobilpayCreditCardGateway.php:342
+#: lib/MobilpayCreditCardGateway.php:340
 msgid "Return URL"
 msgstr "URL înapoiere"
 
-#: lib/MobilpayCreditCardGateway.php:344
+#: lib/MobilpayCreditCardGateway.php:342
 msgid ""
 "You must create a new page and in the content field enter the shortcode "
 "[lvdwcmc_display_mobilpay_order_status] so that the user can see the message that "
@@ -350,11 +354,11 @@ msgstr ""
 "tranzacției. Se poate adăuga orice conținut suplimentar prin care sunt transmise "
 "mulțumiri pentru achiziție."
 
-#: lib/MobilpayCreditCardGateway.php:348
+#: lib/MobilpayCreditCardGateway.php:346
 msgid "mobilPay&trade; digital certificate for the live environment"
 msgstr "Certificatul digital mobilPay&trade; pentru mediul de producție"
 
-#: lib/MobilpayCreditCardGateway.php:349
+#: lib/MobilpayCreditCardGateway.php:347
 msgid ""
 "The public key used for securing communication with the mobilPay&trade; gateway in "
 "the live environment."
@@ -362,16 +366,16 @@ msgstr ""
 "Cheia publică folosită pentru securizarea comunicației cu gateway-ul de plată "
 "mobilPay&trade;, în mediul de producție"
 
-#: lib/MobilpayCreditCardGateway.php:353 lib/MobilpayCreditCardGateway.php:363
-#: lib/MobilpayCreditCardGateway.php:373 lib/MobilpayCreditCardGateway.php:383
+#: lib/MobilpayCreditCardGateway.php:351 lib/MobilpayCreditCardGateway.php:361
+#: lib/MobilpayCreditCardGateway.php:371 lib/MobilpayCreditCardGateway.php:381
 msgid "allowed file types: %s"
 msgstr "tipuri permise de fișiere: %s"
 
-#: lib/MobilpayCreditCardGateway.php:358
+#: lib/MobilpayCreditCardGateway.php:356
 msgid "The private key for the live environment"
 msgstr "Cheia privată pentru mediul de producție"
 
-#: lib/MobilpayCreditCardGateway.php:359
+#: lib/MobilpayCreditCardGateway.php:357
 msgid ""
 "The private key used for securing communication with the mobilPay&trade; gateway in "
 "the live environment."
@@ -379,11 +383,11 @@ msgstr ""
 "Cheia privată folosită pentru securizarea comunicației cu gateway-ul de plată  "
 "mobilPay&trade;, în mediul de producție"
 
-#: lib/MobilpayCreditCardGateway.php:368
+#: lib/MobilpayCreditCardGateway.php:366
 msgid "mobilPay&trade; digital certificate for the sandbox environment"
 msgstr "Certificatul digital mobilPay&trade; pentru mediul de testare"
 
-#: lib/MobilpayCreditCardGateway.php:369
+#: lib/MobilpayCreditCardGateway.php:367
 msgid ""
 "The public key used for securing communication with the mobilPay&trade; gateway in "
 "the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
@@ -392,11 +396,11 @@ msgstr ""
 "mobilPay&trade;, în mediul de testare (folosită atunci când câmpul "
 "\"mobilPay&trade; Sandbox / Mod testare\" este bifat)"
 
-#: lib/MobilpayCreditCardGateway.php:378
+#: lib/MobilpayCreditCardGateway.php:376
 msgid "The private key for the sandbox environment"
 msgstr "Cheia privată pentru mediul de testare"
 
-#: lib/MobilpayCreditCardGateway.php:379
+#: lib/MobilpayCreditCardGateway.php:377
 msgid ""
 "The private key used for securing communication with the mobilPay&trade; gateway in "
 "the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
@@ -405,88 +409,88 @@ msgstr ""
 "mobilPay&trade;, în mediul de producție (folosită atunci când câmpul "
 "\"mobilPay&trade; Sandbox / Mod testare\" este bifat)"
 
-#: lib/MobilpayCreditCardGateway.php:628
+#: lib/MobilpayCreditCardGateway.php:626
 msgid "Payment asset file successfully removed."
 msgstr "Fișierul a fost șters cu succes."
 
-#: lib/MobilpayCreditCardGateway.php:629
+#: lib/MobilpayCreditCardGateway.php:627
 msgid "Payment asset file could not be removed."
 msgstr "Fișierul nu a putut fi șters."
 
-#: lib/MobilpayCreditCardGateway.php:681
+#: lib/MobilpayCreditCardGateway.php:679
 msgid "Thank you for your order"
 msgstr "Îți mulțumim pentru comandă"
 
-#: lib/MobilpayCreditCardGateway.php:832
+#: lib/MobilpayCreditCardGateway.php:830
 msgid "Error initiating MobilPay card payment."
 msgstr "Eroare la inițierea plății prin card via MobilPay"
 
-#: lib/MobilpayCreditCardGateway.php:1094
+#: lib/MobilpayCreditCardGateway.php:1092
 msgid "Payment for order #%s."
 msgstr "Plata pentru comanda #%s."
 
-#: lib/Plugin.php:129
+#: lib/Plugin.php:137
 msgid "Could not activate plug-in: requirements not met."
 msgstr "Modulul nu a putut fi activat: cerințele tehnice nu sunt îndeplinite."
 
-#: lib/Plugin.php:132 lib/Plugin.php:138
+#: lib/Plugin.php:140 lib/Plugin.php:146
 msgid "Activation error"
 msgstr "Eroare la activare"
 
-#: lib/Plugin.php:136
+#: lib/Plugin.php:144
 msgid "Could not activate plug-in: activation failure."
 msgstr "Modulul nu a putut fi activat: eroare la activare."
 
-#: lib/Plugin.php:188 lib/Plugin.php:189
-msgid "mobilPay&trade; Card Transactions"
-msgstr "Tranzacții prin Card via mobilPay&trade; "
+#: lib/Plugin.php:196 lib/Plugin.php:197
+msgid "LivePayments Card Transactions"
+msgstr "Istoric Tranzacții LivePayments"
 
-#: lib/Plugin.php:303 views/lvdwcmc-frontend-transaction-details.php:35
+#: lib/Plugin.php:311 views/lvdwcmc-frontend-transaction-details.php:35
 msgid "Payment transaction details"
 msgstr "Detalii tranzacție"
 
-#: lib/Plugin.php:405
+#: lib/Plugin.php:413
 msgid "&laquo;"
 msgstr "&laquo;"
 
-#: lib/Plugin.php:406
+#: lib/Plugin.php:414
 msgid "&raquo;"
 msgstr "&raquo;"
 
-#: lib/Plugin.php:474
+#: lib/Plugin.php:482
 msgid "mobilPay&trade; Card Transaction Status"
 msgstr "Status Tranzacție prin Card via mobilPay&trade;"
 
-#: lib/Plugin.php:658 lib/Plugin.php:672
+#: lib/Plugin.php:667 lib/Plugin.php:681
 msgid "The selected file is too large. Maximum allowed size is 10MB"
 msgstr ""
 "Fișierul selectat este prea voluminos. Dimensiunea maximă admisă este de 10 MB."
 
-#: lib/Plugin.php:660 lib/Plugin.php:670
+#: lib/Plugin.php:669 lib/Plugin.php:679
 msgid "The selected file type is not valid."
 msgstr "Tipul fișierului nu este valid."
 
-#: lib/Plugin.php:662 lib/Plugin.php:664
+#: lib/Plugin.php:671 lib/Plugin.php:673
 msgid "The file could not be read"
 msgstr "Fișierul nu a putut fi citit."
 
-#: lib/Plugin.php:666
+#: lib/Plugin.php:675
 msgid "The uploader could not be initialized"
 msgstr "Componenta de upload nu a putut fi inițializată"
 
-#: lib/Plugin.php:668 lib/Plugin.php:678
+#: lib/Plugin.php:677 lib/Plugin.php:687
 msgid "The file could not be uploaded"
 msgstr "Fișierul nu a putut fi încărcat"
 
-#: lib/Plugin.php:674
+#: lib/Plugin.php:683
 msgid "No file was uploaded"
 msgstr "Nu a fost încărcat niciun fișier"
 
-#: lib/Plugin.php:676
+#: lib/Plugin.php:685
 msgid "The file could not be uploaded due to a possible internal server issue"
 msgstr "Fișierul nu a putut fi încărcat  din cauza unei posibile probleme interne"
 
-#: lib/Plugin.php:680
+#: lib/Plugin.php:689
 msgid ""
 "Remove asset file? This action cannot be undone and you will have to re-upload the "
 "asset again!"
@@ -494,99 +498,99 @@ msgstr ""
 "Sigur ștergi fișierul? Această operațiune este definitivă și va trebui să reîncarci "
 "fișierul!"
 
-#: lib/Plugin.php:682
+#: lib/Plugin.php:691
 msgid "The asset file could not be removed"
 msgstr "Fișierul nu a putut fi șters"
 
-#: lib/Plugin.php:684
+#: lib/Plugin.php:693
 msgid "The asset file could not be removed due to a possible network issue"
 msgstr "Fișierul nu a putut fi șters din cauza unei posibile probleme de comunicație"
 
-#: lib/Plugin.php:686
+#: lib/Plugin.php:695
 msgid "The file has been successfully uploaded"
 msgstr "Fișierul a fost încărcat cu succes"
 
-#: lib/Plugin.php:688
+#: lib/Plugin.php:697
 msgid "The file has been successfulyl removed"
 msgstr "Fișierul a fost șters cu succes"
 
-#: lib/Plugin.php:690
+#: lib/Plugin.php:699
 msgid "The return URL has been successfully generated."
 msgstr "URL-ul de înapoiere a fost generat cu succes"
 
-#: lib/Plugin.php:692
+#: lib/Plugin.php:701
 msgid "The return URL could not generated."
 msgstr "URL-ul de înapoiere nu a putut fi generat."
 
-#: lib/Plugin.php:694
+#: lib/Plugin.php:703
 msgid "The return URL could not be generated due to a possible network issue"
 msgstr ""
 "URL-ul de înapoiere nu a putut fi generat din cauza unei posibile probleme de "
 "comunicație."
 
-#: lib/Plugin.php:701
+#: lib/Plugin.php:710
 msgid "Could not load transaction details data"
 msgstr "Detaliile tranzacției nu au putut fi încărcate"
 
-#: lib/Plugin.php:703
+#: lib/Plugin.php:712
 msgid "Could not load transaction details data due to a possible network issue"
 msgstr ""
 "Detaliile tranzacției nu au putut fi încărcate din cauza unei probleme de "
 "comunicație"
 
-#: lib/Plugin.php:709
+#: lib/Plugin.php:718
 msgid "Please wait..."
 msgstr "Te rugăm să aștepți..."
 
-#: lib/Plugin.php:717
+#: lib/Plugin.php:726
 msgid "Minimum required PHP version is %s."
 msgstr "Versiunea minimă necesară de PHP este %s."
 
-#: lib/Plugin.php:719
+#: lib/Plugin.php:728
 msgid "Minimum required WordPress version is %s."
 msgstr "Versiunea minimă necesară de WordPress este %s."
 
-#: lib/Plugin.php:721
+#: lib/Plugin.php:730
 msgid "Mysqli extension was not found on your system or is not fully compatible."
 msgstr ""
 "Extensia Mysqli nu a putut fi găsită pe server-ul tău sau există și nu este "
 "compatibilă"
 
-#: lib/Plugin.php:723
+#: lib/Plugin.php:732
 msgid "Openssl extension was not found on your system or is not fully compatible."
 msgstr ""
 "Extensia Openssl nu a putut fi găsită pe server-ul tău sau există și nu este "
 "compatibilă"
 
-#: lib/Plugin.php:725
+#: lib/Plugin.php:734
 msgid "The installation failed."
 msgstr "Instalarea a eșuat"
 
-#: lib/Plugin.php:732
+#: lib/Plugin.php:741
 msgid "Cancelled"
 msgstr "Anulată"
 
-#: lib/Plugin.php:734
+#: lib/Plugin.php:743
 msgid "Confirmed. Payment successful"
 msgstr "Confirmată. Plată finalizată cu succes"
 
-#: lib/Plugin.php:736
+#: lib/Plugin.php:745
 msgid "Pending confirmation"
 msgstr "Se așteaptă confirmarea"
 
-#: lib/Plugin.php:738
+#: lib/Plugin.php:747
 msgid "Credited"
 msgstr "Rambursată"
 
-#: lib/Plugin.php:740
+#: lib/Plugin.php:749
 msgid "Failed"
 msgstr "Eșuată"
 
-#: lib/Plugin.php:742
+#: lib/Plugin.php:751
 msgid "Started"
 msgstr "Începută"
 
-#: lib/Plugin.php:744
+#: lib/Plugin.php:753
 msgid "Pending payment"
 msgstr "Plata în așteptare"
 
@@ -735,3 +739,28 @@ msgstr "Starea detaliată a comenzii"
 #: views/lvdwcmc-payment-status.php:42
 msgid "We have successfully received your payment"
 msgstr "Plata ta a fost primită și procesată cu succes"
+
+#~ msgid "LivePayments Card Gateway via mobilPay&trade;"
+#~ msgstr "LivePayments Card Gateway via mobilPay&trade;"
+
+#~ msgid "LivePayments - mobilPay&trade; Payment Gateway for WooCommerce"
+#~ msgstr "LivePayments - Gateway de plată pentru WooCommerce pentru mobilPay&trade"
+
+#~ msgid "LivePayments MP WC"
+#~ msgstr "LivePayments MP WC"
+
+#~ msgid ""
+#~ "Card WooCommerce Payment Gateway that uses the Romainan mobilPay payment "
+#~ "processing gateway"
+#~ msgstr ""
+#~ "Un modul de plată pentru WooCommerce care permite integrarea cu procesatorul de "
+#~ "plăți mobilPay."
+
+#~ msgid "mobilPay&trade; Payment Gateway for WooCommerce"
+#~ msgstr "mobilPay&trade; Gateway de plată pentru WooCommerce"
+
+#~ msgid "MobilPay"
+#~ msgstr "MobilPay"
+
+#~ msgid "mobilPay&trade; Card Transactions"
+#~ msgstr "Tranzacții prin Card via mobilPay&trade; "

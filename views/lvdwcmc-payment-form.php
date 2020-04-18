@@ -38,6 +38,6 @@
 
         <input type="submit" name="submit_mobilpay_payment_form" 
             id="submit_mobilpay_payment_form" 
-            value="<?php echo esc_attr__('Pay via mobilPay&trade;', 'wc-mobilpayments-card') ?>" />
+            value="<?php echo esc_attr__('Pay via mobilPay&trade;', 'livepayments-mp-wc') ?>" />
     </form>
 <?php endif; ?>
