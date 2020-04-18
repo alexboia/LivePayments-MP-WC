@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WC MobilPayments Card 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/livepayments-mp-wc\n"
-"POT-Creation-Date: 2020-04-18 15:34+0300\n"
-"PO-Revision-Date: 2020-04-18 15:34+0300\n"
+"POT-Creation-Date: 2020-04-18 15:50+0300\n"
+"PO-Revision-Date: 2020-04-18 15:50+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ro_RO\n"
@@ -458,8 +458,8 @@ msgid "&raquo;"
 msgstr "&raquo;"
 
 #: lib/Plugin.php:482
-msgid "mobilPay&trade; Card Transaction Status"
-msgstr "Status Tranzacție prin Card via mobilPay&trade;"
+msgid "LivePayments Card Transaction Status"
+msgstr "Staus Tranzacții LivePayments"
 
 #: lib/Plugin.php:667 lib/Plugin.php:681
 msgid "The selected file is too large. Maximum allowed size is 10MB"
@@ -739,6 +739,9 @@ msgstr "Starea detaliată a comenzii"
 #: views/lvdwcmc-payment-status.php:42
 msgid "We have successfully received your payment"
 msgstr "Plata ta a fost primită și procesată cu succes"
+
+#~ msgid "mobilPay&trade; Card Transaction Status"
+#~ msgstr "Status Tranzacție prin Card via mobilPay&trade;"
 
 #~ msgid "LivePayments Card Gateway via mobilPay&trade;"
 #~ msgstr "LivePayments Card Gateway via mobilPay&trade;"

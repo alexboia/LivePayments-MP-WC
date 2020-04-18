@@ -479,7 +479,7 @@ class Plugin {
 
             if ($addDashboardWidget) {
                 wp_add_dashboard_widget('lvdwcmc-transactions-status', 
-                    __('mobilPay&trade; Card Transaction Status', 'livepayments-mp-wc'), 
+                    __('LivePayments Card Transaction Status', 'livepayments-mp-wc'), 
                     array($this, 'renderTransactionsStatusWidget'), 
                         null,
                         null);
