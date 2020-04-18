@@ -2,7 +2,7 @@
 Data Source Analysed
 
 Directories                                         73
-Files                                              336
+Files                                              338
 Errors                                               0
 
 
@@ -105,7 +105,8 @@ Traits Analysis
     DbTestHelpers                          user             5.4.0               
     GenericTestHelpers                     user             5.4.0               
     MobilpayTransactionTestHelpers         user             5.4.0               
-    Total [3]                                               5.4.0               
+    WcOrderHelpers                         user             5.4.0               
+    Total [4]                                               5.4.0               
 
 Classes Analysis
 
@@ -446,6 +447,7 @@ Classes Analysis
   U LvdWcMc\Installer                                 1       user                   5.3.0               
   U LvdWcMc\MobilpayTransaction                       3       user                   5.3.0               
   U LvdWcMc\MobilpayTransactionFactory                13      user                   5.3.0               
+  U LvdWcMc\Shortcodes                                1       user                   5.3.0               
   U Mandango\Mandango                                 3       user                   5.3.0               
     MobilpayTransactionFactoryTests                           user                   5.4.0               
     MobilpayTransactionTests                                  user                   5.4.0               
@@ -457,14 +459,16 @@ Classes Analysis
   U Propel                                            4       user                   4.0.0               
     ReflectionObject                                  1       Reflection 5.0.0       5.0.0               
     RuntimeException                                  3       spl        5.1.0       5.1.0               
+    ShortcodesTests                                           user                   5.4.0               
     Transliterator                                    1       intl       2.0.0b1     5.2.4               
   U WC_Install                                        1       user                   4.0.0               
-  U WC_Order                                          1       user                   4.0.0               
-    WP_UnitTestCase                                   3       user                   5.0.0               
-    parent                                            8       Core       5.0.0       5.0.0               
+  U WC_Order                                          2       user                   4.0.0               
+  U WP_Error                                          2       user                   4.0.0               
+    WP_UnitTestCase                                   4       user                   5.0.0               
+    parent                                            10      Core       5.0.0       5.0.0               
     self                                              32      Core       5.0.0       5.0.0               
     static                                            777     Core       5.0.0       5.0.0               
-    Total [354]                                                                      5.4.0               
+    Total [357]                                                                      5.4.0               
 
 Functions Analysis
 
@@ -617,7 +621,7 @@ Functions Analysis
     is_object                             1       standard 4.0.0       4.0.0        
     is_readable                           2       standard 4.0.0       4.0.0        
     is_string                             1       standard 4.0.0       4.0.0        
-    is_wp_error                           2       user                 4.0.0        
+    is_wp_error                           5       user                 4.0.0        
     is_writable                           1       standard 4.0.0       4.0.0        
     join                                  30      standard 4.0.0       4.0.0        
     key                                   1       standard 4.0.0       4.0.0        
@@ -712,7 +716,7 @@ Constants Analysis
     NONCE_KEY                   user                 4.0.0        
     NONCE_SALT                  user                 4.0.0        
     PATHINFO_EXTENSION  1       standard 4.0.0       4.0.0        
-    PHP_EOL             8       Core     4.3.10      4.3.10       
+    PHP_EOL             4       Core     4.3.10      4.3.10       
     PHP_FLOAT_MAX       3       user                 4.0.0        
     PHP_INT_MAX         4       Core     4.4.0       4.4.0        
     PHP_VERSION         1       Core     4.0.0       4.0.0        
@@ -732,7 +736,7 @@ Constants Analysis
     __DIR__             3       Core     5.3.0       5.3.0        
     __FILE__            1       Core     4.0.0       4.0.0        
     false               54      Core     4.0.0       4.0.0        
-    null                133     Core     4.0.0       4.0.0        
+    null                135     Core     4.0.0       4.0.0        
     true                55      Core     4.0.0       4.0.0        
     Total [42]                                       5.3.0        
 

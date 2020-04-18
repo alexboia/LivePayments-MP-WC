@@ -1,8 +1,8 @@
 
 Data Source Analysed
 
-Directories                                         16
-Files                                               52
+Directories                                         17
+Files                                               53
 Errors                                               0
 
 
@@ -104,7 +104,7 @@ Functions Analysis
     add_query_arg                   3       user                 4.0.0        
     add_shortcode                   1       user                 4.0.0        
     add_submenu_page                1       user                 4.0.0        
-    apply_filters                   21      user                 4.0.0        
+    apply_filters                   22      user                 4.0.0        
     array_combine                   1       standard 5.0.0       5.0.0        
     array_filter                    1       standard 4.0.6       4.0.6        
     array_keys                      7       standard 4.0.0       4.0.0        
@@ -134,7 +134,7 @@ Functions Analysis
     defined                         18      Core     4.0.0       4.0.0        
     delete_option                   1       user                 4.0.0        
     dirname                         1       standard 4.0.0       4.0.0        
-    do_action                       32      user                 4.0.0        
+    do_action                       33      user                 4.0.0        
     doubleval                       4       standard 4.0.0       4.0.0        
     end                             1       standard 4.0.0       4.0.0        
     esc_attr                        15      user                 4.0.0        
@@ -223,7 +223,7 @@ Functions Analysis
     paginate_links                  1       user                 4.0.0        
     phpversion                      1       standard 4.0.0       4.0.0        
     plugin_basename                 2       user                 4.0.0        
-    plugins_url                     3       user                 4.0.0        
+    plugins_url                     4       user                 4.0.0        
     preg_match                      3       pcre     4.0.0       4.0.0        
     preg_replace                    6       pcre     4.0.0       4.0.0        
     print_r                         1       standard 4.0.0       4.0.0        
@@ -283,7 +283,7 @@ Functions Analysis
     wp_enqueue_script               3       user                 4.0.0        
     wp_enqueue_style                3       user                 4.0.0        
     wp_insert_post                  1       user                 4.0.0        
-    wp_localize_script              4       user                 4.0.0        
+    wp_localize_script              5       user                 4.0.0        
     wp_max_upload_size              1       user                 4.0.0        
     wp_normalize_path               6       user                 4.0.0        
     wp_script_is                    1       user                 4.0.0        
@@ -336,7 +336,7 @@ Constants Analysis
     __DIR__                                     5       Core     5.3.0       5.3.0        
     __FILE__                                    2       Core     4.0.0       4.0.0        
     false                                       119     Core     4.0.0       4.0.0        
-    null                                        342     Core     4.0.0       4.0.0        
+    null                                        343     Core     4.0.0       4.0.0        
     true                                        92      Core     4.0.0       4.0.0        
     Total [45]                                                               5.4.0        
 
