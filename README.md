@@ -157,10 +157,11 @@ However, I only mention this manual and rather unfriendly procedure because you 
 1. PHP version 5.6.2 or greater;
 2. MySQL version 5.7 or greater;
 3. WordPress 5.0 or greater;
-4. openssl extension;
-5. mysqli extension;
-6. mbstring - not strictly required, but recommended;
-7. zlib - not strictly required, but recommended.
+4. WooCommerce 3.2.0 or greater;
+5. openssl extension;
+6. mysqli extension;
+7. mbstring - not strictly required, but recommended;
+8. zlib - not strictly required, but recommended.
 
 ### For development
 
