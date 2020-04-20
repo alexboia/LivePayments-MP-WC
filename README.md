@@ -148,6 +148,36 @@ However, I only mention this manual and rather unfriendly procedure because you 
 
 ![Frontend order page - transaction status information](/screenshots/lvdwcmc-frontend-order-page.png?raw=true)
 
+## Requirements
+
+### For running the plug-in itself
+
+1. PHP version 5.6.2 or greater;
+2. MySQL version 5.7 or greater;
+3. WordPress 5.0 or greater;
+4. openssl extension;
+5. mysqli extension;
+6. mbstring - not strictly required, but recommended;
+7. zlib - not strictly required, but recommended.
+
+### For development
+
+All of the above, with the following amendments:
+
+1. PHP version 5.4.0 or greater is required;
+2. xdebug extension is recommended;
+3. phpunit version 5.x installed and available in your $PATH, for running the tests;
+4. wp (wp-cli) version 2.x installed and available in your $PATH, for initializing the test environment, if needed
+5. phpcompatinfo version 5.x installed and available in your $PATH, for generating the compatibility information files
+6. cygwin, for Windows users, such as myself, for setting up the development environment, running unit tests and the build scripts, with the following requirements itself:
+   - wget command;
+   - curl command;
+   - gettext libraries;
+   - php core engine and the above-mentioned php extensions;
+   - mysql command line client;
+   - subversion command line client;
+   - zip command.
+
 ## Credits
 <a name="lvdwcmc-credits"></a>  
 
