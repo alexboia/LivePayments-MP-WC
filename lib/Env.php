@@ -47,7 +47,16 @@ namespace LvdWcMc {
 
         private $_paymentTransactionsTable;
 
+        /**
+         * Whether or not the mysqli driver has been initialized
+         * 
+         * @var boolean
+         */
+        private $_driverInitialized = false;
+
         private $_db = null;
+
+        private $_metaDb = null;
 
         private $_rootStorageDir;
 
@@ -210,10 +219,30 @@ namespace LvdWcMc {
                     'charset' => 'utf8'
                 ));
 
-                $driver = new \mysqli_driver();
-                $driver->report_mode =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+                $this->_initDriverIfNeeded();
             }
             return $this->_db;
+        }
+
+        public function getMetaDb() {
+            if ($this->_metaDb == null) {
+                $this->_metaDb = new \MysqliDb($this->getDbHost(),
+                    $this->getDbUserName(),
+                    $this->getDbPassword(),
+                    'information_schema');
+    
+                $this->_initDriverIfNeeded();
+            }
+    
+            return $this->_metaDb;
+        }
+
+        private function _initDriverIfNeeded() {
+            if (!$this->_driverInitialized) {
+                $driver = new \mysqli_driver();
+                $driver->report_mode =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+                $this->_driverInitialized = true;
+            }
         }
 
         public function getPaymentTransactionsTableName() {

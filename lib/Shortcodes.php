@@ -52,7 +52,7 @@ namespace LvdWcMc {
                     $data->orderId = $orderId;
                     $data->orderStatus = $order->get_status();
                     $data->order = $order;
-        
+
 					ob_start();
                     require $this->_env->getViewFilePath('lvdwcmc-payment-status.php');
                     $content = ob_get_clean();

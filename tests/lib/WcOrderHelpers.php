@@ -35,7 +35,7 @@ use LvdWcMc\MobilpayCreditCardGateway;
 trait WcOrderHelpers {
     use GenericTestHelpers;
 
-    protected function _generateRandomWcOrder($status = null) {
+    protected function _generateRandomWcOrder($status = null, $gateway = null) {
         $order = null;
         $faker = self::_getFaker();
         $customerId = wc_create_new_customer($faker->email, 
@@ -54,7 +54,7 @@ trait WcOrderHelpers {
                 if ($order->get_id()) {
                     $order->set_total($faker->randomFloat(2, 1, PHP_FLOAT_MAX));
                     $order->set_order_key(wc_generate_order_key());
-                    $order->set_payment_method(MobilpayCreditCardGateway::GATEWAY_ID);
+                    $order->set_payment_method(!empty($gateway) ? $gateway : MobilpayCreditCardGateway::GATEWAY_ID);
                     $order->save();
                 } else {
                     $order = new WP_Error('lvdwcmc-cant-save-new-order', 'Failed to save created order');

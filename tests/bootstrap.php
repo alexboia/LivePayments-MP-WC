@@ -113,14 +113,18 @@ function _manually_install_woocommerce() {
 }
 
 function _manually_install_own_plugin() {
-	if (!_has_own_plugin_been_installed_before()) {
-		$installer = new \LvdWcMc\Installer();
-		$activated = $installer->activate();
-		if (!$activated) {
-			die('Failed to activate plugin. Cannot continue testing.' . PHP_EOL);
-		}
-		_set_own_plugin_installed();
+	$installer = new \LvdWcMc\Installer();
+	if (_has_own_plugin_been_installed_before()) {
+		$installer->uninstall();
 	}
+	
+	$activated = $installer->activate();
+	if (!$activated) {
+		die('Failed to activate plugin. Cannot continue testing.' . PHP_EOL);
+	}
+
+	_set_own_plugin_installed();
+	
 }
 
 function _manually_load_plugins() {

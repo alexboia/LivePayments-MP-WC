@@ -32,6 +32,9 @@
 trait GenericTestHelpers {
     private static $_faker = null;
 
+    /**
+     * @return \Faker\Generator
+     */
     protected static function _getFaker() {
         if (self::$_faker == null) {
             self::$_faker = Faker\Factory::create();

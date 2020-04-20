@@ -34,7 +34,7 @@
 <div class="lvdwcmc-mobilpay-return-container order-status-<?php echo esc_attr($data->orderStatus); ?>">
     <?php if (in_array($data->orderStatus, array('cancelled', 'failed'))): ?>
         <p><?php echo esc_html__('Your payment could not be processed or has been cancelled.', 'livepayments-mp-wc'); ?></p>
-    <?php elseif ($data->orderStatus === 'on-hold'):  ?>
+    <?php elseif ($data->orderStatus == 'on-hold'):  ?>
         <p><?php echo esc_html__('Your payment is currently being processed.', 'livepayments-mp-wc'); ?></p>
         <p><?php echo esc_html__('Order Id', 'livepayments-mp-wc'); ?>: <strong><?php echo $data->orderId; ?></strong></p>
         <p><?php echo esc_html__('Detailed order status', 'livepayments-mp-wc') ?>: <strong><?php echo wc_get_order_status_name($data->orderStatus); ?></strong></p>

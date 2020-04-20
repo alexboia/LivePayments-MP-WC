@@ -73,9 +73,12 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     }
 
     public function test_tryCreateNewFromOrder_invalidOrder_nonExistingOrderId() {
+        $orderIds = array();
         $txFactory = new MobilpayTransactionFactory();
         for ($i = 0; $i < 10; $i ++) {
-            $orderId = $this->_generateRandomNewOrderId();
+            $orderId = $this->_generateRandomNewOrderId($orderIds);
+            $orderIds[] = $orderId;
+
             $tx = $txFactory->newFromOrder($orderId);
             $this->assertNull($tx);
         }
@@ -129,9 +132,12 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     }
 
     public function test_tryCreateExistingFromOrder_invalidOrder_nonExistingOrderId() {
+        $orderIds = array();
         $txFactory = new MobilpayTransactionFactory();
         for ($i = 0; $i < 10; $i ++) {
-            $orderId = $this->_generateRandomNewOrderId();
+            $orderId = $this->_generateRandomNewOrderId($orderIds);
+            $orderIds[] = $orderId;
+
             $tx = $txFactory->existingFromOrder($orderId);
             $this->assertNull($tx);
         }
@@ -139,15 +145,10 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
 
     public function test_tryCreateExistingFromOrder_invalidOrder_emptyOrderId() {
         $txFactory = new MobilpayTransactionFactory();
-
-        $tx = $txFactory->existingFromOrder(0);
-        $this->assertNull($tx);
-
-        $tx = $txFactory->existingFromOrder(null);
-        $this->assertNull($tx);
-
-        $tx = $txFactory->existingFromOrder('');
-        $this->assertNull($tx);
+        foreach (array(null, '', 0) as $orderId) {
+            $tx = $txFactory->existingFromOrder($orderId);
+            $this->assertNull($tx);
+        }
     }
 
     public function test_canCreateFromTransactionId_validTransactionId() {
@@ -252,7 +253,11 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     }
 
     private function _generateRandomNewOrderId($excludeAdditionalIds = array()) {
-        $excludeIds = array_keys($this->_testWcOrdersWoTransaction);
+        $excludeIds = array_merge(
+            array_keys($this->_testWcOrdersWoTransaction),
+            array_keys($this->_testWcOrdersWTransaction)
+        );
+
         if (!empty($excludeAdditionalIds) && is_array($excludeAdditionalIds)) {
             $excludeIds = array_merge($excludeAdditionalIds);
         }
