@@ -14,8 +14,9 @@ This plugin is meant to be used by merchants in Romania.
 4. [Setting up and configuring your plug-in](#lvdwcmc-setup)
 5. [Retrieving mobilPay™ security assets](#lvdwcmc-mobilpay-security-assets)
 6. [Screenshots](#lvdwcmc-screenshots)
-7. [Credits](#lvdwcmc-credits)
-8. [License](#lvdwcmc-license)
+7. [Requirements](#lvdwcmc-requirements)
+8. [Credits](#lvdwcmc-credits)
+9. [License](#lvdwcmc-license)
 
 ## Is it good for you?
 <a name="lvdwcmc-isitgoodforyou"></a>  
@@ -149,6 +150,7 @@ However, I only mention this manual and rather unfriendly procedure because you 
 ![Frontend order page - transaction status information](/screenshots/lvdwcmc-frontend-order-page.png?raw=true)
 
 ## Requirements
+<a name="lvdwcmc-requirements"></a>  
 
 ### For running the plug-in itself
 
