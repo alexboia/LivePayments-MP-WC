@@ -31,7 +31,7 @@
 
  define('LVD_WCMC_LOADED', true);
  define('LVD_WCMC_PLUGIN_ID', 'lvd_wc_mc');
- define('LVD_WCMC_VERSION', '0.1.0');
+ define('LVD_WCMC_VERSION', '0.1.1');
  define('LVD_WCMC_HEADER', __FILE__);
  define('LVD_WCMC_FUNCTIONS', __DIR__ . DIRECTORY_SEPARATOR . 'lvdwcmc-plugin-functions.php');
  define('LVD_WCMC_MAIN', __DIR__ . DIRECTORY_SEPARATOR .  'lvdwcmc-plugin-main.php');

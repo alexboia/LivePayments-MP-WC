@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/alexandruboia
 Tags: payment, card, mobilpay, creditcard, woocommerce
 Requires at least: 5.0
 Tested up to: 5.4.0
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 Requires PHP: 5.6.2
 License: BSD New License
 License URI: https://opensource.org/licenses/BSD-3-Clause
@@ -75,10 +75,16 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments
 
 == Changelog ==
 
+= 0.1.1 =
+Fixed minor usability issues.
+
 = 0.1.0 =
 First officially distributed version.
 
 == Upgrade Notice ==
+
+= 0.1.1 =
+Updated to version 0.1.1 for improved usability.
 
 = 0.1.0 =
 Use this version as the first officially distributed version.

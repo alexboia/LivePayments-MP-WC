@@ -859,6 +859,7 @@ namespace LvdWcMc {
 
                     $this->logDebug('Successfully constructed payment form data', $context);
                 } catch (\Exception $exc) {
+                    $data->success = false;
                     $this->logException('Failed to construct payment form data', 
                         $exc, 
                         $context);
@@ -1256,7 +1257,7 @@ namespace LvdWcMc {
                 $paymentAssetFields = array();
                 foreach ($this->form_fields as $fieldId => $fieldInfo) {
                     if ($this->_isPaymentAssetField($fieldInfo)) {
-                        $paymentAssetFields[$fieldId] = &$fieldInfo;
+                        $paymentAssetFields[$fieldId] = $fieldInfo;
                     }
                 }
             }
