@@ -1,0 +1,186 @@
+/**
+ * Copyright (c) 2019-2020 Alexandru Boia
+ *
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ * 
+ *	1. Redistributions of source code must retain the above copyright notice, 
+ *		this list of conditions and the following disclaimer.
+ *
+ * 	2. Redistributions in binary form must reproduce the above copyright notice, 
+ *		this list of conditions and the following disclaimer in the documentation 
+ *		and/or other materials provided with the distribution.
+ *
+ *	3. Neither the name of the copyright holder nor the names of its contributors 
+ *		may be used to endorse or promote products derived from this software without 
+ *		specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY 
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+.blockUI.blockOverlay:before {
+    content: none;
+}
+
+.lvdwcmc-please-wait-spinner {
+    width: 64px;
+    height: 64px;
+    line-height: normal;
+    image-rendering: optimizeQuality;
+    margin-top: 10px;
+}
+
+.lvdwcmc-stop-scrolling {
+    height: 100%;
+    overflow: hidden;
+}
+
+.lvdwcmc-page-container {
+    margin-right: 20px;
+}
+
+.lvdwcmc-admin-notice {
+    display: block;
+    line-height: 19px;
+    padding: 11px 15px;
+    font-size: 14px;
+    text-align: left;
+    margin-top: 15px;
+    background-color:#fff;
+    border-left: 4px solid #ffba00;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+}
+
+table.lvdwcmc-tx-listing td,
+table.lvdwcmc-tx-listing th {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+td.lvdwcmc-order-id-column,
+th.lvdwcmc-order-id-column {
+    width: 15%;
+}
+
+.lvdwcmc-tx-status {
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.lvdwcmc-tx-status.credit,
+.lvdwcmc-tx-status.canceled {
+    background-color: #e5e5e5;
+    color: #2e4453;
+}
+
+.lvdwcmc-tx-status.new,
+.lvdwcmc-tx-status.confirmed_pending,
+.lvdwcmc-tx-status.paid_pending {
+    background-color: #c6e1c6;
+    color: #5b841b;
+}
+
+.lvdwcmc-tx-status.confirmed {
+    background-color: #c8d7e1;
+    color: #2e4453;
+}
+
+.lvdwcmc-tx-status.failed {
+    background-color: #eba3a3;
+    color: #761919;
+}
+
+.lvdwcmc-pagination-links {
+    margin-top: 15px;
+}
+
+.lvdwcmc-pagination-links .page-numbers {
+    padding: 8px;
+    background-color: #f9f9f9;
+    color: #555;
+    border: 1px solid #e5e5e5;
+    border-radius: 2px;
+    float: none;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.lvdwcmc-pagination-links .page-numbers:active {
+    text-decoration: none;
+}
+
+.lvdwcmc-pagination-links .page-numbers:hover {
+    background-color: #c8d7e1;
+    color: #2e4453;
+    border: 1px solid #2e4453;
+}
+
+.lvdwcmc-pagination-links .page-numbers.current {
+    background-color: #c6e1c6;
+    color: #5b841b;
+    border: 1px solid #5b841b;
+}
+
+.lvdwcmc-generic-close-btn {
+    padding: 5px 8px 5px 8px;
+    border-radius: 3px;
+    border: 1px solid #f5c6cb;
+    background-color: #f5c6cb;
+    color: #721c24;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.lvdwcmc-admin-transaction-details-wnd {
+    padding: 10px;
+    width: calc(100% - 20px);
+    background-color: '#FFF';
+    text-align: left;
+    cursor: default;
+}
+
+.lvdwcmc-admin-transaction-details-wnd-header h3 {
+    margin-top: 0px;
+    margin-top: 10px;
+    border-radius: 4px;
+    padding: 10px;
+    background-color: #c8d7e1;
+    color: #2e4453;
+    display: inline-block;
+    width: auto;
+}
+
+.lvdwcmc-admin-transaction-details-wnd-content {
+    width: 100%;
+    max-height: 350px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.lvdwcmc-admin-transaction-details-wnd-footer {
+    padding-top: 10px;
+    padding-bottom: 0px;
+    width: 100%;
+}
+
+.lvdwcmc-generic-close-btn:hover {
+    color: #721c24;
+}
+
+#lvdwcmc-admin-transaction-details-close {
+    float: right;
+}
+
+.lvdwcmc-clear {
+    clear: both;
+}

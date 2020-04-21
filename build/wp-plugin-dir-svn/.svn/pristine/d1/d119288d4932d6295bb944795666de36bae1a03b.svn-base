@@ -1,0 +1,93 @@
+/**
+ * Copyright (c) 2019-2020 Alexandru Boia
+ *
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ * 
+ *	1. Redistributions of source code must retain the above copyright notice, 
+ *		this list of conditions and the following disclaimer.
+ *
+ * 	2. Redistributions in binary form must reproduce the above copyright notice, 
+ *		this list of conditions and the following disclaimer in the documentation 
+ *		and/or other materials provided with the distribution.
+ *
+ *	3. Neither the name of the copyright holder nor the names of its contributors 
+ *		may be used to endorse or promote products derived from this software without 
+ *		specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY 
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#lvdwcmc-transactions-status .inside {
+    padding: 0px;
+    margin: 0px;
+}
+
+.lvdwcmc-status-count {
+    float: left;
+    margin: 10px 0px 0px 10px;
+    border-radius: 15px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    background-color: #e5e5e5;
+    color: #2e4453;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.confirmed .lvdwcmc-status-count {
+    background-color: #c8d7e1;
+    color: #2e4453;
+}
+
+.failed .lvdwcmc-status-count {
+    background-color: #eba3a3;
+    color: #761919;
+}
+
+.credit .lvdwcmc-status-count,
+.canceled .lvdwcmc-status-count {
+    background-color: #e5e5e5;
+    color: #2e4453;
+}
+
+.new .lvdwcmc-status-count,
+.confirmed_pending .lvdwcmc-status-count,
+.paid_pending .lvdwcmc-status-count {
+    background-color: #c6e1c6;
+    color: #5b841b;
+}
+
+.lvdwcmc-status-label {
+    float: left;
+    margin: 10px 10px 0px 10px;
+    height: 30px;
+    line-height: 30px;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.lvdwcmc-dashboard-transaction-status {
+    margin: 0px;
+}
+
+.lvdwcmc-dashboard-transaction-status li {
+    border-bottom: 1px solid #ececec;
+    padding-bottom: 10px;
+}
+
+.lvdwcmc-dashboard-transaction-status li:last-of-type {
+    border-bottom: 0px none;
+    margin-bottom: 0px;
+}
