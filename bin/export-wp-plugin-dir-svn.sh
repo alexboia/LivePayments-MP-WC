@@ -24,7 +24,7 @@ ensure_root_dir() {
 	if [ ! -d $LVDWCMC_EXPORT_ROOT ]
 	then
 		mkdir $LVDWCMC_EXPORT_ROOT
-		svn co https://plugins.svn.wordpress.org/livepayments-mp-wc/ $LVDWCMC_EXPORT_ROOT
+		svn co https://plugins.svn.wordpress.org/wc-mobilpayments-card/ $LVDWCMC_EXPORT_ROOT
 	fi
 }
 
@@ -43,8 +43,7 @@ clean_trunk_dir() {
 }
 
 regenerate_help() {
-	echo "Re-generating help contents..."
-	php ./help/tools/make-help.php
+	echo "No help contents to regenerate..."
 }
 
 copy_source_files() {
@@ -80,8 +79,8 @@ copy_asset_files() {
     cp ./assets/en_US/lvdwcmc-tx-details.png  "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-6.png" > /dev/null
     cp ./assets/en_US/lvdwcmc-tx-history.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-7.png" > /dev/null
 
-    cp ./assets/banner-772x250.jpg    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-772x250.jpg" > /dev/null
-    cp ./assets/banner-1544x500.jpg    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-1544x500.jpg" > /dev/null
+    cp ./assets/banner-772x250.png    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-772x250.png" > /dev/null
+    cp ./assets/banner-1544x500.png    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-1544x500.png" > /dev/null
     cp ./assets/icon-128x128.png    "$LVDWCMC_EXPORT_ASSETS_DIR/icon-128x128.png" > /dev/null
     cp ./assets/icon-256x256.png    "$LVDWCMC_EXPORT_ASSETS_DIR/icon-256x256.png" > /dev/null
 }
