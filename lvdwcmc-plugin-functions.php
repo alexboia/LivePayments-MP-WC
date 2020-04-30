@@ -32,7 +32,7 @@
 
 function lvd_wcmc_init_autoloader() {
    require_once LVD_WCMC_LIB_DIR . '/Autoloader.php';
-   LvdWcMc\Autoloader::init(LVD_WCMC_LIB_DIR, array(
+   \LvdWcMc\Autoloader::init(LVD_WCMC_LIB_DIR, array(
       'LvdWcMc' => array(
          'separator' => '\\',
          'libDir' => LVD_WCMC_LIB_DIR
@@ -77,8 +77,16 @@ function lvdwcmc_get_amount_format() {
       $amountFormat);
 }
 
+/**
+ * Constructs the standard AJAX response structure 
+ *  returned by admin-ajax.php ajax actions.
+ * Optionally, additional properties can be added, as an associative array
+ * 
+ * @param array $additionalProps Additional properties to add.
+ * @return \stdClass A new standard response instance
+ */
 function lvdwcmc_get_ajax_response($additionalProps = array()) {
-	$response = new stdClass();
+	$response = new \stdClass();
 	$response->success = false;
 	$response->message = null;
 
@@ -89,6 +97,14 @@ function lvdwcmc_get_ajax_response($additionalProps = array()) {
 	return $response;
 }
 
+/**
+ * Appends the given error to the given message if WP_DEBUG is set to true; 
+ * otherwise returns the original message
+ * 
+ * @param string $message
+ * @param string|Exception|WP_Error $error
+ * @return string The processed message
+ */
 function lvdwcmc_append_error($message, $error) {
 	if (defined('WP_DEBUG') && WP_DEBUG) {
 		if ($error instanceof \Exception) {
@@ -100,6 +116,12 @@ function lvdwcmc_append_error($message, $error) {
 	return $message;
 }
 
+/**
+ * Increase script execution time limit and maximum memory limit
+ * 
+ * @param int $executionTimeMinutes The execution time in minutes, to raise the limit to. Defaults to 5 minutes.
+ * @return void
+ */
 function lvdwcmc_increase_limits($executionTimeMinutes = 10) {
    if (function_exists('set_time_limit')) {
 		@set_time_limit($executionTimeMinutes * 60);
@@ -109,6 +131,13 @@ function lvdwcmc_increase_limits($executionTimeMinutes = 10) {
 	}
 }
 
+/**
+ * Encodes and outputs the given data as JSON and sets the appropriate headers
+ * 
+ * @param mixed $data The data to be encoded and sent to client
+ * @param boolean $die Whether or not to halt script execution. Defaults to true.
+ * @return void
+ */
 function lvdwcmc_send_json(\stdClass $data, $die = true) {
    $data = json_encode($data);
 	header('Content-Type: application/json');
@@ -128,25 +157,29 @@ function lvdwcmc_send_json(\stdClass $data, $die = true) {
 }
 
 /**
- * @return \LvdWcMc\Env
+ * Returns the current environment accessor instance
+ * 
+ * @return \LvdWcMc\Env The current environment accessor instance
  */
 function lvdwcmc_env() {
    static $env = null;
    
    if ($env === null) {
-      $env = new LvdWcMc\Env();
+      $env = new \LvdWcMc\Env();
    }
 
    return $env;
 }
 
 /**
- * @return \LvdWcMc\Plugin
+ * Returns the current environment plugin instance
+ * 
+ * @return \LvdWcMc\Plugin The current plugin instance
  */
 function lvdwcmc_plugin() {
    static $plugin = null;
    if ($plugin === null) {
-      $plugin = new LvdWcMc\Plugin(array(
+      $plugin = new \LvdWcMc\Plugin(array(
          'mediaIncludes' => array(
             'refPluginsPath' => LVD_WCMC_MAIN,
             'scriptsInFooter' => true
@@ -156,6 +189,11 @@ function lvdwcmc_plugin() {
    return $plugin;
 }
 
+/**
+ * Runs the plug-in such that it integrates into WP workflow
+ * 
+ * @return void
+ */
 function lvd_wcmc_run() {
    lvdwcmc_plugin()->run();
 }

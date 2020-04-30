@@ -148,7 +148,7 @@ namespace LvdWcMc {
         }
 
         public function isEditingWcOrder() {
-            if ($this->getCurrentPage() == 'post.php' && !empty($_GET['post'])) {
+            if ($this->getCurrentAdminPage() == 'post.php' && !empty($_GET['post'])) {
                 $order = wc_get_order(intval($_GET['post']));
                 return !empty($order) && ($order instanceof \WC_Order);
             } else {
@@ -158,16 +158,16 @@ namespace LvdWcMc {
 
         public function isViewingAdminTransactionListing() {
             return is_admin() 
-                && $this->getCurrentPage() == 'admin.php' 
+                && $this->getCurrentAdminPage() == 'admin.php' 
                 && isset($_GET['page']) 
                 && $_GET['page'] == 'lvdwcmc-card-transactions-listing';
         }
 
         public function isViewingWpDashboard() {
-            return is_admin() && $this->getCurrentPage() == 'index.php';
+            return is_admin() && $this->getCurrentAdminPage() == 'index.php';
         }
 
-        public function getCurrentPage() {
+        public function getCurrentAdminPage() {
             return isset($GLOBALS['pagenow']) 
                 ? strtolower($GLOBALS['pagenow']) 
                 : null;
@@ -226,9 +226,9 @@ namespace LvdWcMc {
 
         public function getMetaDb() {
             if ($this->_metaDb == null) {
-                $this->_metaDb = new \MysqliDb($this->getDbHost(),
-                    $this->getDbUserName(),
-                    $this->getDbPassword(),
+                $this->_metaDb = new \MysqliDb($this->_dbHost,
+                    $this->_dbUserName,
+                    $this->_dbPassword,
                     'information_schema');
     
                 $this->_initDriverIfNeeded();
@@ -277,6 +277,22 @@ namespace LvdWcMc {
             return $this->_setupDataDir;
         }
 
+        public function getRemoteAddress() {
+            return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        }
+
+        public function getPublicAssetUrl($path) {
+            return plugins_url($path, LVD_WCMC_MAIN);
+        }
+
+        public function isHttpPost() {
+            return strtolower($_SERVER['REQUEST_METHOD']) === 'post';
+        }
+    
+        public function isHttpGet() {
+            return strtolower($_SERVER['REQUEST_METHOD']) === 'get';
+        }
+
         public function getPhpVersion() {
             return $this->_phpVersion;
         }
@@ -287,21 +303,6 @@ namespace LvdWcMc {
 
         public function getVersion() {
             return $this->_version;
-        }
-
-        public function getRemoteAddress() {
-            return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
-        }
-        public function isHttpPost() {
-            return strtolower($_SERVER['REQUEST_METHOD']) === 'post';
-        }
-    
-        public function isHttpGet() {
-            return strtolower($_SERVER['REQUEST_METHOD']) === 'get';
-        }
-    
-        public function getPublicAssetUrl($path) {
-            return plugins_url($path, LVD_WCMC_HEADER);
         }
 
         public function getRequiredPhpVersion() {
