@@ -17,5 +17,6 @@ data/help/default
 data/help/en_US
 data/help/ro_RO
 node_modules
+node_modules/*
 .wc-installed
 .lvdwcmc-installed
