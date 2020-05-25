@@ -156,6 +156,19 @@ function lvdwcmc_send_json(\stdClass $data, $die = true) {
    }
 }
 
+if (!function_exists('write_log')) {
+	function write_log ($message)  {
+	   if (is_array($message) || is_object($message)) {
+			ob_start();
+			var_dump($message);
+			$message = ob_get_clean();
+			error_log($message);
+	   } else {
+			error_log($message);
+	   }
+	}
+ }
+
 /**
  * Returns the current environment accessor instance
  * 

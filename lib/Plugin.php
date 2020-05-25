@@ -30,7 +30,10 @@
  */
 
 namespace LvdWcMc {
-    class Plugin {
+
+use stdClass;
+
+class Plugin {
         const ACTION_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details';
 
         const NONCE_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details_nonce';
@@ -70,6 +73,8 @@ namespace LvdWcMc {
          */
         private $_requiredPlugins = null;
 
+        private $_missingPlugins = array();
+
         public function __construct(array $options) {
             if (!isset($options['mediaIncludes']) || !is_array($options['mediaIncludes'])) {
                 $options['mediaIncludes'] = array(
@@ -80,7 +85,7 @@ namespace LvdWcMc {
 
             $this->_requiredPlugins = array(
                 'woocommerce/woocommerce.php' => function() {
-                    return defined('WC_PLUGIN_FILE') 
+                    return defined('WC_PLUGIN_FILE1') 
                         && class_exists('WC_Payment_Gateway') 
                         && class_exists('WooCommerce')
                         && function_exists('WC');
@@ -105,26 +110,10 @@ namespace LvdWcMc {
 
             add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
             add_action('init', array($this, 'onPluginsInit'));
-            
-            add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueStyles'), 9999);
-            add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueScripts'), 9999);
-            add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'), 9999);
-            add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueScripts'), 9999);
-
-            add_action('add_meta_boxes', array($this, 'onRegisterMetaboxes'), 10, 2);
-            add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
-            add_action('wp_dashboard_setup', array($this, 'onDashboardWidgetsSetup'));
-
-            $this->_addAjaxAction(self::ACTION_GET_ADMIN_TRANSACTION_DETAILS, 
-                array($this, 'ajaxGetAdminTransactionDetails'),
-                false);
-
-            add_shortcode('lvdwcmc_display_mobilpay_order_status', 
-                array($this->_shortcodes, 'displayMobilpayOrderStatus'));
         }
 
         public function onActivatePlugin() {
-            if (!$this->_currentUserCanActivatePlugins()) {
+            if (!self::_currentUserCanActivatePlugins()) {
                 return;
             }
 
@@ -148,7 +137,7 @@ namespace LvdWcMc {
         }
 
         public function onDeactivatePlugin() {
-            if (!$this->_currentUserCanActivatePlugins()) {
+            if (!self::_currentUserCanActivatePlugins()) {
                 return;
             }
             if (!$this->_installer->deactivate()) {
@@ -157,26 +146,59 @@ namespace LvdWcMc {
             }
         }
 
-        public static  function onUninstallPlugin() {
-            if (!lvdwcmc_plugin()->getInstaller()->uninstall()) {
-                wp_die(lvdwcmc_append_error('Could not uninstall plug-in', $this->_installer->getLastError()), 
+        public static function onUninstallPlugin() {
+            if (!self::_currentUserCanActivatePlugins()) {
+                return;
+            }
+            
+            $installer = lvdwcmc_plugin()->getInstaller();
+            if (!$installer->uninstall()) {
+                wp_die(lvdwcmc_append_error('Could not uninstall plug-in', $installer->getLastError()), 
                     'Uninstall error');
             }
         }
 
+        public function onAdminNoticesRenderMissingPluginsWarning() {
+            $data = new stdClass();
+            $data->missingPlugins = $this->_missingPlugins;
+            require $this->_env->getViewFilePath('lvdwcmc-admin-notices-missing-required-plugins.php');
+        }
+
         public function onPluginsLoaded() {
+            $this->_missingPlugins = array();
+            add_action('admin_notices', array($this, 'onAdminNoticesRenderMissingPluginsWarning'));
             foreach ($this->_requiredPlugins as $plugin => $checker) {
                 if (!$checker()) {
-                    wp_die('Missing required plug-in: "' . $plugin . '".', 'Missing dependency');
+                    $this->_missingPlugins[] = $plugin;
                 }
             }
 
-            add_filter('woocommerce_payment_gateways', 
-                array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
-            add_filter('woocommerce_order_details_after_order_table', 
-                array($this, 'addTransactionDetailsOnAccountOrderDetails'), -1, 1);
-            add_filter('woocommerce_format_log_entry', 
-                array($this, 'onFormatWooCommerceLogMessage'), 10, 2);
+            if (!$this->_hasMissingRequiredPlugins()) {
+                add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueStyles'), 9999);
+                add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueScripts'), 9999);
+                add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'), 9999);
+                add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueScripts'), 9999);
+
+                add_action('add_meta_boxes', array($this, 'onRegisterMetaboxes'), 10, 2);
+                add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
+                add_action('wp_dashboard_setup', array($this, 'onDashboardWidgetsSetup'));
+
+                $this->_addAjaxAction(self::ACTION_GET_ADMIN_TRANSACTION_DETAILS, 
+                    array($this, 'ajaxGetAdminTransactionDetails'),
+                    false);
+
+                add_shortcode('lvdwcmc_display_mobilpay_order_status', 
+                    array($this->_shortcodes, 'displayMobilpayOrderStatus'));
+
+                add_filter('woocommerce_payment_gateways', 
+                    array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
+                add_filter('woocommerce_order_details_after_order_table', 
+                    array($this, 'addTransactionDetailsOnAccountOrderDetails'), -1, 1);
+                add_filter('woocommerce_format_log_entry', 
+                    array($this, 'onFormatWooCommerceLogMessage'), 10, 2);
+            } else {
+                add_action('admin_notices', array($this, 'onAdminNoticesRenderMissingPluginsWarning'));
+            }
         }
 
         public function onPluginsInit() {
@@ -722,7 +744,7 @@ namespace LvdWcMc {
             load_plugin_textdomain($this->_textDomain, false, plugin_basename(LVD_WCMC_LANG_DIR));
         }
 
-        private function _currentUserCanActivatePlugins() {
+        private static function _currentUserCanActivatePlugins() {
             return current_user_can('activate_plugins');
         }       
 
@@ -771,6 +793,10 @@ namespace LvdWcMc {
 
         private function _getDateTimeFormat() {
             return lvdwcmc_get_datetime_format();
+        }
+
+        private function _hasMissingRequiredPlugins() {
+            return !empty($this->_missingPlugins);
         }
     }
 }
