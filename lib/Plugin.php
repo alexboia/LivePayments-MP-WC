@@ -85,7 +85,7 @@ class Plugin {
 
             $this->_requiredPlugins = array(
                 'woocommerce/woocommerce.php' => function() {
-                    return defined('WC_PLUGIN_FILE1') 
+                    return defined('WC_PLUGIN_FILE') 
                         && class_exists('WC_Payment_Gateway') 
                         && class_exists('WooCommerce')
                         && function_exists('WC');
