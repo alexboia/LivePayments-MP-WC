@@ -114,6 +114,7 @@ class Plugin {
 
         public function onActivatePlugin() {
             if (!self::_currentUserCanActivatePlugins()) {
+                write_log('Attempted to activate plug-in without appropriate access permissions.');
                 return;
             }
 
@@ -138,8 +139,10 @@ class Plugin {
 
         public function onDeactivatePlugin() {
             if (!self::_currentUserCanActivatePlugins()) {
+                write_log('Attempted to deactivate plug-in without appropriate access permissions.');
                 return;
             }
+
             if (!$this->_installer->deactivate()) {
                 wp_die(lvdwcmc_append_error('Could not deactivate plug-in', $this->_installer->getLastError()), 
                     'Deactivation error');
@@ -148,6 +151,7 @@ class Plugin {
 
         public static function onUninstallPlugin() {
             if (!self::_currentUserCanActivatePlugins()) {
+                write_log('Attempted to uninstall plug-in without appropriate access permissions.');
                 return;
             }
             
@@ -166,7 +170,6 @@ class Plugin {
 
         public function onPluginsLoaded() {
             $this->_missingPlugins = array();
-            add_action('admin_notices', array($this, 'onAdminNoticesRenderMissingPluginsWarning'));
             foreach ($this->_requiredPlugins as $plugin => $checker) {
                 if (!$checker()) {
                     $this->_missingPlugins[] = $plugin;
