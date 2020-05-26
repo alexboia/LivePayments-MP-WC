@@ -31,6 +31,12 @@
     defined('LVD_WCMC_LOADED') or die;
 ?>
 
+<style type="text/css">
+    #submit_mobilpay_payment_form_reload_on_error {
+        margin-bottom: 10px;
+    }
+</style>
+
 <?php if ($data->success): ?>
     <form method="post" id="lvdWcMcMobilpayRedirect" action="<?php echo $data->paymentUrl; ?>">
         <input type="hidden" name="env_key" value="<?php echo esc_attr($data->envKey); ?>"/>
@@ -40,4 +46,12 @@
             id="submit_mobilpay_payment_form" 
             value="<?php echo esc_attr__('Pay via mobilPay&trade;', 'livepayments-mp-wc') ?>" />
     </form>
+<?php else: ?>
+    <ul class="woocommerce-error" role="alert">
+        <li><?php echo esc_attr__('The payment could not be initialized. This is usually due to an issue with the store itself, so please contact its administrator.', 'livepayments-mp-wc'); ?></li>
+    </ul>
+
+    <input type="button" name="submit_mobilpay_payment_form_reload_on_error" 
+        id="submit_mobilpay_payment_form_reload_on_error" 
+        value="<?php echo esc_attr__('Retry', 'livepayments-mp-wc') ?>" >
 <?php endif; ?>
