@@ -230,7 +230,8 @@
         return e(WcEmptyContent, {
             title: title,
             message: message,
-            actionLabel: 'Reload page',
+            actionLabel: lvdwcmcWooAdminDashboardSectionsL10n.lblReloadPageBtn,
+            illustrationWidth: 180,
             actionCallback: function() {
                 window.location.reload();
             }
@@ -239,8 +240,15 @@
 
     function _renderSectionHeader() {
         return e(WcSectionHeader, {
-            title: 'LivePayments for Mobilpay - Transaction Reporting'
+            title: lvdwcmcWooAdminDashboardSectionsL10n.lblSectionTitle
         }, null);
+    }
+
+    function _renderCard(title, content) {
+        return e(WcCard, {
+            className: 'woocommerce-dashboard__lvdwcmc-dashboard-card',
+            title: title
+        }, content);
     }
 
     function _renderTransactionStatusCountsCard(countsData) {
@@ -266,16 +274,17 @@
                     className:'lvdwcmc-dashboard-transaction-status' 
                 }, items);
             } else {
-                content = _renderEmptyContent('Data not found!', 'No transactions status counts data found.');
+                content = _renderEmptyContent(
+                    lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
+                    lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTransactionsStatusCounts
+                );
             }
         } else if (countsData.loading) {
             content = _renderLoadingIndicator();
         }
 
-        return e(WcCard, {
-            className: 'woocommerce-dashboard__lvdwcmc-dashboard-card',
-            title: 'Transactions Status Counts'
-        }, content);
+        return _renderCard(lvdwcmcWooAdminDashboardSectionsL10n.lblTitleTransactionsStatusCounts, 
+            content);
     }
 
     function _renderLastTransDetailsCard(txDetailsData) {
@@ -298,16 +307,17 @@
                     className:'lvdwcmc-admin-transaction-details-list' 
                 }, e('tbody', {}, items));
             } else {
-                content = _renderEmptyContent('Data not found!', 'No transactions status counts data found.');
+                content = _renderEmptyContent(
+                    lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
+                    lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundLastTransactionDetails
+                );
             }
         } else {
             content = _renderLoadingIndicator();
         }
 
-        return e(WcCard, {
-            className: 'woocommerce-dashboard__lvdwcmc-dashboard-card',
-            title: 'Last Transaction'
-        }, content);
+        return _renderCard(lvdwcmcWooAdminDashboardSectionsL10n.lblTitleLastTransactionDetails, 
+            content);
     }
 
     function _renderSectionContents(sectionData) {
@@ -347,7 +357,7 @@
                     lastTransctionDetails: store.getLastTransactionDetails()
                 };
             })(TransactionsStatusDashboardSection),
-			title: 'LivePayments for Mobilpay - Transaction Reporting',
+			title: lvdwcmcWooAdminDashboardSectionsL10n.lblSectionTitle,
 			isVisible: true,
 			icon: 'arrow-right-alt',
 			hiddenBlocks: []

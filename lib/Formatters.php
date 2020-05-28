@@ -52,12 +52,12 @@ namespace LvdWcMc {
             $items[] = array(
                 'label' => esc_html__('Original amount', 'livepayments-mp-wc'),
                 'id' => 'amount',
-                'value' => $displayableData->amount
+                'value' => $displayableData->amount . ' ' . $displayableData->currency
             );
             $items[] = array(
                 'label' => esc_html__('Actually processed amount', 'livepayments-mp-wc'),
                 'id' => 'processedAmount',
-                'value' => $displayableData->processedAmount
+                'value' => $displayableData->processedAmount . ' ' . $displayableData->currency
             );
             $items[] = array(
                 'label' => esc_html__('Date initiated', 'livepayments-mp-wc'),

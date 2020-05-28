@@ -78,7 +78,7 @@ namespace LvdWcMc {
                 ->getOne ($this->_env->getPaymentTransactionsTableName());
             
             if (!empty($lastTransactionData)) {
-                $transaction = $this->_transactionFactory->exitingFromRawTransactionData($lastTransactionData);
+                $transaction = $this->_transactionFactory->existingFromRawTransactionData($lastTransactionData);
                 return $this->_formatters->getDisplayableTransactionItemsList($transaction);
             } else {
                 return array();

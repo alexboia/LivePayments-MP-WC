@@ -364,8 +364,13 @@
             $this->_enqueueScript(self::JS_LVDWCMC_PAYMENT_INITIATION);
         }
 
-        public function includeScriptWooAdminDashboardSections() {
+        public function includeScriptWooAdminDashboardSections($localization) {
             $this->_enqueueScript(self::JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS);
+            if (!empty($localization)) {
+                wp_localize_script(self::JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS, 
+                    'lvdwcmcWooAdminDashboardSectionsL10n', 
+                    $localization);
+            }
         }
 
         public function includeStyleCommon() {

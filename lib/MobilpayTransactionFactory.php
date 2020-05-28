@@ -136,8 +136,14 @@
                 : null;
         }
 
-        public function exitingFromRawTransactionData(array $data) {
-            return new MobilpayTransaction($data, $this->_env);
+        /**
+         * @param array $data The data from which to create the transaction instance
+         * @return \LvdWcMc\MobilpayTransaction The corresponding transaction or null if data is empty
+         */
+        public function existingFromRawTransactionData(array $data) {
+            return !empty($data) 
+                ? new MobilpayTransaction($data, $this->_env) 
+                : null;
         }
 
         private function _getDb() {

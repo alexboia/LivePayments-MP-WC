@@ -190,6 +190,7 @@ namespace LvdWcMc {
                 add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueScripts'), 9999);
                 add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'), 9999);
                 add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueScripts'), 9999);
+                add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStylesForWooAdminDashboard'), 0);
                 add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueScriptsForWooAdminDashboard'), 0);
 
                 add_action('add_meta_boxes', array($this, 'onRegisterMetaboxes'), 10, 2);
@@ -275,11 +276,16 @@ namespace LvdWcMc {
                 $this->_mediaIncludes);
         }
 
-        public function onAdminEnqueueScriptsForWooAdminDashboard() {
+        public function onAdminEnqueueStylesForWooAdminDashboard() {
             if ($this->_env->isViewingWooAdminDashboard()) {
                 $this->_mediaIncludes->includeStyleDashboard();
                 $this->_mediaIncludes->includeStyleAdminTransactionDetails();
-                $this->_mediaIncludes->includeScriptWooAdminDashboardSections();
+            }
+        }
+
+        public function onAdminEnqueueScriptsForWooAdminDashboard() {
+            if ($this->_env->isViewingWooAdminDashboard()) {
+                $this->_mediaIncludes->includeScriptWooAdminDashboardSections($this->getWooAdminDashboardSectionsScriptTranslations());
             }
         }
 
@@ -600,6 +606,18 @@ namespace LvdWcMc {
                     => __('The return URL could not generated.', 'livepayments-mp-wc'),
                 'errReturnURLCannotBeGeneratedNetwork'
                     => __('The return URL could not be generated due to a possible network issue', 'livepayments-mp-wc')
+            );
+        }
+
+        public function getWooAdminDashboardSectionsScriptTranslations() {
+            return array(
+                'lblReloadPageBtn' => __('Reload page', 'livepayments-mp-wc'),
+                'lblSectionTitle' => __('LivePayments for Mobilpay - Transaction Reporting', 'livepayments-mp-wc'),
+                'lblTitleTransactionsStatusCounts' => __('Transactions Status Counts', 'livepayments-mp-wc'),
+                'lblTitleLastTransactionDetails' => __('Last Transaction', 'livepayments-mp-wc'),
+                'warnDataNotFoundTitle' => __('Data not found!', 'livepayments-mp-wc'),
+                'warnDataNotFoundLastTransactionDetails' => __('No transactions data found', 'livepayments-mp-wc'),
+                'warnDataNotFoundTransactionsStatusCounts' => __('No transactions status counts data found', 'livepayments-mp-wc')
             );
         }
 
