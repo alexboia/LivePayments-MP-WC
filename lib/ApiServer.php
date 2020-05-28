@@ -1,3 +1,4 @@
+<?php
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -28,31 +29,44 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- #lvdwcmc-transaction-details-metabox .inside {
-    padding-left: 4px;
-    padding-right: 4px;
- }
+namespace LvdWcMc {
+    class ApiServer  {
+        private $_env;
 
- table.lvdwcmc-admin-transaction-details-list {
-    width: 100%;
- }
+        private $_report;
 
- table.lvdwcmc-admin-transaction-details-list th {
-    text-align: left;
- }
+        public function __construct() {
+            $this->_env = lvdwcmc_env();
+            $this->_report = new TransactionReport();
+        }
 
- table.lvdwcmc-admin-transaction-details-list th, td {
-    padding: 8px;
- }
+        public function listen() {
+            register_rest_route('livepayments-mp-wc', 
+                '/reports/transctions-status-counts', 
+                array(
+                    'methods' => 'GET',
+                    'callback' => array($this, 'handleRequestTransactionsStatusCounts'),
+            ));
 
- .woocommerce-dashboard__lvdwcmc-dashboard-card table.lvdwcmc-admin-transaction-details-list th, td {
-   padding: 12px;
+            register_rest_route('livepayments-mp-wc', 
+                '/reports/last-transaction-details', 
+                array(
+                    'methods' => 'GET',
+                    'callback' => array($this, 'handleRequestLastTransactionDetails'),
+            ));
+        }
+
+        public function handleRequestTransactionsStatusCounts(\WP_REST_Request $request) {
+            $data = new \stdClass();
+            $data->data = $this->_report->getTransactionsStatusCounts();
+            $data->success = true;
+            return new \WP_REST_Response($data, 200);
+        }
+
+        public function handleRequestLastTransactionDetails(\WP_REST_Request $request) {
+            $data = new \stdClass();
+            $data->data = $this->_report->getLastTransactionDetails();
+            return new \WP_REST_Response($data, 200);
+        }
+    }
 }
-
- table.lvdwcmc-admin-transaction-details-list tr:nth-child(2n+1) {
-    background-color: #f8f8f8;
- }
-
- table.lvdwcmc-admin-transaction-details-list tr:hover {
-    background-color: #a7cedc;
- }

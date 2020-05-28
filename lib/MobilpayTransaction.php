@@ -45,6 +45,8 @@ namespace LvdWcMc {
 
         const STATUS_FAILED = 'failed';
 
+        private static $_labelsForCodes;
+
         /**
          * @var \LvdWcMc\Env Reference to the environment object
          */
@@ -135,6 +137,31 @@ namespace LvdWcMc {
 
         private function _setLastUpdated() {
             $this->_timestampLastUpdated = date('Y-m-d H:i:s');
+        }
+
+        public static function getStatusLabel($status) {
+            if (self::$_labelsForCodes === null) {
+                self::$_labelsForCodes = array(
+                    MobilpayTransaction::STATUS_CANCELLED 
+                        => __('Cancelled', 'livepayments-mp-wc'),
+                    MobilpayTransaction::STATUS_CONFIRMED 
+                        => __('Confirmed. Payment successful', 'livepayments-mp-wc'),
+                    MobilpayTransaction::STATUS_CONFIRMED_PENDING 
+                        => __('Pending confirmation', 'livepayments-mp-wc'),
+                    MobilpayTransaction::STATUS_CREDIT 
+                        => __('Credited', 'livepayments-mp-wc'),
+                    MobilpayTransaction::STATUS_FAILED 
+                        => __('Failed', 'livepayments-mp-wc'),
+                    MobilpayTransaction::STATUS_NEW 
+                        => __('Started', 'livepayments-mp-wc'),
+                    MobilpayTransaction::STATUS_PAID_PENDING 
+                        => __('Pending payment', 'livepayments-mp-wc')
+                );
+            }
+
+            return isset(self::$_labelsForCodes[$status]) 
+                ? self::$_labelsForCodes[$status] 
+                : '-';
         }
 
         public function save() {

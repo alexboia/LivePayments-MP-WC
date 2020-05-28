@@ -167,6 +167,14 @@ namespace LvdWcMc {
             return is_admin() && $this->getCurrentAdminPage() == 'index.php';
         }
 
+        public function isViewingWooAdminDashboard() {
+            if (!class_exists('Automattic\WooCommerce\Admin\Loader') || !\Automattic\WooCommerce\Admin\Loader::is_admin_page()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         public function getCurrentAdminPage() {
             return isset($GLOBALS['pagenow']) 
                 ? strtolower($GLOBALS['pagenow']) 

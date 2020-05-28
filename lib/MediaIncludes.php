@@ -53,6 +53,8 @@
 
         const JS_LVDWCMC_PAYMENT_INITIATION = 'lvdwcmc-payment-initiation-js';
 
+        const JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS = 'lvdwcmc-wooadmin-dashboard-sections-js';
+
         const STYLE_TOASTR = 'toastr-css';
 
         const STYLE_LVDWCMC_COMMON = 'lvdwcmc-common-css';
@@ -170,6 +172,17 @@
                 'deps' => array(
                     self::JS_JQUERY,
                     self::JS_JQUERY_BLOCKUI
+                )
+            ),
+            self::JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS => array(
+                'path' => 'media/js/lvdwcmc-woocommerce-admin-dashboard-sections.js',
+                'version' => LVD_WCMC_VERSION,
+                'deps' => array(
+                    self::JS_JQUERY,
+                    'wp-hooks',
+			        'wp-element',
+			        'wp-i18n',
+			        'wc-components'
                 )
             )
         );
@@ -349,6 +362,10 @@
 
         public function includeScriptPaymentInitiation() {
             $this->_enqueueScript(self::JS_LVDWCMC_PAYMENT_INITIATION);
+        }
+
+        public function includeScriptWooAdminDashboardSections() {
+            $this->_enqueueScript(self::JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS);
         }
 
         public function includeStyleCommon() {

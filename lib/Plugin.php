@@ -30,10 +30,7 @@
  */
 
 namespace LvdWcMc {
-
-use stdClass;
-
-class Plugin {
+    class Plugin {
         const ACTION_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details';
 
         const NONCE_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details_nonce';
@@ -73,6 +70,21 @@ class Plugin {
          */
         private $_requiredPlugins = null;
 
+        /**
+         * @var \LvdWcMc\TransactionReport
+         */
+        private $_report = null;
+
+        /**
+         * @var \LvdWcMc\Formatters
+         */
+        private $_formatters = null;
+
+        /**
+         * @var \LvdWcMc\ApiServer
+         */
+        private $_apiServer = null;
+
         private $_missingPlugins = array();
 
         public function __construct(array $options) {
@@ -96,6 +108,9 @@ class Plugin {
             $this->_installer = new Installer();
             $this->_shortcodes = new Shortcodes();
             $this->_transactionFactory = new MobilpayTransactionFactory();
+            $this->_report = new TransactionReport();
+            $this->_apiServer = new ApiServer();
+            $this->_formatters = new Formatters();
 
             $this->_mediaIncludes = new MediaIncludes(
                 $options['mediaIncludes']['refPluginsPath'], 
@@ -109,6 +124,7 @@ class Plugin {
             register_uninstall_hook(LVD_WCMC_MAIN, array(__CLASS__, 'onUninstallPlugin'));
 
             add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
+            add_action('rest_api_init', array($this, 'onPluginsRestApiInit'));
             add_action('init', array($this, 'onPluginsInit'));
         }
 
@@ -163,24 +179,18 @@ class Plugin {
         }
 
         public function onAdminNoticesRenderMissingPluginsWarning() {
-            $data = new stdClass();
+            $data = new \stdClass();
             $data->missingPlugins = $this->_missingPlugins;
             require $this->_env->getViewFilePath('lvdwcmc-admin-notices-missing-required-plugins.php');
         }
 
         public function onPluginsLoaded() {
-            $this->_missingPlugins = array();
-            foreach ($this->_requiredPlugins as $plugin => $checker) {
-                if (!$checker()) {
-                    $this->_missingPlugins[] = $plugin;
-                }
-            }
-
-            if (!$this->_hasMissingRequiredPlugins()) {
+            if ($this->_checkMisingPlugins()) {
                 add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueStyles'), 9999);
                 add_action('wp_enqueue_scripts', array($this, 'onFrontendEnqueueScripts'), 9999);
                 add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueStyles'), 9999);
                 add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueScripts'), 9999);
+                add_action('admin_enqueue_scripts', array($this, 'onAdminEnqueueScriptsForWooAdminDashboard'), 0);
 
                 add_action('add_meta_boxes', array($this, 'onRegisterMetaboxes'), 10, 2);
                 add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
@@ -204,6 +214,12 @@ class Plugin {
             }
         }
 
+        public function onPluginsRestApiInit() {
+            if ($this->_checkMisingPlugins()) {
+                $this->_apiServer->listen();
+            }
+        }
+
         public function onPluginsInit() {
             $this->_loadTextDomain();
             $this->_installer->updateIfNeeded();
@@ -215,7 +231,7 @@ class Plugin {
         }
 
         public function onAddAdminMenuEntries() {
-            if ($this->_canManageWooCommerce()) {
+            if (self::_currentUserCanManageWooCommerce()) {
                 add_submenu_page('woocommerce', 
                     __('LivePayments Card Transactions', 'livepayments-mp-wc'), 
                     __('LivePayments Card Transactions', 'livepayments-mp-wc'), 
@@ -257,6 +273,14 @@ class Plugin {
              */
             do_action('lvdwcmc_frontend_enqueue_scripts', 
                 $this->_mediaIncludes);
+        }
+
+        public function onAdminEnqueueScriptsForWooAdminDashboard() {
+            if ($this->_env->isViewingWooAdminDashboard()) {
+                $this->_mediaIncludes->includeStyleDashboard();
+                $this->_mediaIncludes->includeStyleAdminTransactionDetails();
+                $this->_mediaIncludes->includeScriptWooAdminDashboardSections();
+            }
         }
 
         public function onAdminEnqueueStyles() {
@@ -351,7 +375,7 @@ class Plugin {
         }
 
         public function showAdminTransactionsListing() {
-            if (!$this->_canManageWooCommerce()) {
+            if (!self::_currentUserCanManageWooCommerce()) {
                 die;
             }
 
@@ -461,7 +485,7 @@ class Plugin {
         }
 
         public function ajaxGetAdminTransactionDetails() {
-            if (!$this->_canManageWooCommerce()) {
+            if (!self::_currentUserCanManageWooCommerce()) {
                 die;
             }
 
@@ -488,7 +512,6 @@ class Plugin {
         }
 
         public function onDashboardWidgetsSetup() {
-
             /**
              * Filters whether or not to add the transactions 
              *  status widget to the WP admin dashboard
@@ -499,7 +522,7 @@ class Plugin {
              * @return boolean Whether to add the widget or not, as returned by the registered filters
              */
             $addDashboardWidget = apply_filters('lvdwcmc_add_status_dashboard_widget', 
-                $this->_canManageWooCommerce());
+                self::_currentUserCanManageWooCommerce());
 
             if ($addDashboardWidget) {
                 wp_add_dashboard_widget('lvdwcmc-transactions-status', 
@@ -511,31 +534,8 @@ class Plugin {
         }
 
         public function renderTransactionsStatusWidget() {
-            $statusData = array();
-            $db = $this->_env->getDb();
-            
-            $rawStatusData = $db
-                ->groupBy('tx_status')
-                ->get($this->_env->getPaymentTransactionsTableName(), null, 'tx_status, COUNT(tx_status) tx_status_count');
-            
-            foreach ($this->_getEmptyTransactionStatusData() as $status => $count) {
-                $statusData[$status] = array(
-                    'label' => $this->_getTransactionStatusLabel($status),
-                    'count' => $count
-                );
-            }
-
-            if (!empty($rawStatusData)) {
-                foreach ($rawStatusData as $row) {
-                    $statusData[$row['tx_status']] = array(
-                        'label' => $this->_getTransactionStatusLabel($row['tx_status']),
-                        'count' => intval($row['tx_status_count'])
-                    );
-                }
-            }
-
             $data = new \stdClass();
-            $data->status = $statusData;
+            $data->status = $this->_report->getTransactionsStatusCounts();
             $data->success = true;
 
             /**
@@ -638,22 +638,18 @@ class Plugin {
             return $this->_mediaIncludes;
         }
 
+        private static function _currentUserCanManageWooCommerce() {
+            return current_user_can('manage_woocommerce');
+        }
+
+        private static function _currentUserCanActivatePlugins() {
+            return current_user_can('activate_plugins');
+        }  
+
         private function _shouldFormatWooCommerceLogMessage($args) {
             return !empty($args['context']) && (
                 empty($args['context']['source']) 
                 || $args['context']['source'] == MobilpayCreditCardGateway::GATEWAY_ID
-            );
-        }
-
-        private function _getEmptyTransactionStatusData() {
-            return array(
-                MobilpayTransaction::STATUS_NEW => 0,
-                MobilpayTransaction::STATUS_CONFIRMED_PENDING => 0,
-                MobilpayTransaction::STATUS_PAID_PENDING => 0,
-                MobilpayTransaction::STATUS_FAILED => 0,
-                MobilpayTransaction::STATUS_CREDIT => 0,
-                MobilpayTransaction::STATUS_CONFIRMED => 0,
-                MobilpayTransaction::STATUS_CANCELLED => 0
             );
         }
 
@@ -667,55 +663,15 @@ class Plugin {
         }
 
         private function _getDisplayableTransactionDetails(MobilpayTransaction $transaction) {
-            $data = new \stdClass();
-            $data->providerTransactionId = $transaction->getProviderTransactionId();
-            $data->status = $this->_getTransactionStatusLabel($transaction->getStatus());
-            $data->panMasked = $transaction->getPANMasked();
-            
-            $data->amount = $this->_formatTransactionAmount($transaction->getAmount());
-            $data->processedAmount = $this->_formatTransactionAmount($transaction->getProcessedAmount());
-            $data->currency = $transaction->getCurrency();
-            
-            $data->timestampInitiated = $this->_formatTransactionTimestamp($transaction->getTimestampInitiated());
-            $data->timestampLastUpdated = $this->_formatTransactionTimestamp($transaction->getTimestampLastUpdated());
-            $data->errorCode = $transaction->getErrorCode();
-            $data->errorMessage = $transaction->getErrorMessage();
-
-            if ($this->_canManageWooCommerce()) {
-                $data->clientIpAddress = $transaction->getIpAddress();
-            } else {
-                $data->clientIpAddress = null;
-            }
-
-            /**
-             * Filters the transaction details view model, used both 
-             *  in the backend and in the frontend to display transaction information.
-             * Properties may be overwritten.
-             * 
-             * @hook lvdwcmc_get_displayable_transaction_details
-             * 
-             * @param \stdClass $data The initial view model, as provided by LivePayments-MP-WC
-             * @param \LvdWcMc\MobilpayTransaction $transaction The source transaction
-             * @return \stdClass The actual view model, as returned by the registered filters
-             */
-            return apply_filters('lvdwcmc_get_displayable_transaction_details', 
-                $data, 
-                $transaction);
+            return $this->_formatters->getDisplayableTransactionDetails($transaction);
         }
 
         private function _formatTransactionAmount($amount) {
-            $amountFormat = $this->_getAmountFormat();
-            return number_format($amount, 
-                $amountFormat['decimals'], 
-                $amountFormat['decimalSeparator'], 
-                $amountFormat['thousandSeparator']);
+            return $this->_formatters->formatTransactionAmount($amount);
         }
 
         private function _formatTransactionTimestamp($strTimestamp) {
-            $timestamp = date_create_from_format('Y-m-d H:i:s', $strTimestamp);
-            return !empty($timestamp) 
-                ? $timestamp->format($this->_getDateTimeFormat()) 
-                : null;
+            return $this->_formatters->formatTransactionTimestamp($strTimestamp);
         }
 
         private function _addAjaxAction($action, $callBack, $noPriv = false) {
@@ -723,10 +679,6 @@ class Plugin {
             if ($noPriv) {
                 add_action('wp_ajax_nopriv_' . $action, $callBack);
             }
-        }
-
-        private function _canManageWooCommerce() {
-            return current_user_can('manage_woocommerce');
         }
 
         private function _createGetTransactionDetailsNonce() {
@@ -745,11 +697,7 @@ class Plugin {
 
         private function _loadTextDomain() {
             load_plugin_textdomain($this->_textDomain, false, plugin_basename(LVD_WCMC_LANG_DIR));
-        }
-
-        private static function _currentUserCanActivatePlugins() {
-            return current_user_can('activate_plugins');
-        }       
+        }   
 
         private function _getInstallationErrorTranslations() {
             $this->_loadTextDomain();
@@ -768,34 +716,17 @@ class Plugin {
         }
 
         private function _getTransactionStatusLabel($status) {
-            $labelsForCodes = array(
-                MobilpayTransaction::STATUS_CANCELLED 
-                    => __('Cancelled', 'livepayments-mp-wc'),
-                MobilpayTransaction::STATUS_CONFIRMED 
-                    => __('Confirmed. Payment successful', 'livepayments-mp-wc'),
-                MobilpayTransaction::STATUS_CONFIRMED_PENDING 
-                    => __('Pending confirmation', 'livepayments-mp-wc'),
-                MobilpayTransaction::STATUS_CREDIT 
-                    => __('Credited', 'livepayments-mp-wc'),
-                MobilpayTransaction::STATUS_FAILED 
-                    => __('Failed', 'livepayments-mp-wc'),
-                MobilpayTransaction::STATUS_NEW 
-                    => __('Started', 'livepayments-mp-wc'),
-                MobilpayTransaction::STATUS_PAID_PENDING 
-                    => __('Pending payment', 'livepayments-mp-wc')
-            );
-
-            return isset($labelsForCodes[$status]) 
-                ? $labelsForCodes[$status] 
-                : '-';
+            return MobilpayTransaction::getStatusLabel($status);
         }
 
-        private function _getAmountFormat() {
-            return lvdwcmc_get_amount_format();
-        }
-
-        private function _getDateTimeFormat() {
-            return lvdwcmc_get_datetime_format();
+        private function _checkMisingPlugins() {
+            $this->_missingPlugins = array();
+            foreach ($this->_requiredPlugins as $plugin => $checker) {
+                if (!$checker()) {
+                    $this->_missingPlugins[] = $plugin;
+                }
+            }
+            return !$this->_hasMissingRequiredPlugins();
         }
 
         private function _hasMissingRequiredPlugins() {

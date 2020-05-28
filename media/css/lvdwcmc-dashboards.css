@@ -85,9 +85,18 @@
 .lvdwcmc-dashboard-transaction-status li {
     border-bottom: 1px solid #ececec;
     padding-bottom: 10px;
+    margin-bottom: 0px;
 }
 
 .lvdwcmc-dashboard-transaction-status li:last-of-type {
     border-bottom: 0px none;
     margin-bottom: 0px;
+}
+
+.lvdwcmc-dashboard-panel-loading-container {
+    text-align: center;
+}
+
+.woocommerce-dashboard__lvdwcmc-dashboard-card .woocommerce-card__header {
+    padding-bottom: 0px;
 }

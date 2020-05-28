@@ -136,6 +136,10 @@
                 : null;
         }
 
+        public function exitingFromRawTransactionData(array $data) {
+            return new MobilpayTransaction($data, $this->_env);
+        }
+
         private function _getDb() {
             return $this->_env->getDb();
         }
