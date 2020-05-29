@@ -142,7 +142,7 @@
         return function() {
             _setStartedResolutionIfNeeded(spec.selectorName);
             spec.onBeforeLoadSelectorData();
-            apiFetch({ path: spec.path })
+            apiFetch({ path: spec.path, cache: 'no-cache' })
                 .then(function(result) {
                     spec.onSelectorDataLoaded(_getDataWithResult(result));
                     _setFinishedResolution(spec.selectorName);
@@ -268,35 +268,43 @@
         }, content);
     }
 
-    function _renderTransactionStatusCountsCard(countsData) {
+    function _renderTransactionStatusCountsCardContents(countsData) {
         var items = [];
+        var content = null;
+
+        if (countsData.items) {
+            for (status in countsData.items) {
+                if (countsData.items.hasOwnProperty(status)) {
+                    var countItem = countsData.items[status];
+                    items.push(e('li', { className: status },
+                        e('span', { className: 'lvdwcmc-status-count' }, countItem.count),
+                        e('h5', { className: 'lvdwcmc-status-label' }, countItem.label),
+                        e('div', { className: 'lvdwcmc-clear' }, null)
+                    ));
+                }
+            }
+        }
+
+        if(items.length > 0) {
+            content = e('ul', { 
+                className:'lvdwcmc-dashboard-transaction-status' 
+            }, items);
+        } else {
+            content = _renderContentWarning(
+                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
+                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTransactionsStatusCounts
+            );
+        }
+
+        return content;
+    }
+
+    function _renderTransactionStatusCountsCard(countsData) {
         var content = null;
 
         if (countsData.loaded) {
             if (countsData.success) {
-                if (countsData.items) {
-                    for (status in countsData.items) {
-                        if (countsData.items.hasOwnProperty(status)) {
-                            var countItem = countsData.items[status];
-                            items.push(e('li', { className: status },
-                                e('span', { className: 'lvdwcmc-status-count' }, countItem.count),
-                                e('h5', { className: 'lvdwcmc-status-label' }, countItem.label),
-                                e('div', { className: 'lvdwcmc-clear' }, null)
-                            ));
-                        }
-                    }
-                }
-
-                if(items.length > 0) {
-                    content = e('ul', { 
-                        className:'lvdwcmc-dashboard-transaction-status' 
-                    }, items);
-                } else {
-                    content = _renderContentWarning(
-                        lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
-                        lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTransactionsStatusCounts
-                    );
-                }
+                content = _renderTransactionStatusCountsCardContents(countsData);
             } else {
                 content = _renderContentWarning(
                     lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTitle, 
@@ -311,32 +319,41 @@
             content);
     }
 
+    function _renderLastTransDetailsCardContents(txDetailsData) {
+        var items = [];
+        var content = null;
+
+        if (txDetailsData.items) {
+            for (var i = 0; i < txDetailsData.items.length; i ++) {
+                var txDataItem = txDetailsData.items[i];
+                items.push(e('tr', {}, 
+                    e('th', { scope: 'row' }, txDataItem.label),
+                    e('td', { scope: 'row' }, txDataItem.value || '-')
+                ));
+            }
+        }
+
+        if(items.length > 0) {
+            content = e('table', { 
+                className:'lvdwcmc-admin-transaction-details-list' 
+            }, e('tbody', {}, items));
+        } else {
+            content = _renderContentWarning(
+                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
+                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundLastTransactionDetails
+            );
+        }
+
+        return content;
+    }
+
     function _renderLastTransDetailsCard(txDetailsData) {
         var items = [];
         var content = null;
 
         if (txDetailsData.loaded) {
             if (txDetailsData.success) {
-                if (txDetailsData.items) {
-                    for (var i = 0; i < txDetailsData.items.length; i ++) {
-                        var txDataItem = txDetailsData.items[i];
-                        items.push(e('tr', {}, 
-                            e('th', { scope: 'row' }, txDataItem.label),
-                            e('td', { scope: 'row' }, txDataItem.value || '-')
-                        ));
-                    }
-                }
-
-                if(items.length > 0) {
-                    content = e('table', { 
-                        className:'lvdwcmc-admin-transaction-details-list' 
-                    }, e('tbody', {}, items));
-                } else {
-                    content = _renderContentWarning(
-                        lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
-                        lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundLastTransactionDetails
-                    );
-                }
+                content = _renderLastTransDetailsCardContents(txDetailsData);
             } else {
                 content = _renderContentWarning(
                     lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTitle, 
@@ -370,6 +387,7 @@
         }
     });
 
+    //Register store
     wp.data.registerStore(STORE_KEY, {
         reducer: _stateReducer,
         actions: storeActions,
@@ -378,6 +396,7 @@
         resolvers: storeResolvers
     });
 
+    //Hook on to the dashboard sections filter
     wp.hooks.addFilter('woocommerce_dashboard_default_sections', 'lvdwcmc/add-tx-status-dashoard-section', function(sections) {
         sections.unshift({
             key: 'lvdwcmc-transactions-status-dashboard-section',

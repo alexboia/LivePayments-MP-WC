@@ -128,7 +128,8 @@ namespace LvdWcMc {
 
         private function _getLoggingContext() {
             return array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+                'location' => 'api-server'
             );
         }
     }
