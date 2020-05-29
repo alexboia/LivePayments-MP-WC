@@ -617,7 +617,10 @@ namespace LvdWcMc {
                 'lblTitleLastTransactionDetails' => __('Last Transaction', 'livepayments-mp-wc'),
                 'warnDataNotFoundTitle' => __('Data not found!', 'livepayments-mp-wc'),
                 'warnDataNotFoundLastTransactionDetails' => __('No transactions data found', 'livepayments-mp-wc'),
-                'warnDataNotFoundTransactionsStatusCounts' => __('No transactions status counts data found', 'livepayments-mp-wc')
+                'warnDataNotFoundTransactionsStatusCounts' => __('No transactions status counts data found', 'livepayments-mp-wc'),
+                'errDataLoadingErrorTitle' => __('Error loading data', 'livepayments-mp-wc'),
+                'errDataLoadingErrorLastTransactionDetails' => __('The last transaction details data could not be loaded due to an internal server issue. Please try again.', 'livepayments-mp-wc'),
+                'errDataLoadingErrorTransactionsStatusCounts' => __('The transactions status counts data could not be loaded due to an internal server issue. Please try again.', 'livepayments-mp-wc'),
             );
         }
 

@@ -31,9 +31,22 @@
 
 namespace LvdWcMc {
     class ApiServer  {
+        use LoggingExtensions;
+        
+        /**
+         * @var \LvdWcMc\Env Reference to the environment object
+         */
         private $_env;
 
+        /**
+         * @var \LvdWcMc\TransactionReport Reference to the transaction report manager
+         */
         private $_report;
+
+        /**
+         * @var WC_Logger The logger instance used by this API server
+         */
+        private $_logger = null;
 
         public function __construct() {
             $this->_env = lvdwcmc_env();
@@ -57,16 +70,66 @@ namespace LvdWcMc {
         }
 
         public function handleRequestTransactionsStatusCounts(\WP_REST_Request $request) {
+            if (!$this->_currentUserCanManageWooCommerce()) {
+                return new \WP_REST_Response(null, 403);
+            }
+
             $data = new \stdClass();
-            $data->data = $this->_report->getTransactionsStatusCounts();
-            $data->success = true;
+            $this->logDebug('Begin processing transactions status counts report', 
+                $this->_getLoggingContext());
+
+            try {
+                $data->data = $this->_report->getTransactionsStatusCounts();
+                $data->success = true;
+            } catch (\Exception $exc) {
+                $data->data = null;
+                $data->success = false;
+                $this->logException('Error computing transaction status counts report', 
+                    $exc, 
+                    $this->_getLoggingContext());
+            }
+
             return new \WP_REST_Response($data, 200);
         }
 
         public function handleRequestLastTransactionDetails(\WP_REST_Request $request) {
+            if (!$this->_currentUserCanManageWooCommerce()) {
+                return new \WP_REST_Response(null, 403);
+            }
+
             $data = new \stdClass();
-            $data->data = $this->_report->getLastTransactionDetails();
+            $this->logDebug('Begin processing last transaction details report', 
+                $this->_getLoggingContext());
+            
+            try {
+                $data->data = $this->_report->getLastTransactionDetails();
+                $data->success = true;
+            } catch (\Exception $exc) {
+                $data->data = null;
+                $data->success = false;
+                $this->logException('Error computing last transaction details report', 
+                    $exc, 
+                    $this->_getLoggingContext());
+            }
+
             return new \WP_REST_Response($data, 200);
+        }
+
+        private function _currentUserCanManageWooCommerce() {
+            return current_user_can('manage_woocommerce');
+        }
+
+        public function getLogger() {
+            if ($this->_logger === null) {
+                $this->_logger = wc_get_logger();
+            }
+            return $this->_logger;
+        }
+
+        private function _getLoggingContext() {
+            return array(
+                'source' => MobilpayCreditCardGateway::GATEWAY_ID
+            );
         }
     }
 }

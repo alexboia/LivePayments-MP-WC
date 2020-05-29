@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the LivePayments - mobilPay Card WooCommerce Payment Gateway plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: LivePayments - mobilPay Card WooCommerce Payment Gateway 0.1.0\n"
+"Project-Id-Version: LivePayments - mobilPay Card WooCommerce Payment Gateway 0.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/livepayments-mp-wc\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-04-18T12:49:58+00:00\n"
+"POT-Creation-Date: 2020-05-29T08:54:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.3.0\n"
 "X-Domain: livepayments-mp-wc\n"
@@ -32,6 +32,78 @@ msgstr ""
 
 #. Author URI of the plugin
 msgid "http://alexboia.net"
+msgstr ""
+
+#: lib/Formatters.php:38
+#: views/lvdwcmc-admin-transaction-details.php:51
+#: views/lvdwcmc-admin-transactions-listing.php:158
+#: views/lvdwcmc-email-transaction-details.php:52
+#: views/lvdwcmc-frontend-transaction-details.php:54
+msgid "Transaction Id"
+msgstr ""
+
+#: lib/Formatters.php:43
+#: views/lvdwcmc-admin-transaction-details.php:57
+#: views/lvdwcmc-admin-transactions-listing.php:168
+#: views/lvdwcmc-frontend-transaction-details.php:60
+msgid "Transaction status"
+msgstr ""
+
+#: lib/Formatters.php:48
+#: views/lvdwcmc-admin-transaction-details.php:63
+#: views/lvdwcmc-admin-transactions-listing.php:172
+#: views/lvdwcmc-email-transaction-details.php:56
+#: views/lvdwcmc-frontend-transaction-details.php:66
+msgid "Card number"
+msgstr ""
+
+#: lib/Formatters.php:53
+#: views/lvdwcmc-admin-transaction-details.php:69
+#: views/lvdwcmc-admin-transactions-listing.php:182
+#: views/lvdwcmc-frontend-transaction-details.php:72
+msgid "Original amount"
+msgstr ""
+
+#: lib/Formatters.php:58
+#: views/lvdwcmc-admin-transaction-details.php:75
+#: views/lvdwcmc-admin-transactions-listing.php:186
+#: views/lvdwcmc-frontend-transaction-details.php:78
+msgid "Actually processed amount"
+msgstr ""
+
+#: lib/Formatters.php:63
+#: views/lvdwcmc-admin-transaction-details.php:81
+#: views/lvdwcmc-admin-transactions-listing.php:62
+#: views/lvdwcmc-admin-transactions-listing.php:190
+#: views/lvdwcmc-frontend-transaction-details.php:84
+msgid "Date initiated"
+msgstr ""
+
+#: lib/Formatters.php:68
+#: views/lvdwcmc-admin-transaction-details.php:87
+#: views/lvdwcmc-admin-transactions-listing.php:194
+#: views/lvdwcmc-frontend-transaction-details.php:90
+msgid "Date of last activity"
+msgstr ""
+
+#: lib/Formatters.php:75
+#: views/lvdwcmc-admin-transaction-details.php:93
+#: views/lvdwcmc-admin-transactions-listing.php:199
+#: views/lvdwcmc-frontend-transaction-details.php:96
+msgid "Transaction error code"
+msgstr ""
+
+#: lib/Formatters.php:80
+#: views/lvdwcmc-admin-transaction-details.php:97
+#: views/lvdwcmc-admin-transactions-listing.php:203
+#: views/lvdwcmc-frontend-transaction-details.php:101
+msgid "Transaction error message"
+msgstr ""
+
+#: lib/Formatters.php:88
+#: views/lvdwcmc-admin-transaction-details.php:103
+#: views/lvdwcmc-admin-transactions-listing.php:209
+msgid "Client IP Address"
 msgstr ""
 
 #: lib/MobilpayCardPaymentProcessor.php:500
@@ -334,235 +406,241 @@ msgstr ""
 msgid "Error initiating MobilPay card payment."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:1092
+#: lib/MobilpayCreditCardGateway.php:1093
 msgid "Payment for order #%s."
 msgstr ""
 
-#: lib/Plugin.php:137
+#: lib/MobilpayTransaction.php:146
+msgid "Cancelled"
+msgstr ""
+
+#: lib/MobilpayTransaction.php:148
+msgid "Confirmed. Payment successful"
+msgstr ""
+
+#: lib/MobilpayTransaction.php:150
+msgid "Pending confirmation"
+msgstr ""
+
+#: lib/MobilpayTransaction.php:152
+msgid "Credited"
+msgstr ""
+
+#: lib/MobilpayTransaction.php:154
+msgid "Failed"
+msgstr ""
+
+#: lib/MobilpayTransaction.php:156
+msgid "Started"
+msgstr ""
+
+#: lib/MobilpayTransaction.php:158
+msgid "Pending payment"
+msgstr ""
+
+#: lib/Plugin.php:142
 msgid "Could not activate plug-in: requirements not met."
 msgstr ""
 
-#: lib/Plugin.php:140
-#: lib/Plugin.php:146
+#: lib/Plugin.php:145
+#: lib/Plugin.php:151
 msgid "Activation error"
 msgstr ""
 
-#: lib/Plugin.php:144
+#: lib/Plugin.php:149
 msgid "Could not activate plug-in: activation failure."
 msgstr ""
 
-#: lib/Plugin.php:196
-#: lib/Plugin.php:197
+#: lib/Plugin.php:237
+#: lib/Plugin.php:238
 msgid "LivePayments Card Transactions"
 msgstr ""
 
-#: lib/Plugin.php:311
+#: lib/Plugin.php:365
 #: views/lvdwcmc-frontend-transaction-details.php:35
 msgid "Payment transaction details"
 msgstr ""
 
-#: lib/Plugin.php:413
+#: lib/Plugin.php:467
 msgid "&laquo;"
 msgstr ""
 
-#: lib/Plugin.php:414
+#: lib/Plugin.php:468
 msgid "&raquo;"
 msgstr ""
 
-#: lib/Plugin.php:482
+#: lib/Plugin.php:535
 msgid "LivePayments Card Transaction Status"
 msgstr ""
 
-#: lib/Plugin.php:667
-#: lib/Plugin.php:681
+#: lib/Plugin.php:572
+#: lib/Plugin.php:586
 msgid "The selected file is too large. Maximum allowed size is 10MB"
 msgstr ""
 
-#: lib/Plugin.php:669
-#: lib/Plugin.php:679
+#: lib/Plugin.php:574
+#: lib/Plugin.php:584
 msgid "The selected file type is not valid."
 msgstr ""
 
-#: lib/Plugin.php:671
-#: lib/Plugin.php:673
+#: lib/Plugin.php:576
+#: lib/Plugin.php:578
 msgid "The file could not be read"
 msgstr ""
 
-#: lib/Plugin.php:675
+#: lib/Plugin.php:580
 msgid "The uploader could not be initialized"
 msgstr ""
 
-#: lib/Plugin.php:677
-#: lib/Plugin.php:687
+#: lib/Plugin.php:582
+#: lib/Plugin.php:592
 msgid "The file could not be uploaded"
 msgstr ""
 
-#: lib/Plugin.php:683
+#: lib/Plugin.php:588
 msgid "No file was uploaded"
 msgstr ""
 
-#: lib/Plugin.php:685
+#: lib/Plugin.php:590
 msgid "The file could not be uploaded due to a possible internal server issue"
 msgstr ""
 
-#: lib/Plugin.php:689
+#: lib/Plugin.php:594
 msgid "Remove asset file? This action cannot be undone and you will have to re-upload the asset again!"
 msgstr ""
 
-#: lib/Plugin.php:691
+#: lib/Plugin.php:596
 msgid "The asset file could not be removed"
 msgstr ""
 
-#: lib/Plugin.php:693
+#: lib/Plugin.php:598
 msgid "The asset file could not be removed due to a possible network issue"
 msgstr ""
 
-#: lib/Plugin.php:695
+#: lib/Plugin.php:600
 msgid "The file has been successfully uploaded"
 msgstr ""
 
-#: lib/Plugin.php:697
+#: lib/Plugin.php:602
 msgid "The file has been successfulyl removed"
 msgstr ""
 
-#: lib/Plugin.php:699
+#: lib/Plugin.php:604
 msgid "The return URL has been successfully generated."
 msgstr ""
 
-#: lib/Plugin.php:701
+#: lib/Plugin.php:606
 msgid "The return URL could not generated."
 msgstr ""
 
-#: lib/Plugin.php:703
+#: lib/Plugin.php:608
 msgid "The return URL could not be generated due to a possible network issue"
 msgstr ""
 
-#: lib/Plugin.php:710
+#: lib/Plugin.php:614
+msgid "Reload page"
+msgstr ""
+
+#: lib/Plugin.php:615
+msgid "LivePayments for Mobilpay - Transaction Reporting"
+msgstr ""
+
+#: lib/Plugin.php:616
+msgid "Transactions Status Counts"
+msgstr ""
+
+#: lib/Plugin.php:617
+msgid "Last Transaction"
+msgstr ""
+
+#: lib/Plugin.php:618
+msgid "Data not found!"
+msgstr ""
+
+#: lib/Plugin.php:619
+msgid "No transactions data found"
+msgstr ""
+
+#: lib/Plugin.php:620
+msgid "No transactions status counts data found"
+msgstr ""
+
+#: lib/Plugin.php:621
+msgid "Error loading data"
+msgstr ""
+
+#: lib/Plugin.php:622
+msgid "The last transaction details data could not be loaded due to an internal server issue. Please try again."
+msgstr ""
+
+#: lib/Plugin.php:623
+msgid "The transactions status counts data could not be loaded due to an internal server issue. Please try again."
+msgstr ""
+
+#: lib/Plugin.php:630
 msgid "Could not load transaction details data"
 msgstr ""
 
-#: lib/Plugin.php:712
+#: lib/Plugin.php:632
 msgid "Could not load transaction details data due to a possible network issue"
 msgstr ""
 
-#: lib/Plugin.php:718
+#: lib/Plugin.php:638
 msgid "Please wait..."
 msgstr ""
 
-#: lib/Plugin.php:726
+#: lib/Plugin.php:727
 msgid "Minimum required PHP version is %s."
 msgstr ""
 
-#: lib/Plugin.php:728
+#: lib/Plugin.php:729
 msgid "Minimum required WordPress version is %s."
 msgstr ""
 
-#: lib/Plugin.php:730
+#: lib/Plugin.php:731
 msgid "Mysqli extension was not found on your system or is not fully compatible."
 msgstr ""
 
-#: lib/Plugin.php:732
+#: lib/Plugin.php:733
 msgid "Openssl extension was not found on your system or is not fully compatible."
 msgstr ""
 
-#: lib/Plugin.php:734
+#: lib/Plugin.php:735
 msgid "The installation failed."
 msgstr ""
 
-#: lib/Plugin.php:741
-msgid "Cancelled"
+#: tests/test-Shortcodes.php:105
+#: views/lvdwcmc-payment-status.php:36
+msgid "Your payment could not be processed or has been cancelled."
 msgstr ""
 
-#: lib/Plugin.php:743
-msgid "Confirmed. Payment successful"
+#: tests/test-Shortcodes.php:109
+#: views/lvdwcmc-payment-status.php:38
+msgid "Your payment is currently being processed."
 msgstr ""
 
-#: lib/Plugin.php:745
-msgid "Pending confirmation"
-msgstr ""
-
-#: lib/Plugin.php:747
-msgid "Credited"
-msgstr ""
-
-#: lib/Plugin.php:749
-msgid "Failed"
-msgstr ""
-
-#: lib/Plugin.php:751
-msgid "Started"
-msgstr ""
-
-#: lib/Plugin.php:753
-msgid "Pending payment"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:51
-#: views/lvdwcmc-admin-transactions-listing.php:158
-#: views/lvdwcmc-email-transaction-details.php:52
-#: views/lvdwcmc-frontend-transaction-details.php:54
-msgid "Transaction Id"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:57
-#: views/lvdwcmc-admin-transactions-listing.php:168
-#: views/lvdwcmc-frontend-transaction-details.php:60
-msgid "Transaction status"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:63
-#: views/lvdwcmc-admin-transactions-listing.php:172
-#: views/lvdwcmc-email-transaction-details.php:56
-#: views/lvdwcmc-frontend-transaction-details.php:66
-msgid "Card number"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:69
-#: views/lvdwcmc-admin-transactions-listing.php:182
-#: views/lvdwcmc-frontend-transaction-details.php:72
-msgid "Original amount"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:75
-#: views/lvdwcmc-admin-transactions-listing.php:186
-#: views/lvdwcmc-frontend-transaction-details.php:78
-msgid "Actually processed amount"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:81
-#: views/lvdwcmc-admin-transactions-listing.php:62
-#: views/lvdwcmc-admin-transactions-listing.php:190
-#: views/lvdwcmc-frontend-transaction-details.php:84
-msgid "Date initiated"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:87
-#: views/lvdwcmc-admin-transactions-listing.php:194
-#: views/lvdwcmc-frontend-transaction-details.php:90
-msgid "Date of last activity"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:93
-#: views/lvdwcmc-admin-transactions-listing.php:199
-#: views/lvdwcmc-frontend-transaction-details.php:96
-msgid "Transaction error code"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:97
-#: views/lvdwcmc-admin-transactions-listing.php:203
-#: views/lvdwcmc-frontend-transaction-details.php:101
-msgid "Transaction error message"
-msgstr ""
-
-#: views/lvdwcmc-admin-transaction-details.php:103
-#: views/lvdwcmc-admin-transactions-listing.php:209
-msgid "Client IP Address"
-msgstr ""
-
+#: tests/test-Shortcodes.php:112
+#: tests/test-Shortcodes.php:122
 #: views/lvdwcmc-admin-transactions-listing.php:61
 #: views/lvdwcmc-payment-status.php:39
 #: views/lvdwcmc-payment-status.php:43
 msgid "Order Id"
+msgstr ""
+
+#: tests/test-Shortcodes.php:115
+#: tests/test-Shortcodes.php:125
+#: views/lvdwcmc-payment-status.php:40
+#: views/lvdwcmc-payment-status.php:44
+msgid "Detailed order status"
+msgstr ""
+
+#: tests/test-Shortcodes.php:119
+#: views/lvdwcmc-payment-status.php:42
+msgid "We have successfully received your payment"
+msgstr ""
+
+#: views/lvdwcmc-admin-notices-missing-required-plugins.php:37
+msgid "The LivePayments – mobilPay Card WooCommerce Payment Gateway plug-in requires the following plug-ins are currently missing:"
 msgstr ""
 
 #: views/lvdwcmc-admin-transactions-listing.php:63
@@ -624,23 +702,14 @@ msgstr ""
 msgid "Chose a file from disk"
 msgstr ""
 
-#: views/lvdwcmc-payment-form.php:41
+#: views/lvdwcmc-payment-form.php:47
 msgid "Pay via mobilPay&trade;"
 msgstr ""
 
-#: views/lvdwcmc-payment-status.php:36
-msgid "Your payment could not be processed or has been cancelled."
+#: views/lvdwcmc-payment-form.php:51
+msgid "The payment could not be initialized. This is usually due to an issue with the store itself, so please contact its administrator."
 msgstr ""
 
-#: views/lvdwcmc-payment-status.php:38
-msgid "Your payment is currently being processed."
-msgstr ""
-
-#: views/lvdwcmc-payment-status.php:40
-#: views/lvdwcmc-payment-status.php:44
-msgid "Detailed order status"
-msgstr ""
-
-#: views/lvdwcmc-payment-status.php:42
-msgid "We have successfully received your payment"
+#: views/lvdwcmc-payment-form.php:56
+msgid "Retry"
 msgstr ""

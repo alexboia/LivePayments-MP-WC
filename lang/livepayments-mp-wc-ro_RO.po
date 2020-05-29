@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WC MobilPayments Card 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/livepayments-mp-wc\n"
-"POT-Creation-Date: 2020-04-18 15:50+0300\n"
-"PO-Revision-Date: 2020-04-18 15:50+0300\n"
+"POT-Creation-Date: 2020-05-29 11:57+0300\n"
+"PO-Revision-Date: 2020-05-29 12:01+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ro_RO\n"
@@ -40,6 +40,68 @@ msgstr "Alexandru Boia"
 #. Author URI of the plugin
 msgid "http://alexboia.net"
 msgstr "http://alexboia.net"
+
+#: lib/Formatters.php:38 views/lvdwcmc-admin-transaction-details.php:51
+#: views/lvdwcmc-admin-transactions-listing.php:158
+#: views/lvdwcmc-email-transaction-details.php:52
+#: views/lvdwcmc-frontend-transaction-details.php:54
+msgid "Transaction Id"
+msgstr "ID tranzacție"
+
+#: lib/Formatters.php:43 views/lvdwcmc-admin-transaction-details.php:57
+#: views/lvdwcmc-admin-transactions-listing.php:168
+#: views/lvdwcmc-frontend-transaction-details.php:60
+msgid "Transaction status"
+msgstr "Status tranzacție"
+
+#: lib/Formatters.php:48 views/lvdwcmc-admin-transaction-details.php:63
+#: views/lvdwcmc-admin-transactions-listing.php:172
+#: views/lvdwcmc-email-transaction-details.php:56
+#: views/lvdwcmc-frontend-transaction-details.php:66
+msgid "Card number"
+msgstr "Număr de card"
+
+#: lib/Formatters.php:53 views/lvdwcmc-admin-transaction-details.php:69
+#: views/lvdwcmc-admin-transactions-listing.php:182
+#: views/lvdwcmc-frontend-transaction-details.php:72
+msgid "Original amount"
+msgstr "Suma originală"
+
+#: lib/Formatters.php:58 views/lvdwcmc-admin-transaction-details.php:75
+#: views/lvdwcmc-admin-transactions-listing.php:186
+#: views/lvdwcmc-frontend-transaction-details.php:78
+msgid "Actually processed amount"
+msgstr "Suma efectiv procesată"
+
+#: lib/Formatters.php:63 views/lvdwcmc-admin-transaction-details.php:81
+#: views/lvdwcmc-admin-transactions-listing.php:62
+#: views/lvdwcmc-admin-transactions-listing.php:190
+#: views/lvdwcmc-frontend-transaction-details.php:84
+msgid "Date initiated"
+msgstr "Data inițierii"
+
+#: lib/Formatters.php:68 views/lvdwcmc-admin-transaction-details.php:87
+#: views/lvdwcmc-admin-transactions-listing.php:194
+#: views/lvdwcmc-frontend-transaction-details.php:90
+msgid "Date of last activity"
+msgstr "Data ultimei activități"
+
+#: lib/Formatters.php:75 views/lvdwcmc-admin-transaction-details.php:93
+#: views/lvdwcmc-admin-transactions-listing.php:199
+#: views/lvdwcmc-frontend-transaction-details.php:96
+msgid "Transaction error code"
+msgstr "Codul de eroare al tranzacției"
+
+#: lib/Formatters.php:80 views/lvdwcmc-admin-transaction-details.php:97
+#: views/lvdwcmc-admin-transactions-listing.php:203
+#: views/lvdwcmc-frontend-transaction-details.php:101
+msgid "Transaction error message"
+msgstr "Mesajul de eroare al tranzacției"
+
+#: lib/Formatters.php:88 views/lvdwcmc-admin-transaction-details.php:103
+#: views/lvdwcmc-admin-transactions-listing.php:209
+msgid "Client IP Address"
+msgstr "Adresa de IP a clientului"
 
 #: lib/MobilpayCardPaymentProcessor.php:500
 msgid "Card has a risk (i.e. stolen card)"
@@ -425,72 +487,100 @@ msgstr "Îți mulțumim pentru comandă"
 msgid "Error initiating MobilPay card payment."
 msgstr "Eroare la inițierea plății prin card via MobilPay"
 
-#: lib/MobilpayCreditCardGateway.php:1092
+#: lib/MobilpayCreditCardGateway.php:1093
 msgid "Payment for order #%s."
 msgstr "Plata pentru comanda #%s."
 
-#: lib/Plugin.php:137
+#: lib/MobilpayTransaction.php:146
+msgid "Cancelled"
+msgstr "Anulată"
+
+#: lib/MobilpayTransaction.php:148
+msgid "Confirmed. Payment successful"
+msgstr "Confirmată. Plată finalizată cu succes"
+
+#: lib/MobilpayTransaction.php:150
+msgid "Pending confirmation"
+msgstr "Se așteaptă confirmarea"
+
+#: lib/MobilpayTransaction.php:152
+msgid "Credited"
+msgstr "Rambursată"
+
+#: lib/MobilpayTransaction.php:154
+msgid "Failed"
+msgstr "Eșuată"
+
+#: lib/MobilpayTransaction.php:156
+msgid "Started"
+msgstr "Începută"
+
+#: lib/MobilpayTransaction.php:158
+msgid "Pending payment"
+msgstr "Plata în așteptare"
+
+#: lib/Plugin.php:142
 msgid "Could not activate plug-in: requirements not met."
 msgstr "Modulul nu a putut fi activat: cerințele tehnice nu sunt îndeplinite."
 
-#: lib/Plugin.php:140 lib/Plugin.php:146
+#: lib/Plugin.php:145 lib/Plugin.php:151
 msgid "Activation error"
 msgstr "Eroare la activare"
 
-#: lib/Plugin.php:144
+#: lib/Plugin.php:149
 msgid "Could not activate plug-in: activation failure."
 msgstr "Modulul nu a putut fi activat: eroare la activare."
 
-#: lib/Plugin.php:196 lib/Plugin.php:197
+#: lib/Plugin.php:237 lib/Plugin.php:238
 msgid "LivePayments Card Transactions"
 msgstr "Istoric Tranzacții LivePayments"
 
-#: lib/Plugin.php:311 views/lvdwcmc-frontend-transaction-details.php:35
+#: lib/Plugin.php:365 views/lvdwcmc-frontend-transaction-details.php:35
 msgid "Payment transaction details"
 msgstr "Detalii tranzacție"
 
-#: lib/Plugin.php:413
+#: lib/Plugin.php:467
 msgid "&laquo;"
 msgstr "&laquo;"
 
-#: lib/Plugin.php:414
+#: lib/Plugin.php:468
 msgid "&raquo;"
 msgstr "&raquo;"
 
-#: lib/Plugin.php:482
+#: lib/Plugin.php:535
 msgid "LivePayments Card Transaction Status"
-msgstr "Staus Tranzacții LivePayments"
+msgstr "Status Tranzacții LivePayments"
 
-#: lib/Plugin.php:667 lib/Plugin.php:681
+#: lib/Plugin.php:572 lib/Plugin.php:586
 msgid "The selected file is too large. Maximum allowed size is 10MB"
 msgstr ""
 "Fișierul selectat este prea voluminos. Dimensiunea maximă admisă este de 10 MB."
 
-#: lib/Plugin.php:669 lib/Plugin.php:679
+#: lib/Plugin.php:574 lib/Plugin.php:584
 msgid "The selected file type is not valid."
 msgstr "Tipul fișierului nu este valid."
 
-#: lib/Plugin.php:671 lib/Plugin.php:673
+#: lib/Plugin.php:576 lib/Plugin.php:578
 msgid "The file could not be read"
 msgstr "Fișierul nu a putut fi citit."
 
-#: lib/Plugin.php:675
+#: lib/Plugin.php:580
 msgid "The uploader could not be initialized"
 msgstr "Componenta de upload nu a putut fi inițializată"
 
-#: lib/Plugin.php:677 lib/Plugin.php:687
+#: lib/Plugin.php:582 lib/Plugin.php:592
 msgid "The file could not be uploaded"
 msgstr "Fișierul nu a putut fi încărcat"
 
-#: lib/Plugin.php:683
+#: lib/Plugin.php:588
 msgid "No file was uploaded"
 msgstr "Nu a fost încărcat niciun fișier"
 
-#: lib/Plugin.php:685
+#: lib/Plugin.php:590
 msgid "The file could not be uploaded due to a possible internal server issue"
 msgstr "Fișierul nu a putut fi încărcat  din cauza unei posibile probleme interne"
 
-#: lib/Plugin.php:689
+#: lib/Plugin.php:594
 msgid ""
 "Remove asset file? This action cannot be undone and you will have to re-upload the "
 "asset again!"
@@ -498,168 +588,152 @@ msgstr ""
 "Sigur ștergi fișierul? Această operațiune este definitivă și va trebui să reîncarci "
 "fișierul!"
 
-#: lib/Plugin.php:691
+#: lib/Plugin.php:596
 msgid "The asset file could not be removed"
 msgstr "Fișierul nu a putut fi șters"
 
-#: lib/Plugin.php:693
+#: lib/Plugin.php:598
 msgid "The asset file could not be removed due to a possible network issue"
 msgstr "Fișierul nu a putut fi șters din cauza unei posibile probleme de comunicație"
 
-#: lib/Plugin.php:695
+#: lib/Plugin.php:600
 msgid "The file has been successfully uploaded"
 msgstr "Fișierul a fost încărcat cu succes"
 
-#: lib/Plugin.php:697
+#: lib/Plugin.php:602
 msgid "The file has been successfulyl removed"
 msgstr "Fișierul a fost șters cu succes"
 
-#: lib/Plugin.php:699
+#: lib/Plugin.php:604
 msgid "The return URL has been successfully generated."
 msgstr "URL-ul de înapoiere a fost generat cu succes"
 
-#: lib/Plugin.php:701
+#: lib/Plugin.php:606
 msgid "The return URL could not generated."
 msgstr "URL-ul de înapoiere nu a putut fi generat."
 
-#: lib/Plugin.php:703
+#: lib/Plugin.php:608
 msgid "The return URL could not be generated due to a possible network issue"
 msgstr ""
 "URL-ul de înapoiere nu a putut fi generat din cauza unei posibile probleme de "
 "comunicație."
 
-#: lib/Plugin.php:710
+#: lib/Plugin.php:614
+msgid "Reload page"
+msgstr "Reîncarcă pagina"
+
+#: lib/Plugin.php:615
+msgid "LivePayments for Mobilpay - Transaction Reporting"
+msgstr "LivePayments pentru Mobilpay - Raportare Tranzacții"
+
+#: lib/Plugin.php:616
+msgid "Transactions Status Counts"
+msgstr "Statistici Statusuri Tranzacții"
+
+#: lib/Plugin.php:617
+msgid "Last Transaction"
+msgstr "Cea mai Nouă Tranzacție"
+
+#: lib/Plugin.php:618
+msgid "Data not found!"
+msgstr "Datele nu au fost găsite!"
+
+#: lib/Plugin.php:619
+msgid "No transactions data found"
+msgstr "Nu au fost găsite date legate de tranzacții"
+
+#: lib/Plugin.php:620
+msgid "No transactions status counts data found"
+msgstr "Nu au fost găsite date legate de statisticile statusurilor tranzacțiilor"
+
+#: lib/Plugin.php:621
+msgid "Error loading data"
+msgstr "Eroare la încărcarea datelor"
+
+#: lib/Plugin.php:622
+msgid ""
+"The last transaction details data could not be loaded due to an internal server "
+"issue. Please try again."
+msgstr ""
+"Nu au putut fi încărcate datele cele mai noi tranzacții, din cauza unei probleme "
+"interne a server-ului. Te rugăm să reîncerci."
+
+#: lib/Plugin.php:623
+msgid ""
+"The transactions status counts data could not be loaded due to an internal server "
+"issue. Please try again."
+msgstr ""
+"Nu au putut fi încărcate statisticile statusurilor tranzacțiilor, din cauza unei "
+"probleme interne a server-ului. Te rugăm să reîncerci."
+
+#: lib/Plugin.php:630
 msgid "Could not load transaction details data"
 msgstr "Detaliile tranzacției nu au putut fi încărcate"
 
-#: lib/Plugin.php:712
+#: lib/Plugin.php:632
 msgid "Could not load transaction details data due to a possible network issue"
 msgstr ""
 "Detaliile tranzacției nu au putut fi încărcate din cauza unei probleme de "
 "comunicație"
 
-#: lib/Plugin.php:718
+#: lib/Plugin.php:638
 msgid "Please wait..."
 msgstr "Te rugăm să aștepți..."
 
-#: lib/Plugin.php:726
+#: lib/Plugin.php:727
 msgid "Minimum required PHP version is %s."
 msgstr "Versiunea minimă necesară de PHP este %s."
 
-#: lib/Plugin.php:728
+#: lib/Plugin.php:729
 msgid "Minimum required WordPress version is %s."
 msgstr "Versiunea minimă necesară de WordPress este %s."
 
-#: lib/Plugin.php:730
+#: lib/Plugin.php:731
 msgid "Mysqli extension was not found on your system or is not fully compatible."
 msgstr ""
 "Extensia Mysqli nu a putut fi găsită pe server-ul tău sau există și nu este "
 "compatibilă"
 
-#: lib/Plugin.php:732
+#: lib/Plugin.php:733
 msgid "Openssl extension was not found on your system or is not fully compatible."
 msgstr ""
 "Extensia Openssl nu a putut fi găsită pe server-ul tău sau există și nu este "
 "compatibilă"
 
-#: lib/Plugin.php:734
+#: lib/Plugin.php:735
 msgid "The installation failed."
 msgstr "Instalarea a eșuat"
 
-#: lib/Plugin.php:741
-msgid "Cancelled"
-msgstr "Anulată"
+#: tests/test-Shortcodes.php:105 views/lvdwcmc-payment-status.php:36
+msgid "Your payment could not be processed or has been cancelled."
+msgstr "Plata ta nu a putut fi procesată sau a fost anulată"
 
-#: lib/Plugin.php:743
-msgid "Confirmed. Payment successful"
-msgstr "Confirmată. Plată finalizată cu succes"
+#: tests/test-Shortcodes.php:109 views/lvdwcmc-payment-status.php:38
+msgid "Your payment is currently being processed."
+msgstr "Plata ta este în procesare"
 
-#: lib/Plugin.php:745
-msgid "Pending confirmation"
-msgstr "Se așteaptă confirmarea"
-
-#: lib/Plugin.php:747
-msgid "Credited"
-msgstr "Rambursată"
-
-#: lib/Plugin.php:749
-msgid "Failed"
-msgstr "Eșuată"
-
-#: lib/Plugin.php:751
-msgid "Started"
-msgstr "Începută"
-
-#: lib/Plugin.php:753
-msgid "Pending payment"
-msgstr "Plata în așteptare"
-
-#: views/lvdwcmc-admin-transaction-details.php:51
-#: views/lvdwcmc-admin-transactions-listing.php:158
-#: views/lvdwcmc-email-transaction-details.php:52
-#: views/lvdwcmc-frontend-transaction-details.php:54
-msgid "Transaction Id"
-msgstr "ID tranzacție"
-
-#: views/lvdwcmc-admin-transaction-details.php:57
-#: views/lvdwcmc-admin-transactions-listing.php:168
-#: views/lvdwcmc-frontend-transaction-details.php:60
-msgid "Transaction status"
-msgstr "Status tranzacție"
-
-#: views/lvdwcmc-admin-transaction-details.php:63
-#: views/lvdwcmc-admin-transactions-listing.php:172
-#: views/lvdwcmc-email-transaction-details.php:56
-#: views/lvdwcmc-frontend-transaction-details.php:66
-msgid "Card number"
-msgstr "Număr de card"
-
-#: views/lvdwcmc-admin-transaction-details.php:69
-#: views/lvdwcmc-admin-transactions-listing.php:182
-#: views/lvdwcmc-frontend-transaction-details.php:72
-msgid "Original amount"
-msgstr "Suma originală"
-
-#: views/lvdwcmc-admin-transaction-details.php:75
-#: views/lvdwcmc-admin-transactions-listing.php:186
-#: views/lvdwcmc-frontend-transaction-details.php:78
-msgid "Actually processed amount"
-msgstr "Suma efectiv procesată"
-
-#: views/lvdwcmc-admin-transaction-details.php:81
-#: views/lvdwcmc-admin-transactions-listing.php:62
-#: views/lvdwcmc-admin-transactions-listing.php:190
-#: views/lvdwcmc-frontend-transaction-details.php:84
-msgid "Date initiated"
-msgstr "Data inițierii"
-
-#: views/lvdwcmc-admin-transaction-details.php:87
-#: views/lvdwcmc-admin-transactions-listing.php:194
-#: views/lvdwcmc-frontend-transaction-details.php:90
-msgid "Date of last activity"
-msgstr "Data ultimei activități"
-
-#: views/lvdwcmc-admin-transaction-details.php:93
-#: views/lvdwcmc-admin-transactions-listing.php:199
-#: views/lvdwcmc-frontend-transaction-details.php:96
-msgid "Transaction error code"
-msgstr "Codul de eroare al tranzacției"
-
-#: views/lvdwcmc-admin-transaction-details.php:97
-#: views/lvdwcmc-admin-transactions-listing.php:203
-#: views/lvdwcmc-frontend-transaction-details.php:101
-msgid "Transaction error message"
-msgstr "Mesajul de eroare al tranzacției"
-
-#: views/lvdwcmc-admin-transaction-details.php:103
-#: views/lvdwcmc-admin-transactions-listing.php:209
-msgid "Client IP Address"
-msgstr "Adresa de IP a clientului"
-
+#: tests/test-Shortcodes.php:112 tests/test-Shortcodes.php:122
 #: views/lvdwcmc-admin-transactions-listing.php:61 views/lvdwcmc-payment-status.php:39
 #: views/lvdwcmc-payment-status.php:43
 msgid "Order Id"
 msgstr "ID comandă"
+
+#: tests/test-Shortcodes.php:115 tests/test-Shortcodes.php:125
+#: views/lvdwcmc-payment-status.php:40 views/lvdwcmc-payment-status.php:44
+msgid "Detailed order status"
+msgstr "Starea detaliată a comenzii"
+
+#: tests/test-Shortcodes.php:119 views/lvdwcmc-payment-status.php:42
+msgid "We have successfully received your payment"
+msgstr "Plata ta a fost primită și procesată cu succes"
+
+#: views/lvdwcmc-admin-notices-missing-required-plugins.php:37
+msgid ""
+"The LivePayments – mobilPay Card WooCommerce Payment Gateway plug-in requires the "
+"following plug-ins are currently missing:"
+msgstr ""
+"Modulul LivePayments – mobilPay Card WooCommerce Payment Gateway depinde de "
+"următoarele module WordPress care momentan lipsesc:"
 
 #: views/lvdwcmc-admin-transactions-listing.php:63
 msgid "Status"
@@ -720,25 +794,21 @@ msgstr "Ștergere"
 msgid "Chose a file from disk"
 msgstr "Alege un fișier de pe disc"
 
-#: views/lvdwcmc-payment-form.php:41
+#: views/lvdwcmc-payment-form.php:47
 msgid "Pay via mobilPay&trade;"
 msgstr "Plătește via mobilPay&trade;"
 
-#: views/lvdwcmc-payment-status.php:36
-msgid "Your payment could not be processed or has been cancelled."
-msgstr "Plata ta nu a putut fi procesată sau a fost anulată"
+#: views/lvdwcmc-payment-form.php:51
+msgid ""
+"The payment could not be initialized. This is usually due to an issue with the "
+"store itself, so please contact its administrator."
+msgstr ""
+"Plata nu a putut fi inițializată. Acest lucru se întâmplă de obicei din cauza unei "
+"probleme cu site-ul web, deci te rugăm să contactezi administratorul"
 
-#: views/lvdwcmc-payment-status.php:38
-msgid "Your payment is currently being processed."
-msgstr "Plata ta este în procesare"
-
-#: views/lvdwcmc-payment-status.php:40 views/lvdwcmc-payment-status.php:44
-msgid "Detailed order status"
-msgstr "Starea detaliată a comenzii"
-
-#: views/lvdwcmc-payment-status.php:42
-msgid "We have successfully received your payment"
-msgstr "Plata ta a fost primită și procesată cu succes"
+#: views/lvdwcmc-payment-form.php:56
+msgid "Retry"
+msgstr "Reîncearcă"
 
 #~ msgid "mobilPay&trade; Card Transaction Status"
 #~ msgstr "Status Tranzacție prin Card via mobilPay&trade;"
