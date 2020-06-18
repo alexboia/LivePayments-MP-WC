@@ -59,6 +59,10 @@ trait MobilpayTransactionTestHelpers {
             $tx->getTimestampLastUpdated());
     }
 
+    protected function _mobilpayTransactionFromData($txData) {
+        return new MobilpayTransaction($txData, $this->_getEnv());
+    }
+
     protected function _generateRandomMobilpayTransaction($override = array()) {
         return $this->_mobilpayTransactionFromData($this->_generateRandomMobilpayTransactionData($override));
     }

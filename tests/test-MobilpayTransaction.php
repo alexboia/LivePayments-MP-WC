@@ -672,10 +672,6 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
     }
 
-    private function _mobilpayTransactionFromData($txData) {
-        return new MobilpayTransaction($txData, $this->_getEnv());
-    }
-
     private function _generateRandomMobilpayTransactionId($excludeAdditionalIds = array()) {
         $excludeIds = array_keys($this->_testMobilpayTransactions);
         if (!empty($excludeAdditionalIds) && is_array($excludeAdditionalIds)) {

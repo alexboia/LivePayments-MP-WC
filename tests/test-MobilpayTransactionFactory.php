@@ -180,6 +180,16 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
         $this->assertNull($tx);
     }
 
+    public function test_canCreateFromExistingTransactionRawData() {
+        $txFactory = new MobilpayTransactionFactory();
+
+        foreach ($this->_testWcOrdersWTransaction as $order) {
+            $tx = $txFactory->existingFromRawTransactionData($order['txData']);
+            $this->assertNotNull($tx);
+            $this->_assertMobilpayTransactionMatchesData($tx, $order['txData']);
+        }
+    }
+
     private function _assertNewTransactionMatchesOrder(MobilpayTransaction $tx, WC_Order $order, $expectedStatus) {
         $this->assertEquals($order->get_id(), 
             $tx->getOrderId());
