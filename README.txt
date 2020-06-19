@@ -3,8 +3,8 @@ Contributors: alexandruboia
 Donate link: https://ko-fi.com/alexandruboia
 Tags: payment, card, mobilpay, creditcard, woocommerce
 Requires at least: 5.0
-Tested up to: 5.4.0
-Stable tag: 0.1.1
+Tested up to: 5.4.2
+Stable tag: 0.1.2
 Requires PHP: 5.6.2
 License: BSD New License
 License URI: https://opensource.org/licenses/BSD-3-Clause
@@ -75,6 +75,11 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments
 
 == Changelog ==
 
+= 0.1.2 =
+* Add reporting widget to WooCommerce Admin dashboard;
+* Correct handling of payment initiation errors in the payment receipt screen;
+* Correct handling of situations where some plug-in requirements are not fulfilled.
+
 = 0.1.1 =
 Fixed minor usability issues.
 
@@ -82,6 +87,9 @@ Fixed minor usability issues.
 First officially distributed version.
 
 == Upgrade Notice ==
+
+= 0.1.2 =
+Update to version 0.1.2 for improved usability and new features.
 
 = 0.1.1 =
 Updated to version 0.1.1 for improved usability.

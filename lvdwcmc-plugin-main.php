@@ -3,13 +3,13 @@
  * Plugin Name: LivePayments - mobilPay Card WooCommerce Payment Gateway
  * Author: Alexandru Boia
  * Author URI: http://alexboia.net
- * Version: 0.1.1
+ * Version: 0.1.2
  * Description: LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the Romanian mobilPay payment processor.
  * License: New BSD License
  * Plugin URI: https://github.com/alexboia/LivePayments-MP-WC
  * Text Domain: livepayments-mp-wc
  * WC requires at least: 3.2.0
- * WC tested up to: 4.1.0
+ * WC tested up to: 4.2.0
  */
 
 /**
