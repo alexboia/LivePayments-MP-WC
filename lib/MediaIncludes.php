@@ -318,7 +318,7 @@
             }
         }
 
-        public function _includeCommonScriptSettings() {
+        private function _includeCommonScriptSettings() {
             wp_localize_script(self::JS_LVDWCMC_COMMON, 'lvdwcmcCommonSettings', array(
                 'pluginMediaImgRootDir' => plugins_url('media/img', $this->_refPluginsPath)
             ));

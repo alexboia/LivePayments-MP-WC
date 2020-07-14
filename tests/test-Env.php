@@ -35,8 +35,8 @@ class EnvTests extends WP_UnitTestCase {
     use GenericTestHelpers;
 
     public function test_canGetInstance() {
-        $instance = lvdwcmc_env();
-		$otherInstance = lvdwcmc_env();
+        $instance = lvdwcmc_get_env();
+		$otherInstance = lvdwcmc_get_env();
 		
 		$this->assertNotNull($instance);
 		$this->assertNotNull($otherInstance);
@@ -45,7 +45,7 @@ class EnvTests extends WP_UnitTestCase {
     }
 
     public function test_canReadDbParams() {
-		$env = lvdwcmc_env();
+		$env = lvdwcmc_get_env();
 
 		$this->assertEquals(DB_HOST, $env->getDbHost());
 		$this->assertEquals(DB_USER, $env->getDbUserName());
@@ -54,7 +54,7 @@ class EnvTests extends WP_UnitTestCase {
     }
     
     public function test_canReadDbTableParams() {
-		$env = lvdwcmc_env();
+		$env = lvdwcmc_get_env();
 		$dbTablePrefix = $env->getDbTablePrefix();
 
 		$this->assertEquals($GLOBALS['table_prefix'], $dbTablePrefix);
@@ -63,7 +63,7 @@ class EnvTests extends WP_UnitTestCase {
     }
     
     public function test_canGetVersions() {
-		$env = lvdwcmc_env();
+		$env = lvdwcmc_get_env();
 
 		$this->assertEquals(PHP_VERSION, $env->getPhpVersion());
 		$this->assertEquals(get_bloginfo('version', 'raw'), $env->getWpVersion());
@@ -71,10 +71,10 @@ class EnvTests extends WP_UnitTestCase {
 		$this->assertEquals('5.0', $env->getRequiredWpVersion());
 		$this->assertEquals('0.1.2', $env->getVersion());
     }
-    
+
     public function test_canGetDbObject() {
-		$db = lvdwcmc_env()->getDb();
-		$otherDb = lvdwcmc_env()->getDb();
+		$db = lvdwcmc_get_env()->getDb();
+		$otherDb = lvdwcmc_get_env()->getDb();
 
 		$this->assertNotNull($db);
 		$this->assertNotNull($otherDb);
@@ -84,7 +84,7 @@ class EnvTests extends WP_UnitTestCase {
     }
 
     public function test_canGetDirectoriesPath() {
-        $env = lvdwcmc_env();
+        $env = lvdwcmc_get_env();
         $wpUploadsDirInfo = wp_upload_dir();
 
         $this->assertEquals(LVD_WCMC_DATA_DIR, $env->getDataDir());
@@ -105,7 +105,7 @@ class EnvTests extends WP_UnitTestCase {
         for ($i = 0; $i < 10; $i++) {
             $ip = $faker->ipv4;
             $_SERVER['REMOTE_ADDR'] = $ip;
-            $this->assertEquals($ip, lvdwcmc_env()->getRemoteAddress());
+            $this->assertEquals($ip, lvdwcmc_get_env()->getRemoteAddress());
         }
 
         $_SERVER['REMOTE_ADDR'] = $old;
@@ -135,16 +135,16 @@ class EnvTests extends WP_UnitTestCase {
 
         switch($method) {
             case 'get':
-                $this->assertTrue(lvdwcmc_env()->isHttpGet());
-                $this->assertFalse(lvdwcmc_env()->isHttpPost());
+                $this->assertTrue(lvdwcmc_get_env()->isHttpGet());
+                $this->assertFalse(lvdwcmc_get_env()->isHttpPost());
             break;
             case 'post':
-                $this->assertFalse(lvdwcmc_env()->isHttpGet());
-                $this->assertTrue(lvdwcmc_env()->isHttpPost());
+                $this->assertFalse(lvdwcmc_get_env()->isHttpGet());
+                $this->assertTrue(lvdwcmc_get_env()->isHttpPost());
             break;
             default:
-                $this->assertFalse(lvdwcmc_env()->isHttpGet());
-                $this->assertFalse(lvdwcmc_env()->isHttpPost());
+                $this->assertFalse(lvdwcmc_get_env()->isHttpGet());
+                $this->assertFalse(lvdwcmc_get_env()->isHttpPost());
             break;
         }
 

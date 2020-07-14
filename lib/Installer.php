@@ -56,7 +56,7 @@ namespace LvdWcMc {
         private $_lastError = null;
 
         public function __construct() {
-            $this->_env = lvdwcmc_env();
+            $this->_env = lvdwcmc_get_env();
         }
 
         public function updateIfNeeded() {

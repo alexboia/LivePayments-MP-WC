@@ -49,7 +49,7 @@ namespace LvdWcMc {
         private $_transactionFactory = null;
 
         public function __construct() {
-            $this->_env = lvdwcmc_env();
+            $this->_env = lvdwcmc_get_env();
             $this->_logger = wc_get_logger();
             $this->_transactionFactory = new MobilpayTransactionFactory();
 
@@ -66,6 +66,10 @@ namespace LvdWcMc {
             if ($transaction != null 
                 && $transaction->isCredited() 
                 && $transaction->isAmountCompletelyProcessed()) {
+                // WC marks the order as refunded when a refund is created in such a way
+                //   that the sum of all refunds for that order equals the order amount.
+                // However, this is not what we want: we want control over changing the order status,
+                //  so that we may set our own comments.
                 $this->logDebug('Supressing order refund status update.', $context);
                 $status = null;
             }
@@ -398,23 +402,44 @@ namespace LvdWcMc {
                 if ($transaction->canBeSetCredited()) {
                     $transaction->setCredited($transactionId, $processedAmount, $panMasked);
 
-                    //Create partial refund record
-                    $refund = wc_create_refund(array(
+                    /**
+                     * Prepare refund data
+                     * 
+                     * @hook lvdwcmc_refund_data
+                     * 
+                     * @param array $refundData The current refund data
+                     * @param \WC_Order $order The order for which the refund data is computed
+                     * @param \LvdWcMc\MobilpayTransaction The transaction based on which the refund data is comptued
+                     * 
+                     * @return array The actual refund data, as returned by the filters
+                     */
+                    $refundData = apply_filters('lvdwcmc_refund_data', array(
                         'order_id' => $order->get_id(),
                         'amount' => $processedAmount,
                         'reason' => $this->_getPartialRefundReason($transactionId),
                         'line_items' => array(),
                         'restock_items' => false,
                         'refund_payment' => false
-                    ));
+                    ), $order, $transaction);
 
+                    //Create partial refund record
+                    $refund = wc_create_refund($refundData);
                     if (!is_wp_error($refund)) {
+                        $this->logDebug('Created refund record with id = ' . $refund->get_id() . '.', 
+                            $context);
+
                         if ($transaction->isAmountCompletelyProcessed()) {
                             //Do not set status or add notes more than once
                             if (!$order->has_status('refunded')) {
+                                $this->logDebug('Setting order status to refunded.', 
+                                    $context);
+
                                 $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
                                 $order->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
                                 $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+                            } else {
+                                $this->logDebug('Order is already set as refunded. Skipping order status update.', 
+                                    $context);
                             }
                         }
 
@@ -458,10 +483,12 @@ namespace LvdWcMc {
             return $processResult;
         }
 
-        private function _getLoggingContext(\WC_Order $order) {
+        private function _getLoggingContext($order) {
             return array(
                 'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'orderId' => $order->get_id()
+                'orderId' => ($order instanceof \WC_Order) 
+                    ? $order->get_id() 
+                    : intval($order)
             );
         }
 

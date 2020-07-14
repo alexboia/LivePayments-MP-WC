@@ -262,7 +262,7 @@ namespace LvdWcMc {
         }
 
         public function getViewFilePath($viewFile) {
-            return $this->_viewsDir . DIRECTORY_SEPARATOR . $viewFile;
+            return $this->_viewsDir . '/' . $viewFile;
         }
 
         public function getRootStorageDir() {
@@ -311,6 +311,14 @@ namespace LvdWcMc {
 
         public function getVersion() {
             return $this->_version;
+        }
+
+        public function isDebugMode() {
+            return $this->_isDebugMode;
+        }
+
+        public function getLang() {
+            return $this->_lang;
         }
 
         public function getRequiredPhpVersion() {

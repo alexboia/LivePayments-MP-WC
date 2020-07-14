@@ -44,7 +44,7 @@ trait GenericTestHelpers {
     }
 
     protected function _getEnv() {
-        return lvdwcmc_env();
+        return lvdwcmc_get_env();
     }
 
     protected function _getDb() {

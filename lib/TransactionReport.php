@@ -38,7 +38,7 @@ namespace LvdWcMc {
         private $_formatters;
 
         public function __construct() {
-            $this->_env = lvdwcmc_env();
+            $this->_env = lvdwcmc_get_env();
             $this->_transactionFactory = new MobilpayTransactionFactory();
             $this->_formatters = new Formatters();
         }

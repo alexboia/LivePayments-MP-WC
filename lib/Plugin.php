@@ -56,11 +56,6 @@ namespace LvdWcMc {
         private $_shortcodes;
 
         /**
-         * @var string The identifier of the plug-in text domain
-         */
-        private $_textDomain = LVD_WCMC_TEXT_DOMAIN;
-
-        /**
          * @var \LvdWcMc\MobilpayTransactionFactory Reference to the transaction factory
          */
         private $_transactionFactory = null;
@@ -104,7 +99,7 @@ namespace LvdWcMc {
                 }
             );
 
-            $this->_env = lvdwcmc_env();
+            $this->_env = lvdwcmc_get_env();
             $this->_installer = new Installer();
             $this->_shortcodes = new Shortcodes();
             $this->_transactionFactory = new MobilpayTransactionFactory();
@@ -652,7 +647,7 @@ namespace LvdWcMc {
         }
 
         public function getTextDomain() {
-            return $this->_textDomain;
+            return LVD_WCMC_TEXT_DOMAIN;
         }
 
         public function getMediaIncludes() {
@@ -717,7 +712,7 @@ namespace LvdWcMc {
         }
 
         private function _loadTextDomain() {
-            load_plugin_textdomain($this->_textDomain, false, plugin_basename(LVD_WCMC_LANG_DIR));
+            load_plugin_textdomain(LVD_WCMC_TEXT_DOMAIN, false, plugin_basename(LVD_WCMC_LANG_DIR));
         }   
 
         private function _getInstallationErrorTranslations() {

@@ -174,7 +174,7 @@ if (!function_exists('write_log')) {
  * 
  * @return \LvdWcMc\Env The current environment accessor instance
  */
-function lvdwcmc_env() {
+function lvdwcmc_get_env() {
    static $env = null;
    
    if ($env === null) {

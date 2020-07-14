@@ -37,7 +37,7 @@
         private $_env;
 
         public function __construct() {
-            $this->_env = lvdwcmc_env();
+            $this->_env = lvdwcmc_get_env();
         }
 
         private function _getTransactionData(\WC_Order $order) {
@@ -76,7 +76,20 @@
                 $data = $db->getOne($this->_env->getPaymentTransactionsTableName());
                 if (!is_array($data)) {   
                     if ($createIfNotExists) {
-                        $data = $this->_getTransactionData($order);
+                        /**
+                         * Prepare order transaction data - maybe some plugin wants to alter it.
+                         * 
+                         * @hook lvdwcmc_initial_transaction_data_from_order
+                         * 
+                         * @param array $transactionData The current transaction data
+                         * @param \WC_Order $order The order for which the transaction data must be computed
+                         * 
+                         * @return array The actual transaction data, as returned by the filters
+                         */
+                        $data = apply_filters('lvdwcmc_initial_transaction_data_from_order', 
+                            $this->_getTransactionData($order), 
+                            $order);
+
                         $internalTxId = $db->insert($this->_env->getPaymentTransactionsTableName(), $data);
                         if (is_numeric($internalTxId) && $internalTxId > 0) {
                             $data = array_merge($data, array(
