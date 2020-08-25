@@ -69,10 +69,6 @@
 
         const STYLE_LVDWCMC_DASHBOARD = 'lvdwcmc-dashboard-css';
 
-        private $_refPluginsPath;
-
-        private $_scriptsInFooter;
-
         private $_styles = array(
             self::STYLE_TOASTR => array(
                 'path' => 'media/js/3rdParty/toastr/toastr.css',
@@ -187,135 +183,29 @@
             )
         );
 
+        /**
+         * Reference path used to compute asset URL
+         * @var string
+         */
+        private $_refPluginsPath;
+
+        /**
+         * The media includes manager
+         * @var \LivepaymentsCx\MediaIncludesManager
+         */
+        private $_manager;
+
         public function __construct($refPluginsPath, $scriptsInFooter) {
             if (empty($refPluginsPath)) {
                 throw new \InvalidArgumentException('The $refPluginsPath parameter is required and may not be empty.');
             }
 
+            $this->_manager = new MediaIncludesManager($this->_scripts, 
+                $this->_styles, 
+                $refPluginsPath, 
+                $scriptsInFooter);
+
             $this->_refPluginsPath = $refPluginsPath;
-            $this->_scriptsInFooter = $scriptsInFooter;
-        }
-
-        private  function _hasScript($handle) {
-            return !empty($this->_scripts[$handle]);
-        }
-    
-        private function _hasStyle($handle) {
-            return !empty($this->_styles[$handle]);
-        }
-
-        private function _getActualElement($handle, array &$collection) {
-            $script = null;
-            $actual = null;
-    
-            if (isset($collection[$handle])) {
-                $script = $collection[$handle];
-                if (!empty($script['alias'])) {
-                    $handle = $script['alias'];
-                    $actual = isset($collection[$handle]) 
-                        ? $collection[$handle]
-                        : null;
-                }
-    
-                if (!empty($actual)) {
-                    $deps = isset($script['deps']) 
-                        ? $script['deps'] 
-                        : null;
-                    if (!empty($deps)) {
-                        $actual['deps'] = $deps;
-                    }
-                } else {
-                    $actual = $script;
-                }
-            }
-    
-            return $actual;
-        }
-    
-        private function _getActualScriptToInclude($handle) {
-            return $this->_getActualElement($handle, $this->_scripts);
-        }
-    
-        private function _getActualStyleToInclude($handle) {
-            return $this->_getActualElement($handle, $this->_styles);
-        }
-
-        private function _ensureScriptDependencies(array $deps) {
-            foreach ($deps as $depHandle) {
-                if ($this->_hasScript($depHandle)) {
-                    $this->_enqueueScript($depHandle);
-                }
-            }
-        }
-    
-        private  function _ensureStyleDependencies(array $deps) {
-            foreach ($deps as $depHandle) {
-                if ($this->_hasStyle($depHandle)) {
-                    $this->_enqueueStyle($depHandle);
-                }
-            }
-        }
-
-        private function _enqueueScript($handle) {
-            if (empty($handle)) {
-                return;
-            }
-            if (isset($this->_scripts[$handle])) {
-                if (!wp_script_is($handle, 'registered')) {
-                    $script = $this->_getActualScriptToInclude($handle);
-
-                    $deps = isset($script['deps']) && is_array($script['deps']) 
-                        ? $script['deps'] 
-                        : array();
-
-                    if (!empty($deps)) {
-                        $this->_ensureScriptDependencies($deps);
-                    }
-    
-                    wp_enqueue_script($handle, 
-                        plugins_url($script['path'], $this->_refPluginsPath), 
-                        $deps, 
-                        $script['version'], 
-                        $this->_scriptsInFooter);
-
-                    if (isset($script['inline-setup'])) {
-                        wp_add_inline_script($handle, $script['inline-setup']);
-                    }
-                } else {
-                    wp_enqueue_script($handle);
-                }
-            } else {
-                wp_enqueue_script($handle);
-            }
-        }
-
-        private function _enqueueStyle($handle) {
-            if (empty($handle)) {
-                return;
-            }
-            if (isset($this->_styles[$handle])) {
-                $style = $this->_getActualStyleToInclude($handle);
-
-                if (!isset($style['media']) || !$style['media']) {
-                    $style['media'] = 'all';
-                }
-
-                $deps = isset($style['deps']) && is_array($style['deps']) 
-                    ? $style['deps'] 
-                    : array();
-
-                if (!empty($deps)) {
-                    $this->_ensureStyleDependencies($deps);
-                }
-
-                wp_enqueue_style($handle, 
-                    plugins_url($style['path'], $this->_refPluginsPath), 
-                    $deps, 
-                    $style['version'], 
-                    $style['media']);
-            } else {
-                wp_enqueue_style($handle);
-            }
         }
 
         private function _includeCommonScriptSettings() {
@@ -325,7 +215,7 @@
         }
 
         public function includeScriptSettings($settingsScriptLocalization, $commonScriptLocalization) {
-            $this->_enqueueScript(self::JS_LVDWCMC_SETTINGS);
+            $this->_manager->enqueueScript(self::JS_LVDWCMC_SETTINGS);
 
             if (!empty($commonScriptLocalization)) {
                 wp_localize_script(self::JS_LVDWCMC_COMMON,
@@ -343,7 +233,7 @@
         }
 
         public function includeScriptTransactionListing($transactionsScriptLocalization, $commonScriptLocalization) {
-            $this->_enqueueScript(self::JS_LVDWCMC_TRANSACTION_LISTING);
+            $this->_manager->enqueueScript(self::JS_LVDWCMC_TRANSACTION_LISTING);
             
             if (!empty($commonScriptLocalization)) {
                 wp_localize_script(self::JS_LVDWCMC_COMMON,
@@ -361,11 +251,11 @@
         }
 
         public function includeScriptPaymentInitiation() {
-            $this->_enqueueScript(self::JS_LVDWCMC_PAYMENT_INITIATION);
+            $this->_manager->enqueueScript(self::JS_LVDWCMC_PAYMENT_INITIATION);
         }
 
         public function includeScriptWooAdminDashboardSections($localization) {
-            $this->_enqueueScript(self::JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS);
+            $this->_manager->enqueueScript(self::JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS);
             if (!empty($localization)) {
                 wp_localize_script(self::JS_LVDWCMC_WOOADMIN_DASHBOARD_SECTIONS, 
                     'lvdwcmcWooAdminDashboardSectionsL10n', 
@@ -374,28 +264,28 @@
         }
 
         public function includeStyleCommon() {
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_COMMON);
+            $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_COMMON);
         }
 
         public function includeStyleSettings() {
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_SETTINGS);
+            $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_SETTINGS);
         }
 
         public function includeStyleAdminTransactionListing() {
             wp_enqueue_style('woocommerce_admin_styles');
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_LISTING);
+            $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_LISTING);
         }
 
         public function includeStyleFrontendTransactionDetails() {
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_FRONTEND_TRANSACTION_DETAILS);
+            $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_FRONTEND_TRANSACTION_DETAILS);
         }
 
         public function includeStyleAdminTransactionDetails() {
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS);
+            $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_ADMIN_TRANSACTION_DETAILS);
         }
 
         public function includeStyleDashboard() {
-            $this->_enqueueStyle(self::STYLE_LVDWCMC_DASHBOARD);
+            $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_DASHBOARD);
         }
     }
 }
