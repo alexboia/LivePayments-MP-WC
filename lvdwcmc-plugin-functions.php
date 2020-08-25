@@ -167,7 +167,7 @@ if (!function_exists('write_log')) {
 			error_log($message);
 	   }
 	}
- }
+}
 
 /**
  * Returns the current environment accessor instance

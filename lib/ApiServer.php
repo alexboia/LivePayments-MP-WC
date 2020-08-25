@@ -59,6 +59,9 @@ namespace LvdWcMc {
                 array(
                     'methods' => 'GET',
                     'callback' => array($this, 'handleRequestTransactionsStatusCounts'),
+                    'permission_callback' => function() {
+                        return $this->_currentUserCanManageWooCommerce();
+                    }
             ));
 
             register_rest_route('livepayments-mp-wc', 
@@ -66,6 +69,9 @@ namespace LvdWcMc {
                 array(
                     'methods' => 'GET',
                     'callback' => array($this, 'handleRequestLastTransactionDetails'),
+                    'permission_callback' => function() {
+                        return $this->_currentUserCanManageWooCommerce();
+                    }
             ));
         }
 
