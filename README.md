@@ -10,13 +10,14 @@ This plugin is meant to be used by merchants in Romania.
 
 1. [Is it good for you?](#lvdwcmc-isitgoodforyou)
 2. [Supported transaction statuses (actions)](#lvdwcmc-transaction-statuses)
-3. [Installation](#lvdwcmc-installation)
-4. [Setting up and configuring your plug-in](#lvdwcmc-setup)
-5. [Retrieving mobilPay™ security assets](#lvdwcmc-mobilpay-security-assets)
-6. [Screenshots](#lvdwcmc-screenshots)
-7. [Requirements](#lvdwcmc-requirements)
-8. [Credits](#lvdwcmc-credits)
-9. [License](#lvdwcmc-license)
+3. [Downloading the plug-in](#lvdwcmc-get-it)
+4. [Installation](#lvdwcmc-installation)
+5. [Setting up and configuring your plug-in](#lvdwcmc-setup)
+6. [Retrieving mobilPay™ security assets](#lvdwcmc-mobilpay-security-assets)
+7. [Screenshots](#lvdwcmc-screenshots)
+8. [Requirements](#lvdwcmc-requirements)
+9. [Credits](#lvdwcmc-credits)
+10. [License](#lvdwcmc-license)
 
 ## Is it good for you?
 <a name="lvdwcmc-isitgoodforyou"></a>  
