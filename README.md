@@ -50,6 +50,14 @@ If you are a WordPress solution developer and  working on implementing a WooComm
 | canceled | The amount reserved on the client's card is being released. | The order is marked as cancelled. |
 | credit | Amount refunded to client (partially or in full). | The refunded amount is recorded in the order state. If the entire amount has been refunded, the order is marked as refunded. |
 
+## Downloading the plug-in
+<a name="lvdwcmc-get-it"></a>
+
+You can get the plug-in:
+
+- either from the WordPress plug-in directory: [https://wordpress.org/plugins/wc-mobilpayments-card/](https://wordpress.org/plugins/wc-mobilpayments-card/);
+- or from the Releases section of the project's page: [https://github.com/alexboia/LivePayments-MP-WC/releases](https://github.com/alexboia/LivePayments-MP-WC/releases).
+
 ## Installation
 <a name="lvdwcmc-installation"></a>  
 

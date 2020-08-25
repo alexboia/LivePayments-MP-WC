@@ -3,8 +3,8 @@ Contributors: alexandruboia
 Donate link: https://ko-fi.com/alexandruboia
 Tags: payment, card, mobilpay, creditcard, woocommerce
 Requires at least: 5.0
-Tested up to: 5.4.2
-Stable tag: 0.1.2
+Tested up to: 5.5.1
+Stable tag: 0.1.3
 Requires PHP: 5.6.2
 License: BSD New License
 License URI: https://opensource.org/licenses/BSD-3-Clause
