@@ -164,6 +164,7 @@ namespace LvdWcMc {
             add_action('woocommerce_api_' . $this->_apiDescriptor, array($this, 'process_gateway_response'), 10, 1);
             add_action('woocommerce_receipt_' . $this->id, array($this, 'show_payment_initiation'), 10, 1);
             add_action('woocommerce_email_after_order_table', array($this, 'add_transaction_details_to_email'), 10, 4);
+            add_action('woocommerce_settings_payment_gateways_options', array($this, 'add_gateway_readiness_banner'));
 
             if (is_admin()) {
                 add_action('admin_enqueue_scripts', array($this, 'enqueue_form_scripts'));
@@ -428,8 +429,33 @@ namespace LvdWcMc {
             return $value;
         }
 
-        private function _renderAdminOptionsJSSettings() {
+        private function _renderGatewayReadinessBanner($context, $displayMessageIfGatewayReady) {
+            $message = '';
+            $missingRequiredFields = $this->get_missing_required_fields();
+            $gatewayReady = empty($missingRequiredFields);
+
+            if (!$gatewayReady) {
+                $message = sprintf(__('The %s payment gateway requires further configuration until it can be used to accept payments. The following fields are missing:', 'livepayments-mp-wc'), 
+                    $this->title);
+            } else if ($displayMessageIfGatewayReady) {
+                $message = sprintf(__('The %s payment gateway is configured and ready to use.', 'livepayments-mp-wc'), 
+                    $this->title);
+            } else {
+                return '';
+            }
+
+            $data = new \stdClass();
+            $data->message = $message;
+            $data->missingRequiredFields = $missingRequiredFields;
+            $data->gatewayReady = $gatewayReady;
+            $data->context = $context;
+
             ob_start();
+            require $this->_env->getViewFilePath('lvdwcmc-gateway-readiness-banner.php');
+            return ob_get_clean();
+        }
+
+        private function _renderAdminOptionsJSSettings() {
             $data = new \stdClass();
             $data->uploadPaymentAssetUrl = $this->_mobilpayAssetUploadUrl;
             $data->uploadPaymentAssetNonce = wp_create_nonce($this->_mobilpayAssetUploadApiDescriptor);
@@ -467,13 +493,36 @@ namespace LvdWcMc {
             $data = $this->mergeAdditionalData($data, 
                 $additionalData);
 
+            ob_start();
             require $this->_env->getViewFilePath('lvdwcmc-gateway-settings-js.php');
             return ob_get_clean();
         }
 
+        public function add_gateway_readiness_banner() {
+            echo $this->_renderGatewayReadinessBanner('gateway-options-listing', false);
+        }
+
         public function admin_options() {
+            /**
+             * Executed before the admin options form is rendered 
+             *  (also before the gateway readiness banner is displayed).
+             * 
+             * @hook lvdwcmc_before_gateway_admin_options
+             */
+            do_action('lvdwcmc_before_gateway_admin_options', 
+                $this);
+
+            echo $this->_renderGatewayReadinessBanner('gateway-settings-form', true);
             parent::admin_options();
             echo $this->_renderAdminOptionsJSSettings();
+
+            /**
+             * Executed after the admin options form is rendered.
+             * 
+             * @hook lvdwcmc_after_gateway_admin_options
+             */
+            do_action('lvdwcmc_after_gateway_admin_options', 
+                $this);
         }
 
         public function get_tooltip_html($fieldInfo) {
@@ -702,6 +751,52 @@ namespace LvdWcMc {
             lvdwcmc_send_json($result);
         }
 
+        public function get_missing_required_fields() {
+            $missingRequiredFields = array();
+
+            if (empty($this->_mobilpayAccountId)) {
+                $missingRequiredFields['mobilpay_account_id'] = 
+                    $this->form_fields['mobilpay_account_id']['title'];
+            }
+
+            if (empty($this->_mobilpayReturnUrl)) {
+                $missingRequiredFields['mobilpay_return_url'] =
+                    $this->form_fields['mobilpay_return_url']['title'];
+            }
+
+            foreach ($this->_getPaymentAssetFields() as $fieldId => $fieldInfo) {
+                if (!is_readable($this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, $this->_mobilpayAccountId))) {
+                    $missingRequiredFields[$fieldId] = $fieldInfo['title'];
+                }
+            }
+
+            /**
+             * Filters the list of required fields for the gateway 
+             *  to be considered ready for processing payments.
+             * 
+             * The array of required fields must have the following structure:
+             *  - key => field ID, as defined in the $form_fields property;
+             *  - label => a label for the field, usually the label defined 
+             *      in the $form_fields property for this field.
+             * 
+             * Implementors of this hook will also need to implement 
+             *  the lvdwcmc_gateway_needs_setup to ensure that 
+             *  their results are consistent
+             * 
+             * @hook lvdwcmc_gateway_get_missing_required_fields
+             * @see lvdwcmc_gateway_needs_setup
+             * 
+             * @param array $missingRequiredFields The list of required fields that are missing, initially determined by LivePayments-MP-WC
+             * @param array $settings The current settings values
+             * @param \LvdWcMc\MobilpayCreditCardGateway $gateway The gateway instance
+             * 
+             * @return array The list of required fields that are missing
+             */
+            return apply_filters('lvdwcmc_gateway_get_missing_required_fields', $missingRequiredFields, 
+                $this->settings, 
+                $this);
+        }
+
         public function needs_setup() {
             //Used by WC when toggling gateway on or off via AJAX 
             //  (see WC_Ajax::toggle_gateway_enabled())
@@ -711,10 +806,15 @@ namespace LvdWcMc {
 
             /**
              * Filters whether or not the gateway needs setup.
-             * This is invoked by WC, when toggling gateway on or off via AJAX
+             * This is invoked by WC, when toggling gateway on or off via AJAX.
+             * 
+             * Implementors of this hook will also need to implement 
+             *  the lvdwcmc_gateway_get_missing_required_fields to ensure that 
+             *  their results are consistent.
              * 
              * @hook lvdwcmc_gateway_needs_setup
              * @see \WC_Ajax::toggle_gateway_enabled()
+             * @see lvdwcmc_gateway_get_missing_required_fields
              * 
              * @param boolean $needsSetup Whether or not setup is needed, initially determined by default by LivePayments-MP-WC
              * @param array $settings The current settings values

@@ -181,6 +181,41 @@ th.lvdwcmc-order-id-column {
     float: right;
 }
 
+.lvdwcmc-gateway-readiness {
+    padding: 10px;
+}
+
+.lvdwcmc-gateway-readiness.lvdwcmc-readiness-context-gateway-settings-form {
+    width: auto;
+    display: inline-block;
+}
+
+.lvdwcmc-gateway-readiness.lvdwcmc-readiness-context-gateway-options-listing {
+    margin-bottom: 15px;
+    margin-right: 15px;
+}
+
+.lvdwcmc-gateway-readiness ul {
+    margin-left: 10px;
+}
+
+.lvdwcmc-gateway-readiness ul li::before {
+    content: '-';
+    padding-right: 5px;
+}
+
+.lvdwcmc-gateway-readiness-ready {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.lvdwcmc-gateway-readiness-notready {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+}
+
 .lvdwcmc-clear {
     clear: both;
 }
