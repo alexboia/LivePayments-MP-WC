@@ -75,6 +75,11 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments
 
 == Changelog ==
 
+= 0.1.3 =
+* Improved usability: gateway readiness displayd in the WooCommerce payment management tab;
+* Extended action and filter hooks support;
+* Bug fixes.
+
 = 0.1.2 =
 * Add reporting widget to WooCommerce Admin dashboard;
 * Correct handling of payment initiation errors in the payment receipt screen;
@@ -87,6 +92,9 @@ Fixed minor usability issues.
 First officially distributed version.
 
 == Upgrade Notice ==
+
+= 0.1.3 =
+Update to version 0.1.3 for improved usability and new features.
 
 = 0.1.2 =
 Update to version 0.1.2 for improved usability and new features.
