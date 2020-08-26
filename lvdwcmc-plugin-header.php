@@ -189,3 +189,14 @@ if (!defined('LVD_WCMC_RECORDS_PER_PAGE')) {
      */
     define('LVD_WCMC_RECORDS_PER_PAGE', 25);
 }
+
+if (!defined('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER')) {
+    /**
+     * Whether to show the gateway readiness banner in the following sections:
+     *  - payment gateway listing (Payment tab);
+     *  - our own payment gateway settings form.
+     * 
+     * @var boolean
+     */
+    define('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER', true);
+}

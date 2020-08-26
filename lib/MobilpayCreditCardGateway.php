@@ -430,29 +430,31 @@ namespace LvdWcMc {
         }
 
         private function _renderGatewayReadinessBanner($context, $displayMessageIfGatewayReady) {
-            $message = '';
-            $missingRequiredFields = $this->get_missing_required_fields();
-            $gatewayReady = empty($missingRequiredFields);
+            if ($this->_gatewayReadinessBannerEnabled()) {
+                $message = '';
+                $missingRequiredFields = $this->get_missing_required_fields();
+                $gatewayReady = empty($missingRequiredFields);
 
-            if (!$gatewayReady) {
-                $message = sprintf(__('The %s payment gateway requires further configuration until it can be used to accept payments. The following fields are missing:', 'livepayments-mp-wc'), 
-                    $this->title);
-            } else if ($displayMessageIfGatewayReady) {
-                $message = sprintf(__('The %s payment gateway is configured and ready to use.', 'livepayments-mp-wc'), 
-                    $this->title);
-            } else {
-                return '';
+                if (!$gatewayReady) {
+                    $message = sprintf(__('The %s payment gateway requires further configuration until it can be used to accept payments. The following fields are missing:', 'livepayments-mp-wc'), 
+                        $this->title);
+                } else if ($displayMessageIfGatewayReady) {
+                    $message = sprintf(__('The %s payment gateway is configured and ready to use.', 'livepayments-mp-wc'), 
+                        $this->title);
+                } else {
+                    return '';
+                }
+
+                $data = new \stdClass();
+                $data->message = $message;
+                $data->missingRequiredFields = $missingRequiredFields;
+                $data->gatewayReady = $gatewayReady;
+                $data->context = $context;
+
+                ob_start();
+                require $this->_env->getViewFilePath('lvdwcmc-gateway-readiness-banner.php');
+                return ob_get_clean();
             }
-
-            $data = new \stdClass();
-            $data->message = $message;
-            $data->missingRequiredFields = $missingRequiredFields;
-            $data->gatewayReady = $gatewayReady;
-            $data->context = $context;
-
-            ob_start();
-            require $this->_env->getViewFilePath('lvdwcmc-gateway-readiness-banner.php');
-            return ob_get_clean();
         }
 
         private function _renderAdminOptionsJSSettings() {
@@ -1525,6 +1527,11 @@ namespace LvdWcMc {
 
         private function _canManageWcSettings() {
             return current_user_can('manage_woocommerce');
+        }
+
+        private function _gatewayReadinessBannerEnabled() {
+            return defined('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER') 
+                && LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER === true;
         }
 
         private function _isLiveMode() {

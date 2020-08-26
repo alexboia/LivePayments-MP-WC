@@ -35,7 +35,7 @@
 <?php if (!$data->gatewayReady): ?>
     <div class="lvdwcmc-gateway-readiness lvdwcmc-gateway-readiness-notready lvdwcmc-readiness-context-<?php echo esc_attr($data->context); ?>">
         <div class="lvdwcmc-gateway-readiness-message">
-            <?php echo $data->message; ?>
+            <span class="dashicons dashicons-warning"></span> <?php echo $data->message; ?>
         </div>
         <ul>
             <?php foreach ($data->missingRequiredFields as $fieldId => $label): ?>
@@ -44,5 +44,9 @@
         </ul>
     </div>
 <?php else: ?>
-    <div class="lvdwcmc-gateway-readiness lvdwcmc-gateway-readiness-ready lvdwcmc-readiness-context-<?php echo esc_attr($data->context);?>"><?php echo $data->message; ?></div>
+    <div class="lvdwcmc-gateway-readiness lvdwcmc-gateway-readiness-ready lvdwcmc-readiness-context-<?php echo esc_attr($data->context);?>">
+        <div class="lvdwcmc-gateway-readiness-message">
+            <span class="dashicons dashicons-yes"></span> <?php echo $data->message; ?>
+        </div>
+    </div>
 <?php endif; ?>

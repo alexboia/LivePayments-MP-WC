@@ -185,6 +185,17 @@ th.lvdwcmc-order-id-column {
     padding: 10px;
 }
 
+.lvdwcmc-gateway-readiness .dashicons {
+    margin-right: 10px;
+}
+
+.lvdwcmc-gateway-readiness .lvdwcmc-gateway-readiness-message {
+    font-weight: bold;
+    line-height: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
 .lvdwcmc-gateway-readiness.lvdwcmc-readiness-context-gateway-settings-form {
     width: auto;
     display: inline-block;
@@ -196,7 +207,7 @@ th.lvdwcmc-order-id-column {
 }
 
 .lvdwcmc-gateway-readiness ul {
-    margin-left: 10px;
+    margin-left: 30px;
 }
 
 .lvdwcmc-gateway-readiness ul li::before {
