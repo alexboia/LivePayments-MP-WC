@@ -31,18 +31,39 @@
 
 namespace LvdWcMc {
     class Installer {
+        /**
+         * @var int Code for successful install-related operations
+         */
         const INSTALL_OK = 0;
 
+        /**
+         * @var int Error code returned when an incompatible PHP version is detected upon installation
+         */
         const INCOMPATIBLE_PHP_VERSION = 1;
 
+        /**
+         * @var int Error code returned when an incompatible WordPress version is detected upon installation
+         */
         const INCOMPATIBLE_WP_VERSION = 2;
 
+        /**
+         * @var int Error code returned when MySqli extension is not found
+         */
         const SUPPORT_MYSQLI_NOT_FOUND = 3;
 
+        /**
+         * @var int Error code returned when OpenSsl extension is not found
+         */
         const SUPPORT_OPENSSL_NOT_FOUND = 4;
 
+        /**
+         * @var int Generic error code
+         */
         const GENERIC_ERROR = PHP_INT_MAX;
 
+        /**
+         * @var string WP options key for current plug-in version
+         */
         const OPT_VERSION = LVD_WCMC_PLUGIN_ID . '_plugin_version';
 
         /**
@@ -59,10 +80,75 @@ namespace LvdWcMc {
             $this->_env = lvdwcmc_get_env();
         }
 
-        public function updateIfNeeded() {
+        /**
+         * Retrieves the current plug-in version (not the currently installed one, 
+         *	but the one in the package currently being run)
+         * @return string The current plug-in version
+         */
+        private function _getVersion() {
+            return $this->_env->getVersion();
+        }
+
+        /**
+         * Checks whether or not an update is needed
+         * @param string $version The version to be installed
+         * @param string $installedVersion The version to be installed
+         * @return void
+         */
+        private function _isUpdatedNeeded($version, $installedVersion) {
+            return $version != $installedVersion;
+        }
+
+        /**
+         * Retrieve the currently installed version (which may be different 
+         *	than the one in the package currently being run)
+         * @return String The version
+         */
+        private function _getInstalledVersion() {
+            $version = null;
+            if (function_exists('get_option')) {
+                $version = get_option(self::OPT_VERSION, null);
+            }
+            return $version;
+        }
+
+        /**
+         * Carry out the update operation
+         * @param String $version The version to be installed
+         * @param String $installedVersion The version currently being installed
+         * @return Boolean Whether the operation succeeded or not
+         */
+        private function _update($version, $installedVersion) {
+            $this->_reset();
+            update_option(self::OPT_VERSION, $version);
             return self::INSTALL_OK;
         }
 
+        /**
+         * Checks the current plug-in package version, the currently installed version
+         *  and runs the update operation if they differ
+         * 
+         * @return Integer The operation result
+         */
+        public function updateIfNeeded() {
+            $result = self::INSTALL_OK;
+            $version = $this->_getVersion();
+            $installedVersion = $this->_getInstalledVersion();
+
+            if ($this->_isUpdatedNeeded($version, $installedVersion)) {
+                $result = $this->_update($version, $installedVersion);
+            }
+
+            return $result;
+        }
+
+        /**
+         * Checks whether the plug-in can be installed and returns 
+         *  a code that describes the reason it cannot be installed
+         *  or Installer::INSTALL_OK if it can.
+         * 
+         * @return Integer The error code that describes the result of the test.
+         */
         public function canBeInstalled() {
             $this->_reset();
             try {
@@ -87,19 +173,34 @@ namespace LvdWcMc {
                 : self::GENERIC_ERROR;
         }
 
+        /**
+         * Activates the plug-in. 
+         * If a step of the activation process fails, 
+         *  the plug-in attempts to rollback the steps that did successfully execute.
+         * The activation process is idempotent, that is, 
+         *  it will not perform the same operations twice.
+         * 
+         * @return bool True if the operation succeeded, false otherwise.
+         */
         public function activate() {
             $this->_reset();
             try {
+                //Install database tables
                 if (!$this->_installSchema()) {
                     return false;
                 }
 
+                //Install options, for instance, 
+                //  store plug-in version in wp_options table.
                 if (!$this->_installSettings()) {
+                    //If operation fails, rollback database tables installation
                     $this->_uninstallSchema();
                     return false;
                 }
 
+                //Install plug-in assets
                 if (!$this->_installAssets()) {
+                    //If operation fails, rollback previous steps
                     $this->_uninstallSchema();
                     $this->_uninstallSettings();
                     return false;
@@ -113,6 +214,14 @@ namespace LvdWcMc {
             return false;
         }
 
+        /**
+         * Deactivates the plug-in.
+         * If a step of the activation process fails, 
+         *  the plug-in attempts to rollback the steps 
+         *  that did successfully execute.
+         * 
+         * @return bool True if the operation succeeded, false otherwise. 
+         */
         public function deactivate() {
             $this->_reset();
             return true;
@@ -134,6 +243,14 @@ namespace LvdWcMc {
             return false;
         }
 
+        /**
+         * Ensures all the plug-in's storage directories are created, 
+         *  as well as any required assets.
+         * If a directory exists, it is not re-created, nor is it purged.
+         * If a file asset exists, it is overwritten.
+         * 
+         * @return bool True if the operation succeeded, false otherwise
+         */
         private function _installAssets() {
             $result = false;
             $rootStorageDir = $this->_env->getRootStorageDir();
@@ -195,7 +312,9 @@ namespace LvdWcMc {
                         $result = true;
                     }
                 } else if ($asset['type'] == 'directory') {
-                    @mkdir($assetPath);
+                    if (!is_dir($assetPath)) {
+                        @mkdir($assetPath);
+                    }
                     $result = is_dir($assetPath);
                 }
 
@@ -238,6 +357,11 @@ namespace LvdWcMc {
             return true;
         }
 
+        /**
+         * Deletes the plug-in settings.
+         * 
+         * @return true True if the operation succeeded, false othwerise
+         */
         private function _uninstallSettings() {
             delete_option(self::OPT_VERSION);
             return true;
@@ -322,12 +446,25 @@ namespace LvdWcMc {
                 : false;
         }
 
+        
+        /**
+         * Checks whether the current PHP version is compatible 
+         * with the plug-in's minimum required PHP version.
+         * 
+         * @return bool True if compatible, false otherwise
+         */
         private function _isCompatPhpVersion() {
             $current = $this->_env->getPhpVersion();
             $required = $this->_env->getRequiredPhpVersion();
             return version_compare($current, $required, '>=');
         }
 
+        /**
+         * Checks whether the current WP version is compatible 
+         * with the plug-in's minimum required WP version.
+         * 
+         * @return bool True if compatible, false otherwise
+         */
         private function _isCompatWpVersion() {
             $current = $this->_env->getWpVersion();
             $required = $this->_env->getRequiredWpVersion();
@@ -363,6 +500,10 @@ namespace LvdWcMc {
             return '<?php header("Location: ' . str_repeat('../', $redirectCount) . 'index.php"); exit;';
         }
 
+        /**
+         * Resets the last occurred error
+         * @return void 
+         */
         private function _reset() {
             $this->_lastError = null;
         }
@@ -379,6 +520,11 @@ namespace LvdWcMc {
             return $this->_env->getDbCollate();
         }
 
+        /**
+         * Returns the last occurred exception or null if none found.
+         * 
+         * @return \Exception The last occurred exception.
+         */
         public function getLastError() {
             return $this->_lastError;
         }

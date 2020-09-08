@@ -29,8 +29,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-use LvdWcMc\Env;
-
 class EnvTests extends WP_UnitTestCase {
     use GenericTestHelpers;
 

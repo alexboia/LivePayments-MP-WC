@@ -437,10 +437,10 @@ namespace LvdWcMc {
 
                 if (!$gatewayReady) {
                     $message = sprintf(__('The %s payment gateway requires further configuration until it can be used to accept payments. The following fields are missing:', 'livepayments-mp-wc'), 
-                        $this->title);
+                        $this->method_title);
                 } else if ($displayMessageIfGatewayReady) {
                     $message = sprintf(__('The %s payment gateway is configured and ready to use.', 'livepayments-mp-wc'), 
-                        $this->title);
+                        $this->method_title);
                 } else {
                     return '';
                 }

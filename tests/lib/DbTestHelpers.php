@@ -33,9 +33,13 @@
     protected function _truncateTables(MysqliDb $db) {
         $nArgs = func_num_args();
 
+        $db->rawQuery('SET FOREIGN_KEY_CHECKS = 0;');
+
         for ($iArg = 1; $iArg < $nArgs; $iArg ++) {
             $table = func_get_arg($iArg);
             $db->rawQuery('TRUNCATE TABLE `' . $table . '`', null, false);
         }
+        
+        $db->rawQuery('SET FOREIGN_KEY_CHECKS = 1;');
     }
  }
