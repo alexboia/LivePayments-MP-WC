@@ -39,7 +39,11 @@
         </div>
         <ul>
             <?php foreach ($data->missingRequiredFields as $fieldId => $label): ?>
-                <li data-missing-field-id="<?php echo esc_attr($fieldId); ?>"><?php echo $label; ?></li>
+                <li data-missing-field-id="<?php echo esc_attr($fieldId); ?>"><?php echo esc_html($label); ?></li>
+            <?php endforeach; ?>
+
+            <?php foreach ($data->fieldsWithWarnings as $fieldId => $message): ?>
+                <li data-missing-field-id="<?php echo esc_attr($fieldId); ?>"><?php echo esc_html($message); ?></li>
             <?php endforeach; ?>
         </ul>
     </div>

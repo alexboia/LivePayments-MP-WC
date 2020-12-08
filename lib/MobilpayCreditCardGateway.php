@@ -350,6 +350,7 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
                     'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.cer'),
+                    '_kind' => 'public_key_certificate',
                     '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
                     '_is_live_mode' => true
                 ),
@@ -360,6 +361,7 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_LIVE,
                     'desc_tip' => true,
                     'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.key'),
+                    '_kind' => 'private_key_file',
                     '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
                     '_is_live_mode' => true
                 ),
@@ -370,6 +372,7 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
                     'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.cer'),
+                    '_kind' => 'public_key_certificate',
                     '_file_format' => $this->_paymentAssetFileTemplates['public_key_certificate'],
                     '_is_live_mode' => false
                 ),
@@ -380,6 +383,7 @@ namespace LvdWcMc {
                     'environment' => self::GATEWAY_MODE_SANDBOX,
                     'desc_tip' => true,
                     'allowed_files_hints' => sprintf(__('allowed file types: %s', 'livepayments-mp-wc'), '.key'),
+                    '_kind' => 'private_key_file',
                     '_file_format' => $this->_paymentAssetFileTemplates['private_key_file'],
                     '_is_live_mode' => false
                 )
@@ -433,10 +437,13 @@ namespace LvdWcMc {
             if ($this->_gatewayReadinessBannerEnabled()) {
                 $message = '';
                 $missingRequiredFields = $this->get_missing_required_fields();
-                $gatewayReady = empty($missingRequiredFields);
+                $fieldsWithWarnings = $this->get_fields_with_warnings();
+
+                $gatewayReady = empty($missingRequiredFields) 
+                    && empty($fieldsWithWarnings);
 
                 if (!$gatewayReady) {
-                    $message = sprintf(__('The %s payment gateway requires further configuration until it can be used to accept payments. The following fields are missing:', 'livepayments-mp-wc'), 
+                    $message = sprintf(__('The %s payment gateway requires further configuration until it can be used to accept payments. The following fields are missing or require your attention:', 'livepayments-mp-wc'), 
                         $this->method_title);
                 } else if ($displayMessageIfGatewayReady) {
                     $message = sprintf(__('The %s payment gateway is configured and ready to use.', 'livepayments-mp-wc'), 
@@ -448,6 +455,7 @@ namespace LvdWcMc {
                 $data = new \stdClass();
                 $data->message = $message;
                 $data->missingRequiredFields = $missingRequiredFields;
+                $data->fieldsWithWarnings = $fieldsWithWarnings;
                 $data->gatewayReady = $gatewayReady;
                 $data->context = $context;
 
@@ -617,6 +625,21 @@ namespace LvdWcMc {
                 'chunkSize' => LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE, 
                 'maxFileSize' => LVD_WCMC_PAYMENT_ASSET_UPLOAD_MAX_FILE_SIZE, 
                 'allowedFileTypes' => array()));
+
+            $uploader->setCustomValidator(function($destFilePathForValidation) use ($fieldInfo) {
+                $result = true;
+                $contents = file_get_contents($destFilePathForValidation);
+
+                if (isset($fieldInfo['_kind'])) {
+                    if ($fieldInfo['_kind'] == 'public_key_certificate') {
+                        $result = $this->_isValidPublicKeyCertificateFile($contents);
+                    } else if ($fieldInfo['_kind'] == 'private_key_file') {
+                        $result = $this->_isValidPrivateKeyFile($contents);
+                    }
+                }
+
+                return $result;
+            });
 
             $result = new \stdClass();
             $result->status = $uploader->receive();
@@ -797,6 +820,103 @@ namespace LvdWcMc {
             return apply_filters('lvdwcmc_gateway_get_missing_required_fields', $missingRequiredFields, 
                 $this->settings, 
                 $this);
+        }
+
+        public function get_fields_with_warnings() {
+            $fieldsWithWarnings = array();
+            
+            if (!empty($this->_mobilpayReturnUrl)) {
+               $message = $this->_validateMobilpayReturnUrl();
+               if (!empty($message)) {
+                    $fieldsWithWarnings['mobilpay_return_url'] = $message;
+               }
+            }
+
+            if (!empty($this->_mobilpayAccountId)) {
+                foreach ($this->_getPaymentAssetFields() as $fieldId => $fieldInfo) {
+                    $message = $this->_validateMobilpayAsset($fieldInfo);
+                    if (!empty($message)) {
+                        $fieldsWithWarnings[$fieldId] = $message;
+                    }
+                }
+            }
+
+            return $fieldsWithWarnings;
+        }
+
+        private function _validateMobilpayReturnUrl() {
+            $message = null;
+
+            if (!empty($this->_mobilpayReturnUrl)) {
+                $title = $this->form_fields['mobilpay_return_url']['title'];
+                if (parse_url($this->_mobilpayReturnUrl) !== false) {
+                    if ($this->_validateMobilpayReturnUrlAsLocalPage()) {
+                        $postId = url_to_postid($this->_mobilpayReturnUrl);
+                        if (!is_int($postId) || $postId <= 0) {
+                            $message = sprintf(__('The value for the field %s is a valid URL, but no longer corresponds to an existing local page', 'livepayments-mp-wc'), 
+                                $title);
+                        }
+                    }
+                } else {
+                    $message = sprintf(__('The value for the field %s is no longer a valid URL', 'livepayments-mp-wc'), 
+                        $title);
+                }
+            }
+
+            return $message;
+        }
+
+        private function _validateMobilpayAsset(array $fieldInfo) {
+            $message = null;
+            $path = $this->_getPaymentAssetFilePathFromFieldInfo($fieldInfo, $this->_mobilpayAccountId);
+            
+            if (is_readable($path)) {
+                $contents = file_get_contents($path);
+                if (!empty($contents)) {
+                    if ($fieldInfo['_kind'] == 'public_key_certificate') {
+                        if (!$this->_isValidPublicKeyCertificateFile($contents)) {
+                            $message = sprintf(__('The payment asset file %s is not a valid public key certificate', 'livepayments-mp-wc'), 
+                                $fieldInfo['title']);
+                        }
+                    } else if ($fieldInfo['_kind'] == 'private_key_file') {
+                        if (!$this->_isValidPrivateKeyFile($contents)) {
+                            $message = sprintf(__('The payment asset file %s is not a valid private key', 'livepayments-mp-wc'), 
+                                $fieldInfo['title']);
+                        }
+                    }
+                } else {
+                    $message = sprintf(__('The payment asset file %s is empty', 'livepayments-mp-wc'), 
+                        $fieldInfo['title']);
+                }
+            }
+
+            return $message;
+        }
+
+        private function _isValidPublicKeyCertificateFile($fileContents) {
+            $result = true;
+            if (function_exists('openssl_pkey_get_public') && function_exists('openssl_free_key')) {
+                $publicKey = openssl_pkey_get_public($fileContents);
+                if ($publicKey !== false && is_resource($publicKey)) {
+                    openssl_free_key($publicKey);
+                } else {
+                    $result = false;
+                }
+            }
+            return $result;
+        }
+
+        private function _isValidPrivateKeyFile($fileContents) {
+            $result = true;
+            if (function_exists('openssl_pkey_get_private') && function_exists('openssl_free_key')) {
+                $privateKey = openssl_pkey_get_private($fileContents);
+                if ($privateKey !== false && is_resource($privateKey)) {
+                    openssl_free_key($privateKey);
+                } else {
+                    $result = false;
+                }
+            }
+            return $result;
         }
 
         public function needs_setup() {
@@ -1531,7 +1651,12 @@ namespace LvdWcMc {
 
         private function _gatewayReadinessBannerEnabled() {
             return defined('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER') 
-                && LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER === true;
+                && constant('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER') === true;
+        }
+
+        private function _validateMobilpayReturnUrlAsLocalPage() {
+            return defined('LVD_WCMC_VALIDATE_MOBILPAY_URL_AS_LOCAL_PAGE') 
+                && constant('LVD_WCMC_VALIDATE_MOBILPAY_URL_AS_LOCAL_PAGE') === true;
         }
 
         private function _isLiveMode() {
