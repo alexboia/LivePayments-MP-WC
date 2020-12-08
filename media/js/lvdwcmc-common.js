@@ -53,13 +53,18 @@
                 color: '#fff' 
             },
 
-            onBlock: disableWindowScroll,
-            onUnblock: enableWindowScroll
+            onBlock: disableWindowScroll
         });
     }
 
     function hidePleaseWait() {
-        $.unblockUI();
+        $.unblockUI({
+            onUnblock: enableWindowScroll
+        });
+    }
+
+    function scrollToTop() {
+        $('body,html').scrollTop(0);
     }
 
     if (window.lvdwcmc == undefined) {
@@ -70,6 +75,7 @@
         disableWindowScroll: disableWindowScroll,
         enableWindowScroll: enableWindowScroll,
         showPleaseWait: showPleaseWait,
-        hidePleaseWait: hidePleaseWait
+        hidePleaseWait: hidePleaseWait,
+        scrollToTop: scrollToTop
     });
 })(jQuery);

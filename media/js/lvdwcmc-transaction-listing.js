@@ -97,6 +97,10 @@
                         left: 'calc(50% - 340px)',
                         border: '0px none',
                         boxShadow: '0 5px 15px rgba(0, 0, 0, 0.7)'
+                    },
+
+                    onBlock: function() {
+                        lvdwcmc.disableWindowScroll();
                     }
                 });
             } else {
@@ -105,6 +109,21 @@
         }).fail(function() {
             _hideProgress();
             _toastMessage(false, lvdwcmcTransactionsListL10n.errCannotLoadTransactionDetailsNetwork);
+        });
+    }
+
+    function _loadDetailsForTargetTransaction($elementWithAction) { 
+        var transactionId = parseInt($elementWithAction.attr('data-transactionId'));
+        if (!isNaN(transactionId) && transactionId > 0) {
+            _loadDetails(transactionId);
+        }
+    }
+
+    function _closeDetails() {
+        $.unblockUI({
+            onUnblock: function() {
+                lvdwcmc.enableWindowScroll();
+            }
         });
     }
 
@@ -118,14 +137,11 @@
 
     function _initListeners() {
         $('#lvdwcmc-tx-listing').on('click', 'a.lvdwcmc-tx-action', function(e) {
-            var transactionId = parseInt($(this).attr('data-transactionId'));
-            if (!isNaN(transactionId) && transactionId > 0) {
-                _loadDetails(transactionId);
-            }
+            _loadDetailsForTargetTransaction($(this));
         });
 
-        $('body').on('click', '#lvdwcmc-admin-transaction-details-close', function() {
-            $.unblockUI();
+        $(document).on('click', '#lvdwcmc-admin-transaction-details-close', function() {
+            _closeDetails();
         });
     }
 

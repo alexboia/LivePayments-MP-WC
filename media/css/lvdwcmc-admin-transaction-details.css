@@ -34,18 +34,28 @@
  }
 
  table.lvdwcmc-admin-transaction-details-list {
-    width: 100%;
+	width: 100%;
+	table-layout: fixed;
  }
 
  table.lvdwcmc-admin-transaction-details-list th {
-    text-align: left;
+	text-align: left;
+	width: calc(30% - 16px);
  }
 
- table.lvdwcmc-admin-transaction-details-list th, td {
-    padding: 8px;
+ table.lvdwcmc-admin-transaction-details-list td {
+	width: calc(70% - 16px);
  }
 
- .woocommerce-dashboard__lvdwcmc-dashboard-card table.lvdwcmc-admin-transaction-details-list th, td {
+ table.lvdwcmc-admin-transaction-details-list th, 
+ table.lvdwcmc-admin-transaction-details-list td {
+	padding: 8px;
+	word-wrap: break-word;
+	text-align: left;
+ }
+
+ .woocommerce-dashboard__lvdwcmc-dashboard-card table.lvdwcmc-admin-transaction-details-list th, 
+ .woocommerce-dashboard__lvdwcmc-dashboard-card table.lvdwcmc-admin-transaction-details-list td {
    padding: 12px;
 }
 

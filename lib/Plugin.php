@@ -80,6 +80,9 @@ namespace LvdWcMc {
          */
         private $_apiServer = null;
 
+        /**
+         * @var array The list of required plugins that are missing
+         */
         private $_missingPlugins = array();
 
         public function __construct(array $options) {
@@ -713,7 +716,7 @@ namespace LvdWcMc {
 
         private function _loadTextDomain() {
             load_plugin_textdomain(LVD_WCMC_TEXT_DOMAIN, false, plugin_basename(LVD_WCMC_LANG_DIR));
-        }   
+        }
 
         private function _getInstallationErrorTranslations() {
             $this->_loadTextDomain();

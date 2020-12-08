@@ -192,12 +192,12 @@ function lvdwcmc_get_env() {
 function lvdwcmc_plugin() {
    static $plugin = null;
    if ($plugin === null) {
-      $plugin = new \LvdWcMc\Plugin(array(
-         'mediaIncludes' => array(
-            'refPluginsPath' => LVD_WCMC_MAIN,
-            'scriptsInFooter' => true
-         )
-      ));
+		$plugin = new \LvdWcMc\Plugin(array(
+			'mediaIncludes' => array(
+            	'refPluginsPath' => LVD_WCMC_MAIN,
+            	'scriptsInFooter' => true
+        	)
+      	));
    }
    return $plugin;
 }
