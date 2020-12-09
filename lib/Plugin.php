@@ -230,6 +230,30 @@ namespace LvdWcMc {
         }
 
         public function onAddAdminMenuEntries() {
+            if (self::_currentUserCanManageOptions()) {
+                add_menu_page(__('LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Settings', 'livepayments-mp-wc'), 
+                    __('Livepayments-MP-WC', 'livepayments-mp-wc'), 
+                    'manage_options', 
+                    'lvdwcmc-plugin-settings', 
+                    array($this, 'showSettingsForm'), 
+                    'dashicons-money-alt', 
+                    60);
+
+                add_submenu_page('lvdwcmc-plugin-settings', 
+                    __('LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Settings', 'livepayments-mp-wc'),
+                    __('Plugin Settings', 'livepayments-mp-wc'),
+                    'manage_options',
+                    'lvdwcmc-plugin-settings',
+                    array($this, 'showSettingsForm'));
+
+                add_submenu_page('lvdwcmc-plugin-settings', 
+                    __('LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Diagnostics', 'livepayments-mp-wc'),
+                    __('Plugin Diagnostics', 'livepayments-mp-wc'),
+                    'manage_options',
+                    'lvdwcmc-plugin-diagnostics',
+                    array($this, 'showDiagnosticsPage'));
+            }
+
             if (self::_currentUserCanManageWooCommerce()) {
                 add_submenu_page('woocommerce', 
                     __('LivePayments Card Transactions', 'livepayments-mp-wc'), 
@@ -294,6 +318,10 @@ namespace LvdWcMc {
 
             if ($this->_env->isViewingAdminTransactionListing()) {
                 $this->_mediaIncludes->includeStyleAdminTransactionListing();
+            }
+
+            if ($this->_env->isViewingAdminPluginDiagnosticsPage()) {
+                $this->_mediaIncludes->includeStylePluginDiagnostics();
             }
 
             /**
@@ -376,6 +404,23 @@ namespace LvdWcMc {
                     require $this->_env->getViewFilePath('lvdwcmc-admin-transaction-details.php');
                 }
             }
+        }
+
+        public function showSettingsForm() {
+
+        }
+
+        public function showDiagnosticsPage() {
+            $data = new \stdClass();
+            $data->systemInfo = $this->_getSystemInfoProperties();
+            $data->gatewaySettingsPageUrl = MobilpayCreditCardGatewayDiagnostics::getGatewaySettingsPageUrl();
+
+            $gatewayDiagnostics = new MobilpayCreditCardGatewayDiagnostics();
+            $data->gatewayConfigured = $gatewayDiagnostics->isGatewayConfigured();
+            $data->gatewayDiagnosticMessages = $gatewayDiagnostics->getDiagnosticMessages();
+            $data->gatewayOk = empty($data->gatewayDiagnosticMessages);
+
+            require $this->_env->getViewFilePath('lvdwcmc-plugin-diagnostics.php');
         }
 
         public function showAdminTransactionsListing() {
@@ -609,16 +654,26 @@ namespace LvdWcMc {
 
         public function getWooAdminDashboardSectionsScriptTranslations() {
             return array(
-                'lblReloadPageBtn' => __('Reload page', 'livepayments-mp-wc'),
-                'lblSectionTitle' => __('LivePayments for Mobilpay - Transaction Reporting', 'livepayments-mp-wc'),
-                'lblTitleTransactionsStatusCounts' => __('Transactions Status Counts', 'livepayments-mp-wc'),
-                'lblTitleLastTransactionDetails' => __('Last Transaction', 'livepayments-mp-wc'),
-                'warnDataNotFoundTitle' => __('Data not found!', 'livepayments-mp-wc'),
-                'warnDataNotFoundLastTransactionDetails' => __('No transactions data found', 'livepayments-mp-wc'),
-                'warnDataNotFoundTransactionsStatusCounts' => __('No transactions status counts data found', 'livepayments-mp-wc'),
-                'errDataLoadingErrorTitle' => __('Error loading data', 'livepayments-mp-wc'),
-                'errDataLoadingErrorLastTransactionDetails' => __('The last transaction details data could not be loaded due to an internal server issue. Please try again.', 'livepayments-mp-wc'),
-                'errDataLoadingErrorTransactionsStatusCounts' => __('The transactions status counts data could not be loaded due to an internal server issue. Please try again.', 'livepayments-mp-wc'),
+                'lblReloadPageBtn' 
+                    => __('Reload page', 'livepayments-mp-wc'),
+                'lblSectionTitle' 
+                    => __('LivePayments for Mobilpay - Transaction Reporting', 'livepayments-mp-wc'),
+                'lblTitleTransactionsStatusCounts' 
+                    => __('Transactions Status Counts', 'livepayments-mp-wc'),
+                'lblTitleLastTransactionDetails' 
+                    => __('Last Transaction', 'livepayments-mp-wc'),
+                'warnDataNotFoundTitle' 
+                    => __('Data not found!', 'livepayments-mp-wc'),
+                'warnDataNotFoundLastTransactionDetails' 
+                    => __('No transactions data found', 'livepayments-mp-wc'),
+                'warnDataNotFoundTransactionsStatusCounts' 
+                    => __('No transactions status counts data found', 'livepayments-mp-wc'),
+                'errDataLoadingErrorTitle' 
+                    => __('Error loading data', 'livepayments-mp-wc'),
+                'errDataLoadingErrorLastTransactionDetails' 
+                    => __('The last transaction details data could not be loaded due to an internal server issue. Please try again.', 'livepayments-mp-wc'),
+                'errDataLoadingErrorTransactionsStatusCounts' 
+                    => __('The transactions status counts data could not be loaded due to an internal server issue. Please try again.', 'livepayments-mp-wc'),
             );
         }
 
@@ -657,6 +712,23 @@ namespace LvdWcMc {
             return $this->_mediaIncludes;
         }
 
+        private function _getSystemInfoProperties() {
+            return array(
+                array(
+                    'label' => __('Plugin version', 'livepayments-mp-wc'),
+                    'value' => $this->_env->getVersion(),
+                ),
+                array(
+                    'label' => __('WordPress version', 'livepayments-mp-wc'),
+                    'value' => $this->_env->getWpVersion()
+                ),
+                array(
+                    'label' => __('PHP version', 'livepayments-mp-wc'),
+                    'value' => $this->_env->getPhpVersion()
+                )
+            );
+        }
+
         private static function _currentUserCanManageWooCommerce() {
             return current_user_can('manage_woocommerce');
         }
@@ -664,6 +736,10 @@ namespace LvdWcMc {
         private static function _currentUserCanActivatePlugins() {
             return current_user_can('activate_plugins');
         }  
+
+        private static function _currentUserCanManageOptions() {
+            return current_user_can('manage_options');
+        }
 
         private function _shouldFormatWooCommerceLogMessage($args) {
             return !empty($args['context']) && (

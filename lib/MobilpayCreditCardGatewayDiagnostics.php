@@ -8,17 +8,42 @@ namespace LvdWcMc {
         private $_paymentGateway = null;
 
         public function __construct() {
-            $gateways = WC()->payment_gateways()->get_available_payment_gateways();
-            foreach ($gateways as $id => $g) {
-                if ($id == MobilpayCreditCardGateway::GATEWAY_ID) {
+            $gateways = WC()
+                ->payment_gateways()
+                ->payment_gateways;
+
+            foreach ($gateways as $g) {
+                if ($g->id == MobilpayCreditCardGateway::GATEWAY_ID) {
                     $this->_paymentGateway = $g;
                     break;
                 }
             }
         }
 
+        public static function getGatewaySettingsPageUrl() {
+            return admin_url('admin.php?page=wc-settings&tab=checkout&section=' . MobilpayCreditCardGateway::GATEWAY_ID);
+        }
+
+        /**
+         * Returns a list of diagnistic messages as an associative array.
+         * Keys are gateway option field IDs.
+         * Values are diagnostic warning messages.
+         * 
+         * This returns messages only for gateway option fields that have been filled in.
+         * 
+         * @return array The array of diagnositc messages
+         */
         public function getDiagnosticMessages() {
-            return $this->_paymentGateway->get_fields_with_warnings();
+            return $this->isGatewayConfigured() 
+                ? $this->_paymentGateway->get_fields_with_warnings() 
+                : array();
+        }
+
+        /**
+         * @return bool True if the gateway has been completely configured, false otherwise
+         */
+        public function isGatewayConfigured() {
+            return !$this->_paymentGateway->needs_setup();
         }
     }
 }

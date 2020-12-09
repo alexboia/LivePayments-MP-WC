@@ -163,6 +163,13 @@ namespace LvdWcMc {
                 && $_GET['page'] == 'lvdwcmc-card-transactions-listing';
         }
 
+        public function isViewingAdminPluginDiagnosticsPage() {
+            return is_admin() 
+                && $this->getCurrentAdminPage() == 'admin.php' 
+                && isset($_GET['page']) 
+                && $_GET['page'] == 'lvdwcmc-plugin-diagnostics';
+        }
+
         public function isViewingWpDashboard() {
             return is_admin() && $this->getCurrentAdminPage() == 'index.php';
         }

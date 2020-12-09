@@ -69,6 +69,8 @@
 
         const STYLE_LVDWCMC_DASHBOARD = 'lvdwcmc-dashboard-css';
 
+        const STYLE_LVDWCMC_PLUGIN_DIAGNOSTICS = 'lvdwcmc-plugin-diagnostics';
+
         private $_styles = array(
             self::STYLE_TOASTR => array(
                 'path' => 'media/js/3rdParty/toastr/toastr.css',
@@ -107,6 +109,9 @@
                 'deps' => array(
                     self::STYLE_LVDWCMC_COMMON
                 )
+            ),
+            self::STYLE_LVDWCMC_PLUGIN_DIAGNOSTICS => array(
+                'alias' => self::STYLE_LVDWCMC_COMMON
             )
         );
 
@@ -286,6 +291,10 @@
 
         public function includeStyleDashboard() {
             $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_DASHBOARD);
+        }
+
+        public function includeStylePluginDiagnostics() {
+            $this->_manager->enqueueStyle(self::STYLE_LVDWCMC_PLUGIN_DIAGNOSTICS);
         }
     }
 }
