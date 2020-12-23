@@ -1,6 +1,37 @@
 <?php
+/**
+ * Copyright (c) 2019-2020 Alexandru Boia
+ *
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ * 
+ *	1. Redistributions of source code must retain the above copyright notice, 
+ *		this list of conditions and the following disclaimer.
+ *
+ * 	2. Redistributions in binary form must reproduce the above copyright notice, 
+ *		this list of conditions and the following disclaimer in the documentation 
+ *		and/or other materials provided with the distribution.
+ *
+ *	3. Neither the name of the copyright holder nor the names of its contributors 
+ *		may be used to endorse or promote products derived from this software without 
+ *		specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY 
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 namespace LvdWcMc {
+    use MimeReader;
+
     class Uploader {
         /**
          * No error while uploading and validating the file.
@@ -248,7 +279,7 @@ namespace LvdWcMc {
             @fclose($in);
             @fclose($out);
 
-            $isReady = $this->_chunkSize == 0 || ($this->_chunk + 1 >= $this->_chunks);
+            $isReady = $this->_isUploadCompleted();
             if ($isReady && !$this->_passesCustomValidator()) {
                 @unlink($this->_destinationPath);
                 write_log('File upload failed because source file did not pass custom validation.');
@@ -259,6 +290,18 @@ namespace LvdWcMc {
 
             $this->_isReady = $isReady;
             return self::UPLOAD_OK;
+        }
+
+        private function _isUploadCompleted() {
+            return !$this->_isChunkedUpload() || $this->_haveAllChunksBeenUploaded();
+        }
+
+        private function _isChunkedUpload() {
+            return $this->_chunkSize > 0;
+        }
+
+        private function _haveAllChunksBeenUploaded() {
+            return $this->_chunk + 1 >= $this->_chunks;
         }
 
         public function isReady() {
@@ -273,10 +316,21 @@ namespace LvdWcMc {
         }
 
         private function _detectTypeAndValidate() {
-            if (count($this->_allowedFileTypes) == 0) {
-                return true;
+            $isUploadedFileValid = false;
+            
+            if ($this->_hasFileMimeTypeRestrictions()) {
+                $this->_detectedType = $this
+                    ->_detectUploadedFileMimeType();
+                $isUploadedFileValid = $this
+                    ->_isUploadedFileMimeTypeAllowed();
+            } else {
+                $isUploadedFileValid = true;
             }
 
+            return $isUploadedFileValid;
+        }
+
+        private function _detectUploadedFileMimeType() {
             $file = null;
             if ($this->_chunkSize == 0 || !file_exists($this->_destinationPath)) {
                 $file = $this->_getTmpFilePath();
@@ -285,13 +339,12 @@ namespace LvdWcMc {
             }
 
             $sniffer = new MimeReader($file);
-            $this->_detectedType = $sniffer->getType();
+            return $sniffer->getType();
+        }
 
-            if (empty($this->_detectedType) || !in_array($this->_detectedType, $this->_allowedFileTypes)) {
-                return false;
-            }
-
-            return true;
+        private function _isUploadedFileMimeTypeAllowed() {
+            return !empty($this->_detectedType) 
+                && in_array($this->_detectedType, $this->_allowedFileTypes);
         }
 
         private function _isFileSizeValid() {
@@ -320,6 +373,10 @@ namespace LvdWcMc {
 
         private function _getTmpFilePath() {
             return $_FILES[$this->_key]['tmp_name'];
+        }
+
+        private function _hasFileMimeTypeRestrictions() {
+            return count($this->_allowedFileTypes) > 0;
         }
     }
 }

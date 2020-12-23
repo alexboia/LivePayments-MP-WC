@@ -155,6 +155,11 @@ define('LVD_WCMC_TEXT_DOMAIN', 'livepayments-mp-wc');
  */
 define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY', 'payment_asset_file');
 
+/**
+ * @var string
+ */
+define('LVD_WCMC_WOOCOMMERCE_CC_GATEWAY_ID', 'lvd_wc_mc_mobilpay_cc_gateway');
+
 if (!defined('LVD_WCMC_PAYMENT_ASSET_UPLOAD_CHUNK_SIZE')) {
     /**
      * The chunk size is the maxim file chunk, expressed in bytes, 

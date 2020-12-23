@@ -260,6 +260,10 @@ namespace LvdWcMc {
             }
         }
 
+        public function getAjaxBaseUrl() {
+            return get_admin_url(null, 'admin-ajax.php', 'admin');
+        }
+
         public function getPaymentTransactionsTableName() {
             return $this->_paymentTransactionsTable;
         }

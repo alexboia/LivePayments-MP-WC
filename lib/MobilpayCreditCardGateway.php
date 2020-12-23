@@ -38,7 +38,7 @@ namespace LvdWcMc {
 
         const GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION = 0x1000;
 
-        const GATEWAY_ID = 'lvd_wc_mc_mobilpay_cc_gateway';
+        const GATEWAY_ID = LVD_WCMC_WOOCOMMERCE_CC_GATEWAY_ID;
 
         const GATEWAY_MODE_LIVE = 'live';
 
@@ -196,7 +196,7 @@ namespace LvdWcMc {
 
             $plugin = lvdwcmc_plugin();
             $this->_mediaIncludes->includeScriptSettings(
-                $plugin->getSettingsScriptTranslations(), 
+                $plugin->getGatewaySettingsScriptTranslations(), 
                 $plugin->getCommonScriptTranslations());
 
             /**

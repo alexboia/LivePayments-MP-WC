@@ -20,8 +20,24 @@ namespace LvdWcMc {
             }
         }
 
-        public static function getGatewaySettingsPageUrl() {
+        public function getGatewaySettingsPageUrl() {
             return admin_url('admin.php?page=wc-settings&tab=checkout&section=' . MobilpayCreditCardGateway::GATEWAY_ID);
+        }
+
+        public function logDiagnosticsSupported() {
+
+        }
+
+        public function countLogItems() {
+
+        }
+
+        public function getLatestLogTail() {
+
+        }
+
+        public function getLatestLogLinkViewUrl() {
+
         }
 
         /**
