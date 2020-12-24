@@ -83,5 +83,9 @@ namespace LvdWcMc\PluginModules {
         protected function _getAjaxBaseUrl() {
             return $this->_env->getAjaxBaseUrl();
         }
+
+        protected function _getDb() {
+            return $this->_env->getDb();
+        }
     }
 }

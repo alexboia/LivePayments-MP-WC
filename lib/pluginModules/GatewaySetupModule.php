@@ -33,38 +33,23 @@ namespace LvdWcMc\PluginModules {
 
     use LvdWcMc\Plugin;
 
-    class WooCommerceAdminDashboardReportingWidgetsModule extends PluginModule {
+    class GatewaySetupModule extends PluginModule {
         public function __construct(Plugin $plugin) {
             parent::__construct($plugin);
         }
 
         public function load() {
-            $this->_registerWebPageAssets();
+            $this->_registerPaymentGateways();
         }
 
-        private function _registerWebPageAssets() {
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueStylesForWooAdminDashboard'), 0);
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueScriptsForWooAdminDashboard'), 0);
+        private function _registerPaymentGateways() {
+            add_filter('woocommerce_payment_gateways', 
+                array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
         }
 
-        public function onAdminEnqueueStylesForWooAdminDashboard() {
-            if ($this->_env->isViewingWooAdminDashboard()) {
-                $this->_mediaIncludes
-                    ->includeStyleDashboard();
-                $this->_mediaIncludes
-                    ->includeStyleAdminTransactionDetails();
-            }
-        }
-
-        public function onAdminEnqueueScriptsForWooAdminDashboard() {
-            if ($this->_env->isViewingWooAdminDashboard()) {
-                $this->_mediaIncludes
-                    ->includeScriptWooAdminDashboardSections(
-                        $this->_plugin->getWooAdminDashboardSectionsScriptTranslations()
-                    );
-            }
+        public function onWooCommercePaymentGatewaysRequested($methods) {
+            $methods[] = '\LvdWcMc\MobilpayCreditCardGateway';
+            return $methods;
         }
     }
 }

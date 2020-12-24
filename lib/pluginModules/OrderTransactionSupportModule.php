@@ -122,7 +122,19 @@ namespace LvdWcMc\PluginModules {
         }
 
         public function onRegisterAdminOrderAndTransactionMetaBoxes($postType, $post) {
-            /**
+            if ($this->_shouldRegisterOrderAndTransactionDetailsMetabox($postType, $post)) {
+                $this->_registerOrderAndTransactionDetailsMetabox();
+            }
+        }
+
+        private function _shouldRegisterOrderAndTransactionDetailsMetabox($postType, $post) {
+            $registerMetabox = ($postType === 'shop_order');
+            $additionalHookArgs = array(
+                'postType' => $postType,
+                'post' => $post
+            );
+
+             /**
              * Filters whether or not to add the payment details metabox 
              *  to the admin order details screen.
              * 
@@ -132,21 +144,18 @@ namespace LvdWcMc\PluginModules {
              * @param array $args Additional arguments that establish the context of the operation
              * @return boolean Whether or not to register the metabox, as established by the registered filters
              */
-            $registerMetabox = apply_filters('lvdwcmc_register_order_payment_details_metabox', 
-                ($postType === 'shop_order'),
-                array(
-                    'postType' => $postType,
-                    'post' => $post
-                ));
+            return apply_filters('lvdwcmc_register_order_payment_details_metabox', 
+                $registerMetabox,
+                $additionalHookArgs);
+        }
 
-            if ($registerMetabox) {
-                add_meta_box('lvdwcmc-transaction-details-metabox', 
-                    __('Payment transaction details', 'livepayments-mp-wc'), 
-                    array($this, 'addTransactionDetailsOnAdminOrderDetails'), 
-                    'shop_order', 
-                    'side', 
-                    'default');
-            }
+        private function _registerOrderAndTransactionDetailsMetabox() {
+            add_meta_box('lvdwcmc-transaction-details-metabox', 
+                __('Payment transaction details', 'livepayments-mp-wc'), 
+                array($this, 'addTransactionDetailsOnAdminOrderDetails'), 
+                'shop_order', 
+                'side', 
+                'default');
         }
 
         public function addTransactionDetailsOnAdminOrderDetails() {

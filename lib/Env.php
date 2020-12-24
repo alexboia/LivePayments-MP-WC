@@ -54,8 +54,14 @@ namespace LvdWcMc {
          */
         private $_driverInitialized = false;
 
+        /**
+         * @var \MysqliDb
+         */
         private $_db = null;
 
+        /**
+         * @var \MysqliDb
+         */
         private $_metaDb = null;
 
         private $_rootStorageDir;

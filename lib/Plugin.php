@@ -33,8 +33,10 @@ namespace LvdWcMc {
 
     use LvdWcMc\PluginModules\AdminTransactionDetailsModule;
     use LvdWcMc\PluginModules\GatewayDiagnosticsModule;
+    use LvdWcMc\PluginModules\GatewaySetupModule;
     use LvdWcMc\PluginModules\OrderTransactionSupportModule;
     use LvdWcMc\PluginModules\PluginSettingsModule;
+    use LvdWcMc\PluginModules\WebPageAssetsExtensionPointsProviderModule;
     use LvdWcMc\PluginModules\WooCommerceAdminDashboardReportingWidgetsModule;
     use LvdWcMc\PluginModules\WordPressDashboardReportingWidgetsModule;
 
@@ -143,7 +145,9 @@ namespace LvdWcMc {
                 new AdminTransactionDetailsModule($this),
                 new OrderTransactionSupportModule($this),
                 new WordPressDashboardReportingWidgetsModule($this),
-                new WooCommerceAdminDashboardReportingWidgetsModule($this)
+                new WooCommerceAdminDashboardReportingWidgetsModule($this),
+                new GatewaySetupModule($this),
+                new WebPageAssetsExtensionPointsProviderModule($this)
             );
         }
 
@@ -242,31 +246,15 @@ namespace LvdWcMc {
 
         public function onPluginsLoaded() {
             if ($this->_checkIfDependenciesSatisfied()) {
-                $this->_loggingFormatter
-                    ->interceptWooCommerceLogEntries();
-
-                $this->_registerWebPageAssets();
-                $this->_registerPaymentGateways();
+                $this->_setupLogging();
                 $this->_setupPluginModules();
             } else {
                 $this->_registerMissingPluginsWarning();
             }
         }
 
-        private function _registerWebPageAssets() {
-            add_action('wp_enqueue_scripts', 
-                array($this, 'onFrontendEnqueueStyles'), 9999);
-            add_action('wp_enqueue_scripts', 
-                array($this, 'onFrontendEnqueueScripts'), 9999);
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueStyles'), 9999);
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueScripts'), 9999);
-        }
-
-        private function _registerPaymentGateways() {
-            add_filter('woocommerce_payment_gateways', 
-                array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
+        private function _setupLogging() {
+            $this->_loggingFormatter->interceptWooCommerceLogEntries();
         }
 
         private function _setupPluginModules() {
@@ -288,63 +276,6 @@ namespace LvdWcMc {
         public function onPluginsInit() {
             $this->_loadTextDomain();
             $this->_installer->updateIfNeeded();
-        }
-
-        public function onWooCommercePaymentGatewaysRequested($methods) {
-            $methods[] = '\LvdWcMc\MobilpayCreditCardGateway';
-            return $methods;
-        }
-
-        public function onFrontendEnqueueStyles() {
-            /**
-             * Triggered after all the core-plug-in frontend styles 
-             *  have been enqueued.
-             * 
-             * @hook lvdwcmc_frontend_enqueue_styles
-             * 
-             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
-             */
-            do_action('lvdwcmc_frontend_enqueue_styles', 
-                $this->_mediaIncludes);
-        }
-
-        public function onFrontendEnqueueScripts() {
-            /**
-             * Triggered after all the core-plug-in frontend scripts 
-             *  have been enqueued.
-             * 
-             * @hook lvdwcmc_frontend_enqueue_scripts
-             * 
-             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
-             */
-            do_action('lvdwcmc_frontend_enqueue_scripts', 
-                $this->_mediaIncludes);
-        }
-
-        public function onAdminEnqueueStyles() {
-            /**
-             * Triggered after all the core-plug-in admin styles 
-             *  have been enqueued.
-             * 
-             * @hook lvdwcmc_admin_enqueue_styles
-             * 
-             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
-             */
-            do_action('lvdwcmc_admin_enqueue_styles', 
-                $this->_mediaIncludes);
-        }
-
-        public function onAdminEnqueueScripts() {
-            /**
-             * Triggered after all the core-plug-in admin scripts 
-             *  have been enqueued.
-             * 
-             * @hook lvdwcmc_admin_enqueue_scripts
-             * 
-             * @param \LvdWcMc\MediaIncludes $mediaIncludes Reference to the media includes manager
-             */
-            do_action('lvdwcmc_admin_enqueue_scripts', 
-                $this->_mediaIncludes);
         }
 
         public function getGatewaySettingsScriptTranslations() {
