@@ -66,7 +66,13 @@ namespace LvdWcMc\PluginModules {
                 array($this, 'onDashboardWidgetsSetup'));
         }
 
-        public function onDashboardWidgetsSetup() {
+        public function onDashboardWidgetsSetup() {           
+            if ($this->_shouldAddDashboardReportingWidget()) {
+                $this->_registerDashboardReportingWidget();
+            }
+        }
+
+        private function _shouldAddDashboardReportingWidget() {
             /**
              * Filters whether or not to add the transactions 
              *  status widget to the WP admin dashboard
@@ -76,16 +82,16 @@ namespace LvdWcMc\PluginModules {
              * @param boolean $addDashboardWidget Whether to add the widget or not, initially provided by LivePayments-MP-WC
              * @return boolean Whether to add the widget or not, as returned by the registered filters
              */
-            $addDashboardWidget = apply_filters('lvdwcmc_add_status_dashboard_widget', 
+            return apply_filters('lvdwcmc_add_status_dashboard_widget', 
                 $this->_currentUserCanManageWooCommerce());
+        }
 
-            if ($addDashboardWidget) {
-                wp_add_dashboard_widget('lvdwcmc-transactions-status', 
-                    __('LivePayments Card Transaction Status', 'livepayments-mp-wc'), 
-                    array($this, 'renderTransactionsStatusWidget'), 
-                        null,
-                        null);
-            }
+        private function _registerDashboardReportingWidget() {
+            wp_add_dashboard_widget('lvdwcmc-transactions-status', 
+                __('LivePayments Card Transaction Status', 'livepayments-mp-wc'), 
+                array($this, 'renderTransactionsStatusWidget'), 
+                    null,
+                    null);
         }
 
         public function renderTransactionsStatusWidget() {
