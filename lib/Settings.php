@@ -35,7 +35,7 @@ namespace LvdWcMc {
 
         const OPT_SEND_DIAGNOSTICS_WARNING_TO_EMAIL = 'sendDiagnosticsWarningToEmail';
 
-        const OPT_SETTINGS_KEY = LVD_WCMC_PLUGIN_ID . '.settings';
+        const OPT_SETTINGS_KEY = LVD_WCMC_PLUGIN_ID . '_settings';
 
         /**
          * @var \LvdWcMc\Settings
