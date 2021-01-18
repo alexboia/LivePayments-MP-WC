@@ -195,7 +195,7 @@ namespace LvdWcMc {
                 $this->_mediaIncludes);
 
             $plugin = lvdwcmc_plugin();
-            $this->_mediaIncludes->includeScriptSettings(
+            $this->_mediaIncludes->includeScriptGatewaySettings(
                 $plugin->getGatewaySettingsScriptTranslations(), 
                 $plugin->getCommonScriptTranslations());
 
@@ -259,6 +259,11 @@ namespace LvdWcMc {
 
             //Update final processing result
             $processResult = $processResult && $renameOk;
+
+            //Setup status changed, store it
+            if ($processResult) {
+                $this->store_gateway_setup_status();
+            }
 
             /**
              * Fires after the gateway has performed its custom processing
@@ -439,6 +444,13 @@ namespace LvdWcMc {
                 $missingRequiredFields = $this->get_missing_required_fields();
                 $fieldsWithWarnings = $this->get_fields_with_warnings();
 
+                //Make sure we don't display duplicate messages
+                foreach (array_keys($missingRequiredFields) as $fieldId) {
+                    if (isset($fieldsWithWarnings[$fieldId])) {
+                        unset($fieldsWithWarnings[$fieldId]);
+                    }
+                }
+
                 $gatewayReady = empty($missingRequiredFields) 
                     && empty($fieldsWithWarnings);
 
@@ -510,6 +522,24 @@ namespace LvdWcMc {
 
         public function add_gateway_readiness_banner() {
             echo $this->_renderGatewayReadinessBanner('gateway-options-listing', false);
+        }
+
+        public function store_gateway_setup_status() {
+            $optionKey = $this->_getSetupCompletedKey();
+            if (!$this->needs_setup()) {
+                update_option($optionKey, 'yes', true);
+            } else {
+                update_option($optionKey, 'no', true);
+            }
+        }
+
+        public function get_last_stored_gateway_setup_status() {
+            $optionKey = $this->_getSetupCompletedKey();
+            return get_option($optionKey, null);
+        }
+
+        private function _getSetupCompletedKey() {
+            return LVD_WCMC_PLUGIN_ID . '_setup_completed';
         }
 
         public function admin_options() {
@@ -641,6 +671,11 @@ namespace LvdWcMc {
                 return $result;
             });
 
+            //Setup status changed, store it
+            if ($uploader->isReady()) {
+                $this->store_gateway_setup_status();
+            }
+
             $result = new \stdClass();
             $result->status = $uploader->receive();
             $result->ready = $uploader->isReady();
@@ -699,6 +734,9 @@ namespace LvdWcMc {
             $result->message = $result->success
                 ? __('Payment asset file successfully removed.', 'livepayments-mp-wc')
                 : __('Payment asset file could not be removed.', 'livepayments-mp-wc');
+
+            //Setup status changed, store it
+            $this->store_gateway_setup_status();
 
             /**
              * Fires after a payment asset has been removed.
@@ -888,6 +926,9 @@ namespace LvdWcMc {
                     $message = sprintf(__('The payment asset file %s is empty', 'livepayments-mp-wc'), 
                         $fieldInfo['title']);
                 }
+            } else {
+                $message = sprintf(__('The payment asset file %s was not found', 'livepayments-mp-wc'), 
+                    $fieldInfo['title']);
             }
 
             return $message;

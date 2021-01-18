@@ -52,10 +52,33 @@ namespace LvdWcMc\PluginModules {
         }
 
         public function load() {
+            $this->_registerWebPageAssets();
             $this->_registerMenuHook();
 
             $this->_saveSettingsAction
                 ->register();
+        }
+
+        private function _registerWebPageAssets() {
+            add_action('admin_enqueue_scripts', 
+                array($this, 'onAdminEnqueueScripts'), 9998);
+            add_action('admin_enqueue_scripts', 
+                array($this, 'onAdminEnqueueStyles'), 9998);
+        }
+
+        public function onAdminEnqueueScripts() {
+            if ($this->_env->isViewingAdminPluginSettingsPage()) {
+                $this->_mediaIncludes->includeScriptPluginSettings(
+                    $this->_plugin->getPluginSettingsScriptTranslations(), 
+                    $this->_plugin->getCommonScriptTranslations()
+                );
+            }
+        }
+
+        public function onAdminEnqueueStyles() {
+            if ($this->_env->isViewingAdminPluginSettingsPage()) {
+                $this->_mediaIncludes->includeStylePluginSettings();
+            }
         }
 
         private function _registerMenuHook() {
@@ -72,15 +95,94 @@ namespace LvdWcMc\PluginModules {
         }
 
         public function showSettingsForm() {
-            $data = new \stdClass();
-            $data->settings = new \stdClass();
-            $data->settings->monitorGatewayStatus = true;
+            if (!$this->_currentUserCanManageOptions()) {
+                die;
+            }
 
-            echo $this->_viewEngine->renderView('lvdwcmc-plugin-settings.php', $data);
+            $settings = $this->_getSettings();
+
+            $data = new \stdClass();
+            $data->ajaxBaseUrl = $this->_getAjaxBaseUrl();
+            $data->saveSettingsAction = self::ACTION_SAVE_SETTINGS;
+            $data->saveSettingsNonce = $this->_saveSettingsAction
+                ->generateNonce();
+
+            $data->adminEmailAddress = $this->_getBlogAdminEmailAddress();
+            $data->settings = $settings
+                ->asPlainObject();
+
+            echo $this->_viewEngine->renderView('lvdwcmc-plugin-settings.php', 
+                $data);
         }
 
         public function saveSettings() {
-            
+            if (!$this->_env->isHttpPost()) {
+                die;
+            }
+
+            $settings = $this->_getSettings();
+            $response = lvdwcmc_get_ajax_response();
+
+            $monitorDiagnostics = $this->_getMonitorDiagnosticsFromHttpPost();
+
+            if ($monitorDiagnostics) {
+                $sendDiagnosticsWarningToEmail = $this->_getSendDiagnosticsWarningToEmailFromHttpPost();
+                if ($this->_isValidEmailAddress($sendDiagnosticsWarningToEmail)) {
+                    $response->message = __('Please fill in a valid e-mail address to which diagnostics warnings will be sent.', 'livepayments-mp-wc');
+                    return $response;
+                }
+            } else {
+                $sendDiagnosticsWarningToEmail = null;
+            }
+
+            $settings->setMonitorDiagnostics($monitorDiagnostics);
+            $settings->setSendDiagnosticsWarningToEmail($sendDiagnosticsWarningToEmail);
+
+            if ($settings->saveSettings()) {
+                if ($monitorDiagnostics) {
+                    $this->_scheduleGatewayDiagnosticsCron();
+                } else {
+                    $this->_unscheduleGatewayDiagnosticsCron();
+                }
+
+                $response->success = true;
+            } else {
+                $response->message = esc_html__('The settings could not be saved. Please try again.', 'livepayments-mp-wcs');
+            }
+
+            return $response;
+        }
+
+        private function _scheduleGatewayDiagnosticsCron() {
+            if (wp_next_scheduled('lvdwcmc_auto_gateway_diagnostics') === false) {
+                wp_schedule_event(time() + 60, 'daily', 'lvdwcmc_auto_gateway_diagnostics');
+            }
+        }
+
+        private function _unscheduleGatewayDiagnosticsCron() {
+            if (($timestamp = wp_next_scheduled('lvdwcmc_auto_gateway_diagnostics')) !== false) {
+                wp_unschedule_event($timestamp, 'lvdwcmc_auto_gateway_diagnostics');
+            }
+        }
+
+        private function _getMonitorDiagnosticsFromHttpPost() {
+            return isset($_POST['monitorDiagnostics'])
+                ? $_POST['monitorDiagnostics'] === '1'
+                : false;
+        }
+
+        private function _getSendDiagnosticsWarningToEmailFromHttpPost() {
+            return isset($_POST['sendDiagnosticsWarningToEmail'])
+                ? sanitize_email(strip_tags($_POST['sendDiagnosticsWarningToEmail']))
+                : null;
+        }
+
+        private function _isValidEmailAddress($email) {
+            return empty($email) || !is_email($email);
+        }
+
+        private function _getBlogAdminEmailAddress() {
+            return get_option('admin_email');
         }
     }
 }

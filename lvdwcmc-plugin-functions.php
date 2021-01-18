@@ -1,5 +1,7 @@
 <?php
 
+use LvdWcMc\Settings;
+
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -167,6 +169,13 @@ if (!function_exists('write_log')) {
 			error_log($message);
 	   }
 	}
+}
+
+/**
+ * @return \LvdWcMc\Settings 
+ */
+function lvdwcmc_get_settings() {
+   return Settings::getInstance();
 }
 
 /**

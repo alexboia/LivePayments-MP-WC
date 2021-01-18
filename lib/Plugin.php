@@ -140,13 +140,13 @@ namespace LvdWcMc {
 
         private function _initModules() {
             $this->_pluginModules = array(
+                new GatewaySetupModule($this),
                 new PluginSettingsModule($this),
                 new GatewayDiagnosticsModule($this),
                 new AdminTransactionDetailsModule($this),
                 new OrderTransactionSupportModule($this),
                 new WordPressDashboardReportingWidgetsModule($this),
                 new WooCommerceAdminDashboardReportingWidgetsModule($this),
-                new GatewaySetupModule($this),
                 new WebPageAssetsExtensionPointsProviderModule($this)
             );
         }
@@ -288,6 +288,10 @@ namespace LvdWcMc {
 
         public function getTransactionsListingScriptTranslations() {
             return TranslatedScriptMessages::getTransactionsListingScriptTranslations();
+        }
+
+        public function getPluginSettingsScriptTranslations() {
+            return array();
         }
 
         public function getCommonScriptTranslations() {

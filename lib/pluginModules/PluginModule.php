@@ -80,8 +80,16 @@ namespace LvdWcMc\PluginModules {
             return current_user_can('manage_woocommerce');
         }
 
+        protected function _currentUserCanManageOptions() {
+            return current_user_can('manage_options');
+        }
+
         protected function _getAjaxBaseUrl() {
             return $this->_env->getAjaxBaseUrl();
+        }
+
+        protected function _getSettings() {
+            return lvdwcmc_get_settings();
         }
 
         protected function _getDb() {

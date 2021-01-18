@@ -74,6 +74,10 @@ namespace LvdWcMc {
 
         private $_viewsDir;
 
+        private $_emailViewsDir;
+
+        private $_plainEmailViewsDir;
+
         private $_version;
 
         private $_lang;
@@ -133,6 +137,11 @@ namespace LvdWcMc {
             $this->_dataDir = LVD_WCMC_DATA_DIR;
             $this->_viewsDir = LVD_WCMC_VIEWS_DIR;
 
+            $this->_emailViewsDir = wp_normalize_path(sprintf('%s/emails', 
+                $this->_viewsDir));
+            $this->_plainEmailViewsDir = wp_normalize_path(sprintf('%s/plain', 
+                $this->_emailViewsDir));
+
             $this->_setupDataDir = wp_normalize_path(sprintf('%s/setup', 
                 $this->_dataDir));
         }
@@ -163,17 +172,15 @@ namespace LvdWcMc {
         }
 
         public function isViewingAdminTransactionListing() {
-            return is_admin() 
-                && $this->getCurrentAdminPage() == 'admin.php' 
-                && isset($_GET['page']) 
-                && $_GET['page'] == 'lvdwcmc-card-transactions-listing';
+            return $this->isViewingAdminPageSlug('lvdwcmc-card-transactions-listing');
         }
 
         public function isViewingAdminPluginDiagnosticsPage() {
-            return is_admin() 
-                && $this->getCurrentAdminPage() == 'admin.php' 
-                && isset($_GET['page']) 
-                && $_GET['page'] == 'lvdwcmc-plugin-diagnostics';
+            return $this->isViewingAdminPageSlug('lvdwcmc-plugin-diagnostics');
+        }
+
+        public function isViewingAdminPluginSettingsPage() {
+            return $this->isViewingAdminPageSlug('lvdwcmc-plugin-settings');
         }
 
         public function isViewingWpDashboard() {
@@ -186,6 +193,13 @@ namespace LvdWcMc {
             } else {
                 return true;
             }
+        }
+
+        public function isViewingAdminPageSlug($slug) {
+            return is_admin() 
+                && $this->getCurrentAdminPage() == 'admin.php' 
+                && isset($_GET['page']) 
+                && $_GET['page'] == $slug;
         }
 
         public function getCurrentAdminPage() {
@@ -282,6 +296,14 @@ namespace LvdWcMc {
             return $this->_viewsDir . '/' . $viewFile;
         }
 
+        public function getEmailViewFilePath($viewFile) {
+            return $this->_emailViewsDir . '/' . $viewFile;
+        }
+
+        public function getPlainEmailViewFilePath($viewFile) {
+            return $this->_plainEmailViewsDir  . '/' . $viewFile;
+        }
+
         public function getRootStorageDir() {
             return $this->_rootStorageDir;
         }
@@ -296,6 +318,14 @@ namespace LvdWcMc {
 
         public function getViewDir() {
             return $this->_viewsDir;
+        }
+
+        public function getEmailViewsDir() {
+            return $this->_emailViewsDir;
+        }
+
+        public function getPlainEmailViewsDir() {
+            return $this->_plainEmailViewsDir;
         }
 
         public function getSetupDataDir() {

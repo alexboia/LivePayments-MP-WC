@@ -31,12 +31,14 @@
 
 namespace LvdWcMc\PluginModules {
 
+    use LvdWcMc\MobilpayCreditCardGatewayDiagnosticsEmail;
     use LvdWcMc\MobilpayCreditCardGatewayDiagnostics;
     use LvdWcMc\Plugin;
     use LvdWcMc\PluginMenu;
     use LvdWcMc\SystemInfoPropertiesProvider;
+    use WC_Email;
 
-    class GatewayDiagnosticsModule extends PluginModule {
+class GatewayDiagnosticsModule extends PluginModule {
         /**
          * @var \LvdWcMc\SystemInfoPropertiesProvider
          */
@@ -51,6 +53,71 @@ namespace LvdWcMc\PluginModules {
         public function load() {
             $this->_registerMenuHook();
             $this->_registerWebPageAssets();
+            $this->_storeInitialGatewaySetupStatusIfDoesNotExist();
+            $this->_setupGatewayDiagnosticsWarningEmail();
+            $this->_registerAutoGatewayDiagnosticsWpCron();
+        }
+
+        private function _storeInitialGatewaySetupStatusIfDoesNotExist() {
+            $this->_getMobilpayCreditCardGatewayDiagnostics()
+                ->storeInitialGatewaySetupStatusIfDoesNotExist();
+        }
+
+        private function _setupGatewayDiagnosticsWarningEmail() {
+            add_filter('woocommerce_email_classes', 
+                array($this, 'registerGatewayDiagnosticsWarningEmail'), 
+                10, 1);
+        }
+
+        public static function registerGatewayDiagnosticsWarningEmail($emails) {
+            $emails['LvdWcMc_GatewayDiagnosticsEmail'] = new MobilpayCreditCardGatewayDiagnosticsEmail();
+            return $emails;
+        }
+
+        private function _registerAutoGatewayDiagnosticsWpCron() {
+            add_action('lvdwcmc_auto_gateway_diagnostics', 
+                array($this, 'runAutoGatewayDiagnosticsCron'));
+        }
+
+        public function runAutoGatewayDiagnosticsCron() {
+            $gatewayDiagnostics = $this->_getMobilpayCreditCardGatewayDiagnostics();
+            if ($gatewayDiagnostics->isGatewayConfigured() && !$gatewayDiagnostics->isGatewayOk()) {
+                write_log('Gateway configured but not ok. Sending diagnostics warning e-mail...');
+                $mailer = $this->_getGatewayDiagnosticsMailer();
+                if ($mailer != null) {
+                    $mailer->trigger($this->_getGatewayDiagnosticsWarningData($gatewayDiagnostics));
+                } else {
+                    write_log('Gateway diagnostics mailer not found. No e-mail sent.');
+                }
+            } else {
+                write_log('Gateway either not configured or no warnings found. Nothing to be done.');
+            }
+        }
+
+        /**
+         * @return \LvdWcMc\MobilpayCreditCardGatewayDiagnosticsEmail|null 
+         */
+        private function _getGatewayDiagnosticsMailer() {
+            $emails = WC()->mailer()->get_emails();
+            if ($emails['LvdWcMc_GatewayDiagnosticsEmail']) {
+                return $emails['LvdWcMc_GatewayDiagnosticsEmail'];
+            } else {
+                return null;
+            }
+        }
+
+        private function _getGatewayDiagnosticsWarningData(MobilpayCreditCardGatewayDiagnostics $gatewayDiagnostics) {
+            $data = new \stdClass();
+            $data->sendDiagnosticsWarningToEmail = $this->_getSendDiagnosticsWarningEmail();
+            $data->gatewayDiagnosticMessages = $gatewayDiagnostics->getDiagnosticMessages();
+            $data->gatewayOk = $gatewayDiagnostics->isGatewayOk();
+            return $data;
+        }
+
+        private function _getSendDiagnosticsWarningEmail() {
+            return $this
+                ->_getSettings()
+                ->getSendDiagnosticsWarningToEmail();
         }
 
         private function _registerWebPageAssets() {
@@ -77,13 +144,13 @@ namespace LvdWcMc\PluginModules {
 
         public function showDiagnosticsPage() {
             $data = new \stdClass();
-            $gatewayDiagnostics = new MobilpayCreditCardGatewayDiagnostics();
+            $gatewayDiagnostics = $this->_getMobilpayCreditCardGatewayDiagnostics();
 
             $data->systemInfo = $this->_getSystemInfoProperties();
             $data->gatewaySettingsPageUrl = $gatewayDiagnostics->getGatewaySettingsPageUrl();
             $data->gatewayConfigured = $gatewayDiagnostics->isGatewayConfigured();
             $data->gatewayDiagnosticMessages = $gatewayDiagnostics->getDiagnosticMessages();
-            $data->gatewayOk = empty($data->gatewayDiagnosticMessages);
+            $data->gatewayOk = $gatewayDiagnostics->isGatewayOk();
 
             echo $this->_viewEngine->renderView('lvdwcmc-plugin-diagnostics.php', 
                 $data);
@@ -92,6 +159,10 @@ namespace LvdWcMc\PluginModules {
         private function _getSystemInfoProperties() {
             return $this->_systemInfoPropertiesProvider
                 ->getSystemInfoProperties();
+        }
+
+        private function _getMobilpayCreditCardGatewayDiagnostics() {
+            return new MobilpayCreditCardGatewayDiagnostics();
         }
     }
 }
