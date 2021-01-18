@@ -10,16 +10,7 @@ namespace LvdWcMc {
         private $_diagnosticMessages = null;
 
         public function __construct() {
-            $gateways = WC()
-                ->payment_gateways()
-                ->payment_gateways;
-
-            foreach ($gateways as $g) {
-                if ($g->id == MobilpayCreditCardGateway::GATEWAY_ID) {
-                    $this->_paymentGateway = $g;
-                    break;
-                }
-            }
+            $this->_paymentGateway = lvdwcmc_get_mobilpay_credit_card_gateway();
         }
 
         public function storeInitialGatewaySetupStatusIfDoesNotExist() {
@@ -56,7 +47,8 @@ namespace LvdWcMc {
          * @return bool True if the gateway has been completely configured, false otherwise
          */
         public function isGatewayConfigured() {
-            return $this->_paymentGateway->get_last_stored_gateway_setup_status() === 'yes';
+            return $this->_paymentGateway != null && 
+                $this->_paymentGateway->get_last_stored_gateway_setup_status() === 'yes';
         }
 
         public function isGatewayOk() {

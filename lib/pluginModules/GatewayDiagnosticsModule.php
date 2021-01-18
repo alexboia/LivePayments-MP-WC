@@ -36,9 +36,8 @@ namespace LvdWcMc\PluginModules {
     use LvdWcMc\Plugin;
     use LvdWcMc\PluginMenu;
     use LvdWcMc\SystemInfoPropertiesProvider;
-    use WC_Email;
 
-class GatewayDiagnosticsModule extends PluginModule {
+    class GatewayDiagnosticsModule extends PluginModule {
         /**
          * @var \LvdWcMc\SystemInfoPropertiesProvider
          */

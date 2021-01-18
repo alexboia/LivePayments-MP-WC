@@ -1,6 +1,7 @@
 <?php
 
 use LvdWcMc\Settings;
+use LvdWcMc\MobilpayCreditCardGateway;
 
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
@@ -77,6 +78,26 @@ function lvdwcmc_get_amount_format() {
     */
    return apply_filters('lvdwcmc_amount_format', 
       $amountFormat);
+}
+
+/**
+ * @return \LvdWcMc\MobilpayCreditCardGateway
+ */
+function lvdwcmc_get_mobilpay_credit_card_gateway() {
+   static $gatewayInstance = null;
+   if ($gatewayInstance === null) {
+      $gateways = WC()
+            ->payment_gateways()
+            ->payment_gateways;
+
+      foreach ($gateways as $g) {
+            if ($g->id == MobilpayCreditCardGateway::GATEWAY_ID) {
+               $gatewayInstance = $g;
+               break;
+            }
+      }
+   }
+   return $gatewayInstance;
 }
 
 /**
