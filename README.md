@@ -161,8 +161,8 @@ The diagnostic messages are presented as follows:
 
 - In the WooCommerce payment gateway listing page;
 - In the the plug-in's payment gateway configuration page;
-- In a newly created, dedicated, plug-in diagnostic page (Livepayments-MP-WC > Plugin Diagnostics menu);
-- Via e-mail, if activated in the plug-in settings page (Livepayments-MP-WC > Plugin Settings menu), delivered to an e-mail address of your chosing (defaults to the site administrator's e-mail address): the plug-in will scan the payment gateway once a day and deliver an e-mail warning notification if issues are found.
+- In a newly created, dedicated, plug-in diagnostic page (`Livepayments-MP-WC > Plugin Diagnostics` menu);
+- Via e-mail, if activated in the plug-in settings page (`Livepayments-MP-WC > Plugin Settings` menu), delivered to an e-mail address of your chosing (defaults to the site administrator's e-mail address): the plug-in will scan the payment gateway once a day and deliver an e-mail warning notification if issues are found.
 
 ### Return URL validation
 
@@ -177,6 +177,11 @@ To enable it, simply define the following constant in `wp-config.php`:
 ```php
 define('LVD_WCMC_VALIDATE_MOBILPAY_URL_AS_LOCAL_PAGE', true);
 ```
+
+### Customizing the warning e-mail template
+
+The e-mail sent when some issues are found for the mobilPay™ card payment gateway is fully integrated in WooCommerce's e-mail system. 
+As such, not only does it use the standard e-mail templates, but is also customizable: simply go to `WooCommerce > Settings > Emails` and look for `	LivePayments - mobilPay Card WooCommerce Payment Gateway - Gateway diagnostics warning e-mail`.
 
 ## Screenshots
 <a name="lvdwcmc-screenshots"></a>    
@@ -254,7 +259,7 @@ All of the above, with the following amendments:
 
 1. [PHP-MySQLi-Database-Class](https://github.com/joshcam/PHP-MySQLi-Database-Class) - small mysqli wrapper for PHP. I used it instead of the builtin wpdb class.
 2. [MimeReader](http://social-library.org/) - PHP mime sniffer written by Shane Thompson.
-3. [Payment gateway integration libary provide by mobilPay](https://github.com/mobilpay/PHP_CARD).
+3. [Payment gateway integration libary provided by mobilPay](https://github.com/mobilpay/PHP_CARD).
 4. [URI.js](https://github.com/medialize/URI.js) - JavaScript URI builder and parser.
 5. [Toastr](https://github.com/CodeSeven/toastr) - Javascript library for non-blocking notifications.
 6. [blockUI](https://github.com/malsup/blockui/) - jQuery modal view plug-in.
