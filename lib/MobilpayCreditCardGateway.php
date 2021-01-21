@@ -442,14 +442,9 @@ namespace LvdWcMc {
             if ($this->_gatewayReadinessBannerEnabled()) {
                 $message = '';
                 $missingRequiredFields = $this->get_missing_required_fields();
-                $fieldsWithWarnings = $this->get_fields_with_warnings();
-
-                //Make sure we don't display duplicate messages
-                foreach (array_keys($missingRequiredFields) as $fieldId) {
-                    if (isset($fieldsWithWarnings[$fieldId])) {
-                        unset($fieldsWithWarnings[$fieldId]);
-                    }
-                }
+                $fieldsWithWarnings = empty($missingRequiredFields) 
+                    ? $this->get_fields_with_warnings() 
+                    : array();
 
                 $gatewayReady = empty($missingRequiredFields) 
                     && empty($fieldsWithWarnings);
@@ -671,14 +666,15 @@ namespace LvdWcMc {
                 return $result;
             });
 
+            //Process upload and store result
+            $result = new \stdClass();
+            $result->status = $uploader->receive();
+            $result->ready = $uploader->isReady();
+
             //Setup status changed, store it
             if ($uploader->isReady()) {
                 $this->store_gateway_setup_status();
             }
-
-            $result = new \stdClass();
-            $result->status = $uploader->receive();
-            $result->ready = $uploader->isReady();
 
             /**
              * Fires after a payment asset upload step has been completed.

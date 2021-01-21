@@ -13,6 +13,12 @@ namespace LvdWcMc {
             $this->_paymentGateway = lvdwcmc_get_mobilpay_credit_card_gateway();
         }
 
+        public function updateGatewaySetupStatus() {
+            if ($this->_paymentGateway) {
+                $this->_paymentGateway->store_gateway_setup_status();
+            }
+        }
+
         public function storeInitialGatewaySetupStatusIfDoesNotExist() {
             if ($this->_paymentGateway) {
                 if ($this->_paymentGateway->get_last_stored_gateway_setup_status() === null) {
@@ -23,6 +29,41 @@ namespace LvdWcMc {
 
         public function getGatewaySettingsPageUrl() {
             return admin_url('admin.php?page=wc-settings&tab=checkout&section=' . MobilpayCreditCardGateway::GATEWAY_ID);
+        }
+
+        public function canSendGatewayDiagnosticsWarningNotification() {
+            return $this->isGatewayConfigured() && !$this->isGatewayOk();
+        }
+
+        public function sendGatewayDiagnosticsWarningNotification($toAddress) {
+            if ($this->canSendGatewayDiagnosticsWarningNotification()) {
+                $mailer = $this->_getGatewayDiagnosticsMailer();
+                if ($mailer != null) {
+                    $mailer->trigger($this->_getGatewayDiagnosticsWarningData($toAddress));
+                } else {
+                    write_log('Gateway diagnostics mailer not found. No e-mail sent.');
+                }
+            }
+        }
+
+        private function _getGatewayDiagnosticsWarningData($toAddress) {
+            $data = new \stdClass();
+            $data->sendDiagnosticsWarningToEmail = $toAddress;
+            $data->gatewayDiagnosticMessages = $this->getDiagnosticMessages();
+            $data->gatewayOk = $this->isGatewayOk();
+            return $data;
+        }
+
+        /**
+         * @return \LvdWcMc\MobilpayCreditCardGatewayDiagnosticsEmail|null 
+         */
+        private function _getGatewayDiagnosticsMailer() {
+            $emails = WC()->mailer()->get_emails();
+            if ($emails['LvdWcMc_GatewayDiagnosticsEmail']) {
+                return $emails['LvdWcMc_GatewayDiagnosticsEmail'];
+            } else {
+                return null;
+            }
         }
 
         /**

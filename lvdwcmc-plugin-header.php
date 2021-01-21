@@ -156,6 +156,8 @@ define('LVD_WCMC_TEXT_DOMAIN', 'livepayments-mp-wc');
 define('LVD_WCMC_PAYMENT_ASSET_UPLOAD_KEY', 'payment_asset_file');
 
 /**
+ * The identifier for the woocommerce mobilPay credit card payment gateway.
+ * @see \LvdWcMc\MobilpayCreditCardGateway
  * @var string
  */
 define('LVD_WCMC_WOOCOMMERCE_CC_GATEWAY_ID', 'lvd_wc_mc_mobilpay_cc_gateway');

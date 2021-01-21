@@ -80,37 +80,12 @@ namespace LvdWcMc\PluginModules {
 
         public function runAutoGatewayDiagnosticsCron() {
             $gatewayDiagnostics = $this->_getMobilpayCreditCardGatewayDiagnostics();
-            if ($gatewayDiagnostics->isGatewayConfigured() && !$gatewayDiagnostics->isGatewayOk()) {
+            if ($gatewayDiagnostics->canSendGatewayDiagnosticsWarningNotification()) {
                 write_log('Gateway configured but not ok. Sending diagnostics warning e-mail...');
-                $mailer = $this->_getGatewayDiagnosticsMailer();
-                if ($mailer != null) {
-                    $mailer->trigger($this->_getGatewayDiagnosticsWarningData($gatewayDiagnostics));
-                } else {
-                    write_log('Gateway diagnostics mailer not found. No e-mail sent.');
-                }
+                $gatewayDiagnostics->sendGatewayDiagnosticsWarningNotification($this->_getSendDiagnosticsWarningEmail());
             } else {
                 write_log('Gateway either not configured or no warnings found. Nothing to be done.');
             }
-        }
-
-        /**
-         * @return \LvdWcMc\MobilpayCreditCardGatewayDiagnosticsEmail|null 
-         */
-        private function _getGatewayDiagnosticsMailer() {
-            $emails = WC()->mailer()->get_emails();
-            if ($emails['LvdWcMc_GatewayDiagnosticsEmail']) {
-                return $emails['LvdWcMc_GatewayDiagnosticsEmail'];
-            } else {
-                return null;
-            }
-        }
-
-        private function _getGatewayDiagnosticsWarningData(MobilpayCreditCardGatewayDiagnostics $gatewayDiagnostics) {
-            $data = new \stdClass();
-            $data->sendDiagnosticsWarningToEmail = $this->_getSendDiagnosticsWarningEmail();
-            $data->gatewayDiagnosticMessages = $gatewayDiagnostics->getDiagnosticMessages();
-            $data->gatewayOk = $gatewayDiagnostics->isGatewayOk();
-            return $data;
         }
 
         private function _getSendDiagnosticsWarningEmail() {
