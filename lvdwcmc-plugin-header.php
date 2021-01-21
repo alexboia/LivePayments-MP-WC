@@ -207,3 +207,14 @@ if (!defined('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER')) {
      */
     define('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER', true);
 }
+
+if (!defined('LVD_WCMC_VALIDATE_MOBILPAY_URL_AS_LOCAL_PAGE')) {
+    /**
+     * Whether or not to validate the payment gateway's return URL 
+     *  as a valid local WordPress page or post 
+     *  when performing gateway diagnostics
+     * 
+     * @var boolean
+     */
+    define('LVD_WCMC_VALIDATE_MOBILPAY_URL_AS_LOCAL_PAGE', false);
+}

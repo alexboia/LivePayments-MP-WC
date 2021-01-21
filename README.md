@@ -14,10 +14,12 @@ This plugin is meant to be used by merchants in Romania.
 4. [Installation](#lvdwcmc-installation)
 5. [Setting up and configuring your plug-in](#lvdwcmc-setup)
 6. [Retrieving mobilPay™ security assets](#lvdwcmc-mobilpay-security-assets)
-7. [Screenshots](#lvdwcmc-screenshots)
-8. [Requirements](#lvdwcmc-requirements)
-9. [Credits](#lvdwcmc-credits)
-10. [License](#lvdwcmc-license)
+7. [Gateway readiness](#lvdwcmc-gateway-readiness)
+8. [Gateway diagnostics](#lvdwcmc-gateway-diagnostics)
+9. [Screenshots](#lvdwcmc-screenshots)
+10. [Requirements](#lvdwcmc-requirements)
+11. [Credits](#lvdwcmc-credits)
+12. [License](#lvdwcmc-license)
 
 ## Is it good for you?
 <a name="lvdwcmc-isitgoodforyou"></a>  
@@ -126,6 +128,55 @@ However, I only mention this manual and rather unfriendly procedure because you 
 - post type: `page`;
 - comment status: `closed`;
 - ping status: `closed`.
+
+## Gateway Readiness
+<a name="lvdwcmc-gateway-readiness"></a>
+
+If the mobilPay™ card payment gateway requires further configuration, the plug-in displays a banner in which you are informed what information is needed for the gateway to be able to process payments.
+The banner is shown in the following places:
+- payment gateway listing (Payment tab);
+- our own payment gateway settings form.
+
+Below is a sample of how such a banner would look like:
+![Sample gateway readiness banner](/screenshots/lvdwcmc-sample-gateway-notready-banner.png?raw=true)
+
+To disable this feature, simply set the following constant in your `wp-config.php` file:
+
+```php
+define('LVD_WCMC_SHOW_GATEWAY_READINESS_BANNER', false);
+```
+
+## Gateway Diagnostics
+<a name="lvdwcmc-gateway-diagnostics"></a>    
+
+Similar to the Stargate, the built-in mobilPay™ card payment gateway now offers a diagnostic feature which notifies you whether and when something is wrong. 
+The following parameters are monitored:
+
+- Whether or not your return URL is still a valid URL; 
+- Whether or not your return URL points to a valid local WordPress page (this bit is optional actually, see more details below);
+- Whether or not your payment assets are still valid: makes sure that payment asset file is not empty and that its content is what it is supposed to be (i.e. valid public key certificate data or private key data).
+
+These checks are only being performed if the payment gateway has been configured (i.e. all the necessary information has been filled in and saved).
+The diagnostic messages are presented as follows:
+
+- In the WooCommerce payment gateway listing page;
+- In the the plug-in's payment gateway configuration page;
+- In a newly created, dedicated, plug-in diagnostic page (Livepayments-MP-WC > Plugin Diagnostics menu);
+- Via e-mail, if activated in the plug-in settings page (Livepayments-MP-WC > Plugin Settings menu), delivered to an e-mail address of your chosing (defaults to the site administrator's e-mail address): the plug-in will scan the payment gateway once a day and deliver an e-mail warning notification if issues are found.
+
+### Return URL validation
+
+When validationg the return URL, there is also an optional check to be performed, whether or not that URL corresponds to an existing local WordPress page or post.
+This has been intentionally left inactive by default because, if left active by default, it might interefere with valid configurations which have either:
+- an external return URL or 
+- a valid non-WordPress return URL.
+
+In a situation like this, the diagnostics feature will issue false warnings. 
+To enable it, simply define the following constant in `wp-config.php`:
+
+```php
+define('LVD_WCMC_VALIDATE_MOBILPAY_URL_AS_LOCAL_PAGE', true);
+```
 
 ## Screenshots
 <a name="lvdwcmc-screenshots"></a>    
