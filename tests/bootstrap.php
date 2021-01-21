@@ -30,10 +30,13 @@
  */
 
 require_once 'faker/autoload.php';
+require_once 'lib/IntegerIdGenerator.php';
 require_once 'lib/GenericTestHelpers.php';
 require_once 'lib/DbTestHelpers.php';
 require_once 'lib/MobilpayTransactionTestHelpers.php';
 require_once 'lib/WcOrderHelpers.php';
+require_once 'lib/MobilpayCardRequestTestHelpers.php';
+require_once 'lib/WordPressHookTester.php';	
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 if ( ! $_tests_dir ) {

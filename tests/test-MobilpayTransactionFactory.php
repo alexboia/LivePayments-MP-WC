@@ -38,22 +38,99 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     use WcOrderHelpers;
     use DbTestHelpers;
 
-    private $_maxTransactionId = 0;
+    /**
+     * @var IntegerIdGenerator
+     */
+    private $_mobilpayTransactionIdGenerator = null;
+
+    /**
+     * @var IntegerIdGenerator
+     */
+    private $_newOrderIdGenerator = null;
 
     private $_testWcOrdersWTransaction = array();
 
     private $_testWcOrdersWoTransaction = array();
 
+    public function __construct() {
+        $this->_mobilpayTransactionIdGenerator =
+            new IntegerIdGenerator();
+        $this->_newOrderIdGenerator = 
+            new IntegerIdGenerator();
+    }
+
     public function setUp() {
         parent::setUp();
         $this->_dontReportNotices();
-        $this->_initTestData();
+        $this->_installTestData();
         $this->_reportAllErrors();
+    }
+
+    private function _installTestData() {
+        $db = $this->_getDb();
+        $env = $this->_getEnv();
+        $orderIds = array();
+
+        $db->startTransaction();
+
+        for ($i = 0; $i < 10; $i ++) {
+            $order = $this->_generateRandomWcOrder();
+            if (!is_wp_error($order)) {
+                $this->_testWcOrdersWoTransaction[$order->get_id()] = $order;
+                $orderIds[] = $order->get_id();
+            } else {
+                $this->_writeLine($order->get_error_message());
+            }
+        }
+
+        for ($i = 0; $i < 10; $i ++) {
+            $order = $this->_generateRandomWcOrder();
+            if (!is_wp_error($order)) {
+                $txData = $this->_generateRandomMobilpayTransactionData(array(
+                    'tx_order_id' => $order->get_id(),
+                    'tx_amount' => $order->get_total(),
+                    'tx_currency' => $order->get_currency(),
+                    'tx_order_user_id' => $order->get_user_id(),
+                    'tx_processed_amount' => 0,
+                    'tx_ip_address' => $order->get_customer_ip_address(),
+                    'tx_transaction_id' => $order->get_order_key()
+                ));
+
+                $txId = $db->insert($env->getPaymentTransactionsTableName(), 
+                    $txData);
+
+                $this->_testWcOrdersWTransaction[$order->get_id()] = array(
+                    'order' => $order,
+                    'txData' => array_merge($txData, array(
+                        'tx_id' => $txId
+                    ))
+                );
+
+                $orderIds[] = $order->get_id();
+            } else {
+                $this->_writeLine($order->get_error_message());
+            }
+        }
+
+        $this->_newOrderIdGenerator
+            ->setExcludedIds($orderIds);
+
+        $db->commit();
     }
 
     public function tearDown() {
         parent::tearDown();
         $this->_cleanupTestData();
+    }
+
+    private function _cleanupTestData() {
+        $this->_truncateAllWcOrderData();
+        $this->_testWcOrdersWoTransaction = array();
+        $this->_testWcOrdersWTransaction = array();
+        $this->_mobilpayTransactionIdGenerator
+            ->reset();
+        $this->_newOrderIdGenerator
+            ->reset();
     }
 
     public function test_canCreateNewFromOrder_validOrder_fromId() {
@@ -85,16 +162,13 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     }
 
     public function test_tryCreateNewFromOrder_invalidOrder_emptyOrderId() {
+        $emptyOrderIds = array(null, '', 0);
         $txFactory = new MobilpayTransactionFactory();
 
-        $tx = $txFactory->newFromOrder(0);
-        $this->assertNull($tx);
-
-        $tx = $txFactory->newFromOrder(null);
-        $this->assertNull($tx);
-
-        $tx = $txFactory->newFromOrder('');
-        $this->assertNull($tx);
+        foreach ($emptyOrderIds as $emptyOrderId) {
+            $tx = $txFactory->newFromOrder($emptyOrderId);
+            $this->assertNull($tx);
+        }
     }
 
     public function test_canCreateExistingFromOrder_validOrder_fromId() {
@@ -134,6 +208,7 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     public function test_tryCreateExistingFromOrder_invalidOrder_nonExistingOrderId() {
         $orderIds = array();
         $txFactory = new MobilpayTransactionFactory();
+
         for ($i = 0; $i < 10; $i ++) {
             $orderId = $this->_generateRandomNewOrderId($orderIds);
             $orderIds[] = $orderId;
@@ -144,9 +219,11 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     }
 
     public function test_tryCreateExistingFromOrder_invalidOrder_emptyOrderId() {
+        $emptyOrderIds = array(null, '', 0);
         $txFactory = new MobilpayTransactionFactory();
-        foreach (array(null, '', 0) as $orderId) {
-            $tx = $txFactory->existingFromOrder($orderId);
+
+        foreach ($emptyOrderIds as $emptyOrderId) {
+            $tx = $txFactory->existingFromOrder($emptyOrderId);
             $this->assertNull($tx);
         }
     }
@@ -168,16 +245,13 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
     }
 
     public function test_tryCreateFromTransactionId_invalidTransactionId_emptyId() {
+        $emptyTransactionIds = array(null, '', 0);
         $txFactory = new MobilpayTransactionFactory();
 
-        $tx = $txFactory->fromTransactionId(0);
-        $this->assertNull($tx);
-
-        $tx = $txFactory->fromTransactionId(null);
-        $this->assertNull($tx);
-
-        $tx = $txFactory->fromTransactionId('');
-        $this->assertNull($tx);
+        foreach ($emptyTransactionIds as $emptyTransactionId) {
+            $tx = $txFactory->fromTransactionId($emptyTransactionId);
+            $this->assertNull($tx);
+        }
     }
 
     public function test_canCreateFromExistingTransactionRawData() {
@@ -206,85 +280,14 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
         $this->assertEquals($order->get_user_id(), 
             $tx->getOrderUserId());
     }
-    
-    private function _initTestData() {
-        $db = $this->_getDb();
-        $env = $this->_getEnv();
-
-        $db->startTransaction();
-
-        for ($i = 0; $i < 10; $i ++) {
-            $order = $this->_generateRandomWcOrder();
-            if (!is_wp_error($order)) {
-                $this->_testWcOrdersWoTransaction[$order->get_id()] = $order;
-            } else {
-                $this->_writeLine($order->get_error_message());
-            }
-        }
-
-        for ($i = 0; $i < 10; $i ++) {
-            $order = $this->_generateRandomWcOrder();
-            if (!is_wp_error($order)) {
-                $txData = $this->_generateRandomMobilpayTransactionData(array(
-                    'tx_order_id' => $order->get_id(),
-                    'tx_amount' => $order->get_total(),
-                    'tx_currency' => $order->get_currency(),
-                    'tx_order_user_id' => $order->get_user_id(),
-                    'tx_processed_amount' => 0,
-                    'tx_ip_address' => $order->get_customer_ip_address(),
-                    'tx_transaction_id' => $order->get_order_key()
-                ));
-
-                $txId = $db->insert($env->getPaymentTransactionsTableName(), 
-                    $txData);
-
-                $this->_maxTransactionId = max($this->_maxTransactionId, 
-                    $txId);
-
-                $this->_testWcOrdersWTransaction[$order->get_id()] = array(
-                    'order' => $order,
-                    'txData' => array_merge($txData, array(
-                        'tx_id' => $txId
-                    ))
-                );
-            } else {
-                $this->_writeLine($order->get_error_message());
-            }
-        }
-
-        $db->commit();
-    }
-
-    private function _cleanupTestData() {
-        $this->_truncateAllWcOrderData();
-        $this->_testWcOrdersWoTransaction = array();
-        $this->_testWcOrdersWTransaction = array();
-        $this->_maxTransactionId = 0;
-    }
 
     private function _generateRandomNewOrderId($excludeAdditionalIds = array()) {
-        $excludeIds = array_merge(
-            array_keys($this->_testWcOrdersWoTransaction),
-            array_keys($this->_testWcOrdersWTransaction)
-        );
-
-        if (!empty($excludeAdditionalIds) && is_array($excludeAdditionalIds)) {
-            $excludeIds = array_merge($excludeAdditionalIds);
-        }
-
-        $faker = self::_getFaker();
-        
-        $max = !empty($excludeIds) 
-            ? max($excludeIds) 
-            : 0;
-
-        $orderId = $faker->numberBetween($max + 1, $max + 1000);
-        return $orderId;
+       return $this->_newOrderIdGenerator
+            ->generateId($excludeAdditionalIds);
     }
 
     private function _generateRandomMobilpayTransactionId() {
-        $faker = self::_getFaker();      
-        $transactionId = $faker->numberBetween($this->_maxTransactionId + 1, $this->_maxTransactionId + 1000);
-        return $transactionId;
+        return $this->_mobilpayTransactionIdGenerator
+            ->generateId();
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -30,45 +29,36 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-use LvdWcMc\Env;
+use \Mobilpay_Payment_Request_Card;
 
-trait GenericTestHelpers {
-    private static $_faker = null;
+trait MobilpayCardRequestTestHelpers {
+    use GenericTestHelpers;
 
-    /**
-     * @return \Faker\Generator
-     */
-    protected static function _getFaker() {
-        if (self::$_faker == null) {
-            self::$_faker = Faker\Factory::create();
-        }
+    protected function _createCardPaymentRequestFromOrder(\Wc_Order $order) {
+        $faker = $this->_getFaker();
 
-        return self::$_faker;
+        $paymentRequest = new \Mobilpay_Payment_Request_Card();
+        $paymentRequest->signature = $this->_generateMobilpayAccountId();
+        $paymentRequest->orderId = $order->get_id();
+        
+        $paymentRequest->confirmUrl = $faker->url;
+        $paymentRequest->returnUrl = $faker->url;
+
+        $paymentRequest->invoice = new \Mobilpay_Payment_Invoice();
+        $paymentRequest->invoice->currency = $order->get_currency();
+        $paymentRequest->invoice->amount = sprintf('%.2f', $order->get_total());
+        $paymentRequest->invoice->details = $faker->text();
+
+        $paymentRequest->params = array(
+            '_lvdwcmc_order_id' => $order->get_id(),
+            '_lvdwcmc_customer_id' => $order->get_customer_id(),
+            '_lvdwcmc_customer_ip' => $order->get_customer_ip_address()
+        );
+        
+        return $paymentRequest;
     }
 
-    /**
-     * @return \LvdWcMc\Env
-     */
-    protected function _getEnv() {
-        return lvdwcmc_get_env();
-    }
-
-    /**
-     * @return \MysqliDb
-     */
-    protected function _getDb() {
-        return $this->_getEnv()->getDb();
-    }
-
-    protected function _dontReportNotices() {
-        error_reporting(E_ALL & ~E_NOTICE);
-    }
-
-    protected function _reportAllErrors() {
-        error_reporting(E_ALL);
-    }
-
-    protected function _writeLine($message) {
-        echo PHP_EOL . $message . PHP_EOL;
+    private function _generateMobilpayAccountId() {
+        return $this->_getFaker()->uuid;
     }
 }

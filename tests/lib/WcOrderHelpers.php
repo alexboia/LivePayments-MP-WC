@@ -1,7 +1,4 @@
 <?php
-
-use LvdWcMc\MobilpayCreditCardGateway;
-
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -31,6 +28,8 @@ use LvdWcMc\MobilpayCreditCardGateway;
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+use LvdWcMc\MobilpayCreditCardGateway;
 
 trait WcOrderHelpers {
     use GenericTestHelpers;
@@ -77,6 +76,8 @@ trait WcOrderHelpers {
             $env->getPaymentTransactionsTableName(),
             $env->getDbTablePrefix() . 'woocommerce_order_itemmeta',
             $env->getDbTablePrefix() . 'woocommerce_order_items',
+            $env->getDbTablePrefix() . 'comments',
+            $env->getDbTablePrefix() . 'commentmeta',
             $env->getDbTablePrefix() . 'postmeta',
             $env->getDbTablePrefix() . 'posts',
             $env->getDbTablePrefix() . 'usermeta',

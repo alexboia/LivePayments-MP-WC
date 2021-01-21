@@ -35,16 +35,56 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
     use MobilpayTransactionTestHelpers;
     use DbTestHelpers;
 
+    /**
+     * @var IntegerIdGenerator
+     */
+    private $_mobilpayTransactionIdGenerator;
+
     private $_testMobilpayTransactions = array();
+
+    public function __construct() {
+        $this->_mobilpayTransactionIdGenerator = 
+            new IntegerIdGenerator();
+    }
 
     public function setUp() {
         parent::setUp();
         $this->_installTestData();
     }
 
+    private function _installTestData() {
+        $db = $this->_getDb();
+        $table = $this->_getEnv()->getPaymentTransactionsTableName();
+        $transactionIds = array();
+
+        $db->startTransaction();
+        
+        for ($i = 0; $i < 10; $i ++) {
+            $txData = $this->_generateRandomMobilpayTransactionData(array(
+                'tx_id' => 0
+            ));
+
+            $txId = $db->insert($table, $txData);
+            $this->_testMobilpayTransactions[$txId] = $txData;
+            $transactionIds[] = $txId;
+        }
+
+        $this->_mobilpayTransactionIdGenerator
+            ->setExcludedIds($transactionIds);
+
+        $db->commit();
+    }
+
     public function tearDown() { 
         parent::tearDown();
         $this->_clearTestData();
+    }
+
+    private function _clearTestData() {
+        $this->_truncateTables($this->_getDb(), $this->_getEnv()->getPaymentTransactionsTableName());
+        $this->_testMobilpayTransactions = array();
+        $this->_mobilpayTransactionIdGenerator
+            ->reset();
     }
 
     public function test_canCheckStatus() {
@@ -183,15 +223,13 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
             ));
 
             $tx = $this->_mobilpayTransactionFromData($txData);
+            $this->assertFalse($tx->canBeSetFailed());
 
             $providerTxId = $faker->sha1;
             $errorCode = $faker->numberBetween(1, 100);
             $errorMessage = $faker->sentence();
 
-            $this->assertFalse($tx->canBeSetFailed());
-
             $tx->setFailed($providerTxId, $errorCode, $errorMessage);
-
             $this->assertFalse($tx->isFailed());
 
             $this->_assertMobilpayTransactionMatchesData($tx, $txData);
@@ -308,7 +346,6 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
     }
 
     public function test_canSetConfirmed_validStatus_partialAmountProcessed() {
-        $faker = self::_getFaker();
         $statuses = array(
             MobilpayTransaction::STATUS_NEW,
             MobilpayTransaction::STATUS_PAID_PENDING,
@@ -397,7 +434,6 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
             $processedAmount = $txData['tx_amount'];
 
             $tx->setConfirmed($providerTxId, $processedAmount, $panMasked);
-
             $this->assertFalse($tx->isConfirmed());
 
             $this->_assertMobilpayTransactionMatchesData($tx, $txData);
@@ -554,9 +590,10 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
             $this->assertFalse($tx->canBeSetCredited());
 
             $providerTxId = $faker->sha1;
+            $panMasked = $faker->creditCardNumber;
+            $processedAmount = $txData['tx_amount'];
 
-            $tx->setCancelled($providerTxId);
-
+            $tx->setCredited($providerTxId, $processedAmount, $panMasked);
             $this->assertFalse($tx->isCredited());
 
             $this->_assertMobilpayTransactionMatchesData($tx, $txData);
@@ -607,16 +644,15 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         $db->where('tx_id', $txId);
         $dbData = $db->getOne($this->_getEnv()->getPaymentTransactionsTableName());
 
-        $caller = debug_backtrace();
-        $caller = sprintf('%s::%s', 
-            $caller[1]['class'], 
-            $caller[1]['function']);
+        $caller = $this->_getFormattedCallerName(debug_backtrace());
 
         $this->assertNotEmpty($dbData);
         foreach ($data as $key => $value) {
             $this->assertArrayHasKey($key, $dbData);
 
-            $errorMessageIfFailed = sprintf('Comparison failed for key %s. Caller: %s.', $key, $caller);
+            $errorMessageIfFailed = sprintf('Comparison failed for key %s. Caller: %s.', 
+                $key, 
+                $caller);
 
             if ($key == 'tx_amount' || $key == 'tx_processed_amount') {
                 $this->assertEquals($value, $dbData[$key], $errorMessageIfFailed, 0.001);
@@ -626,27 +662,10 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         }
     }
 
-    private function _installTestData() {
-        $db = $this->_getDb();
-        $table = $this->_getEnv()->getPaymentTransactionsTableName();
-
-        $db->startTransaction();
-        
-        for ($i = 0; $i < 10; $i ++) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
-                'tx_id' => 0
-            ));
-
-            $txId = $db->insert($table, $txData);
-            $this->_testMobilpayTransactions[$txId] = $txData;
-        }
-
-        $db->commit();
-    }
-
-    private function _clearTestData() {
-        $this->_truncateTables($this->_getDb(), $this->_getEnv()->getPaymentTransactionsTableName());
-        $this->_testMobilpayTransactions = array();
+    private function _getFormattedCallerName($debugBacktrace) {
+        return sprintf('%s::%s', 
+            $debugBacktrace[1]['class'], 
+            $debugBacktrace[1]['function']);
     }
 
     private function _getStatusCheckTestsCases() {
@@ -672,19 +691,8 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
     }
 
-    private function _generateRandomMobilpayTransactionId($excludeAdditionalIds = array()) {
-        $excludeIds = array_keys($this->_testMobilpayTransactions);
-        if (!empty($excludeAdditionalIds) && is_array($excludeAdditionalIds)) {
-            $excludeIds = array_merge($excludeAdditionalIds);
-        }
-
-        $faker = self::_getFaker();
-        
-        $max = !empty($excludeIds) 
-            ? max($excludeIds) 
-            : 0;
-
-        $transactionId = $faker->numberBetween($max + 1, $max + 1000);
-        return $transactionId;
+    private function _generateRandomMobilpayTransactionId() {
+        return $this->_mobilpayTransactionIdGenerator
+            ->generateId();
     }
 }

@@ -70,7 +70,7 @@ trait MobilpayTransactionTestHelpers {
     protected function _generateRandomMobilpayTransactionData($override = array()) {
         $faker = self::_getFaker();
         return array_merge(array(
-            'tx_id' => $faker->numerify(0, PHP_INT_MAX),
+            'tx_id' => $faker->numberBetween(0, PHP_INT_MAX),
             'tx_order_id' => $faker->numberBetween(1, PHP_INT_MAX),
             'tx_order_user_id' => $faker->numberBetween(1, PHP_INT_MAX),
             'tx_provider' => 'mobilpay',

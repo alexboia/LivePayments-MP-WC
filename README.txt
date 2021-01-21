@@ -100,6 +100,9 @@ First officially distributed version.
 
 == Upgrade Notice ==
 
+= 0.1.4 =
+Update to version 0.1.4 for improved usability and new features.
+
 = 0.1.3 =
 Update to version 0.1.3 for improved usability and new features.
 
