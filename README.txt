@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/alexandruboia
 Tags: payment, card, mobilpay, creditcard, woocommerce
 Requires at least: 5.0
 Tested up to: 5.6.0
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 Requires PHP: 5.6.2
 License: BSD New License
 License URI: https://opensource.org/licenses/BSD-3-Clause
@@ -30,6 +30,7 @@ Features
 - dashboard widget for a quick outlook on overall transaction statuses;
 - detailed transaction details are reported for each order, for both admin staff and your clients;
 - multi-language support (romanian translation included);
+- advanced diagnosis and monitoring of plugin configuration;
 - detailed journaling.
 
 Supported transaction statuses (actions)
@@ -64,6 +65,8 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments
 5. Admin dashboard widget
 6. Admin transaction history - details
 7. Admin transaction history - listing
+8. Plugin settings page (Livepayments-MP-WC > Plugin Settings menu)
+9. Plugin diagnosis page (Livepayments-MP-WC > Plugin Diagnostics menu)
 
 == Installation ==
 
@@ -74,6 +77,10 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments
 5. Fill in the required fields as instructed here: https://github.com/alexboia/LivePayments-MP-WC#setting-up-and-configuring-your-plug-in.
 
 == Changelog ==
+
+= 0.1.4 =
+* Fixed some minor display issues;
+* Added support for diagnosis and monitoring of the plugin payment gateway's configuration.
 
 = 0.1.3 =
 * Improved usability: gateway readiness displayd in the WooCommerce payment management tab;

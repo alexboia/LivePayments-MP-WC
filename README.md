@@ -158,6 +158,14 @@ However, I only mention this manual and rather unfriendly procedure because you 
 
 ![Frontend order page - transaction status information](/screenshots/lvdwcmc-frontend-order-page.png?raw=true)
 
+#### Plugin Settings page
+
+![Plugin Settings page](/screenshots/lvdwcmc-plugin-settings.png?raw=true)
+
+#### Plugin Diagnostics page
+
+![Plugin Diagnostics page](/screenshots/lvdwcmc-plugin-diagnostics.png?raw=true)
+
 ## Requirements
 <a name="lvdwcmc-requirements"></a>  
 

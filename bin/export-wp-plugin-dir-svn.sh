@@ -78,6 +78,8 @@ copy_asset_files() {
     cp ./assets/en_US/lvdwcmc-tx-dashboard-widget.png	"$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-5.png" > /dev/null
     cp ./assets/en_US/lvdwcmc-tx-details.png  "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-6.png" > /dev/null
     cp ./assets/en_US/lvdwcmc-tx-history.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-7.png" > /dev/null
+	cp ./assets/en_US/lvdwcmc-plugin-settings.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-8.png" > /dev/null
+	cp ./assets/en_US/lvdwcmc-plugin-diagnostics.png    "$LVDWCMC_EXPORT_ASSETS_DIR/screenshot-9.png" > /dev/null
 
     cp ./assets/banner-772x250.png    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-772x250.png" > /dev/null
     cp ./assets/banner-1544x500.png    "$LVDWCMC_EXPORT_ASSETS_DIR/banner-1544x500.png" > /dev/null

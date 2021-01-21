@@ -90,6 +90,33 @@ function _set_own_plugin_installed() {
 	file_put_contents(_get_tests_file_path('.lvdwcmc-installed'), 'yes');
 }
 
+function _disable_mysqli_strict_reporting() {
+	$driver = new \mysqli_driver();
+	$driver->report_mode =  MYSQLI_REPORT_OFF;
+}
+
+function _enable_mysqli_strict_reporting() {
+	$driver = new \mysqli_driver();
+	$driver->report_mode =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+}
+
+function _setup_woocommerce_action_scheduler() {
+	$actionSchedulerPackageFile = _get_3rdparty_plugin_base_dir('woocommerce') . '/packages/action-scheduler/action-scheduler.php';
+	if (file_exists($actionSchedulerPackageFile)) {
+		echo 'Action scheduler found. Need to setup...' . PHP_EOL;
+		include $actionSchedulerPackageFile;
+		$loggerSchema = new ActionScheduler_LoggerSchema();
+		$loggerSchema->register_tables();
+		$storeSchema = new ActionScheduler_StoreSchema();
+		$storeSchema->register_tables();
+	}
+}
+
+function _setup_woocommerce_admin() {
+	\Automattic\WooCommerce\Admin\Install::create_tables();
+	\Automattic\WooCommerce\Admin\Install::create_events();
+}
+
 function _manually_install_woocommerce() {
 	if (_has_wc_been_installed_before()) {
 		// Clean existing install first.
@@ -100,6 +127,8 @@ function _manually_install_woocommerce() {
 
 	error_reporting(E_ALL & ~E_NOTICE);
 	WC_Install::install();
+	_setup_woocommerce_admin();
+	_setup_woocommerce_action_scheduler();
 	error_reporting(E_ALL);
 
 	if ( version_compare( $GLOBALS['wp_version'], '4.7', '<' ) ) {
@@ -123,8 +152,7 @@ function _manually_install_own_plugin() {
 		die('Failed to activate plugin. Cannot continue testing.' . PHP_EOL);
 	}
 
-	_set_own_plugin_installed();
-	
+	_set_own_plugin_installed();	
 }
 
 function _manually_load_plugins() {
@@ -133,8 +161,10 @@ function _manually_load_plugins() {
 }
 
 function _manually_install_plugins() {
+	_disable_mysqli_strict_reporting();
 	_manually_install_woocommerce();
 	_manually_install_own_plugin();
+	_enable_mysqli_strict_reporting();
 }
 
 function _sync_wp_tests_config($testsDir) {
