@@ -100,7 +100,7 @@ class FormattersTests extends WP_UnitTestCase {
     public function test_canGetDisplayableTransactionDetails() {
         $formatters = new Formatters();
         for ($i = 0; $i < 10; $i ++) {
-            $transaction = $this->_generateRandomMobilpayTransaction();
+            $transaction = $this->_generateMobilpayTransaction();
             foreach (self::$_testUsers as $roleName => $userId) {
                 $canManageWooCommerce = self::$_canManageWooCommercePerRoles[$roleName];
                 wp_set_current_user($userId);
@@ -119,7 +119,7 @@ class FormattersTests extends WP_UnitTestCase {
     public function test_canGetDisplayableTransactionItemsList() {
         $formatters = new Formatters();
         for ($i = 0; $i < 10; $i ++) {
-            $transaction = $this->_generateRandomMobilpayTransaction();
+            $transaction = $this->_generateMobilpayTransaction();
             foreach (self::$_testUsers as $roleName => $userId) {
                 $canManageWooCommerce = self::$_canManageWooCommercePerRoles[$roleName];
                 wp_set_current_user($userId);

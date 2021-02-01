@@ -131,7 +131,7 @@ class ShortcodesTests extends WP_UnitTestCase {
     private function _initTestData() {
         $faker = self::_getFaker();
         foreach ($this->_getWcOrderStatuses() as $status) {
-            $order = $this->_generateRandomWcOrder($status);
+            $order = $this->_generateAndSaveRandomWcOrder($status);
             if (!is_wp_error($order)) {
                 $this->_testWcOrders[$order->get_id()] = $order;
             } else {
@@ -140,7 +140,7 @@ class ShortcodesTests extends WP_UnitTestCase {
         }
 
         foreach ($this->_getWcOrderStatuses() as $status) {
-            $order = $this->_generateRandomWcOrder($status, $faker->randomElement(array('stripe', 'bacs')));
+            $order = $this->_generateAndSaveRandomWcOrder($status, $faker->randomElement(array('stripe', 'bacs')));
             if (!is_wp_error($order)) {
                 $this->_testWcOrdersOtherGateway[$order->get_id()] = $order;
             } else {

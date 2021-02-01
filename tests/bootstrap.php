@@ -142,6 +142,8 @@ function _manually_install_woocommerce() {
 	}
 
 	_set_wc_installed();
+
+	require_once 'lib/WcOrderProxy.php';
 }
 
 function _manually_install_own_plugin() {

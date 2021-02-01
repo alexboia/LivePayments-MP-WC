@@ -34,7 +34,7 @@ use LvdWcMc\MobilpayCreditCardGateway;
 trait WcOrderHelpers {
     use GenericTestHelpers;
 
-    protected function _generateRandomWcOrder($status = null, $gateway = null) {
+    protected function _generateAndSaveRandomWcOrder($status = null, $gateway = null) {
         $order = null;
         $faker = self::_getFaker();
         $customerId = wc_create_new_customer($faker->email, 

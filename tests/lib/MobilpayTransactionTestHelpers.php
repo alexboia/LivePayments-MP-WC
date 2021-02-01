@@ -63,11 +63,11 @@ trait MobilpayTransactionTestHelpers {
         return new MobilpayTransaction($txData, $this->_getEnv());
     }
 
-    protected function _generateRandomMobilpayTransaction($override = array()) {
-        return $this->_mobilpayTransactionFromData($this->_generateRandomMobilpayTransactionData($override));
+    protected function _generateMobilpayTransaction($override = array()) {
+        return $this->_mobilpayTransactionFromData($this->_generateMobilpayTransactionData($override));
     }
 
-    protected function _generateRandomMobilpayTransactionData($override = array()) {
+    protected function _generateMobilpayTransactionData($override = array()) {
         $faker = self::_getFaker();
         return array_merge(array(
             'tx_id' => $faker->numberBetween(0, PHP_INT_MAX),
@@ -87,6 +87,24 @@ trait MobilpayTransactionTestHelpers {
             'tx_error_message' => $faker->sentence(),
             'tx_pan_masked' => $faker->creditCardNumber
         ), $override);
+    }
+
+    protected function _generateMobilpayTransactionDataFromWcOrder(WC_Order $order, $status = null) {
+        $override = array(
+            'tx_order_id' => $order->get_id(),
+            'tx_amount' => $order->get_total(),
+            'tx_currency' => $order->get_currency(),
+            'tx_order_user_id' => $order->get_user_id(),
+            'tx_processed_amount' => 0,
+            'tx_ip_address' => $order->get_customer_ip_address(),
+            'tx_transaction_id' => $order->get_order_key()
+        );
+
+        if (!empty($status)) {
+            $override['tx_status'] = $status;
+        }
+
+        return $this->_generateMobilpayTransactionData($override);
     }
 
     protected function _getMobilpayTransactionStatuses() {

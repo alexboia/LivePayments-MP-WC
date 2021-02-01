@@ -60,7 +60,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         $db->startTransaction();
         
         for ($i = 0; $i < 10; $i ++) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0
             ));
 
@@ -89,7 +89,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
     public function test_canCheckStatus() {
         foreach ($this->_getStatusCheckTestsCases() as $status => $checker) {
-            $tx = $this->_generateRandomMobilpayTransaction(array(
+            $tx = $this->_generateMobilpayTransaction(array(
                 'tx_status' => $status
             ));
             $checker($tx);
@@ -98,7 +98,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
     public function test_canGetDataProperties() {
         for ($i = 0; $i < 10; $i ++) {
-            $data = $this->_generateRandomMobilpayTransactionData();
+            $data = $this->_generateMobilpayTransactionData();
             $tx = new MobilpayTransaction($data, $this->_getEnv());
             $this->_assertMobilpayTransactionMatchesData($tx, $data);
         }
@@ -110,21 +110,21 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         for ($i = 0; $i < 10; $i ++) {
             //Processed amount is 0
             $amount = $faker->numberBetween(1, PHP_INT_MAX);
-            $tx = $this->_generateRandomMobilpayTransaction(array(
+            $tx = $this->_generateMobilpayTransaction(array(
                 'tx_amount' => $amount,
                 'tx_processed_amount' => 0
             ));
             $this->assertFalse($tx->isAmountCompletelyProcessed());
 
             //Processed amount is greater than 0 but lower than initial amount
-            $tx = $this->_generateRandomMobilpayTransaction(array(
+            $tx = $this->_generateMobilpayTransaction(array(
                 'tx_amount' => $amount,
                 'tx_processed_amount' => round($amount * $faker->randomFloat(2, 0.01, 0.99))
             ));
             $this->assertFalse($tx->isAmountCompletelyProcessed());
 
             //Processed amount is equal to the initial amount
-            $tx = $this->_generateRandomMobilpayTransaction(array(
+            $tx = $this->_generateMobilpayTransaction(array(
                 'tx_amount' => $amount,
                 'tx_processed_amount' => $amount
             ));
@@ -134,7 +134,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
     public function test_canSave_existing() {
         foreach ($this->_testMobilpayTransactions as $txId => $txData) {
-            $newTxData = $this->_generateRandomMobilpayTransactionData(array(
+            $newTxData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => $txId
             ));
 
@@ -147,7 +147,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
     public function test_canSave_new() {
         for ($i = 0; $i < 10; $i ++) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0
             ));
 
@@ -171,7 +171,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0,
                 'tx_status' => $status,
                 'tx_error_code' => null,
@@ -215,7 +215,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => $this->_generateRandomMobilpayTransactionId(),
                 'tx_status' => $status,
                 'tx_error_code' => null,
@@ -245,7 +245,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0,
                 'tx_status' => $status,
                 'tx_error_code' => null,
@@ -290,7 +290,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => $this->_generateRandomMobilpayTransactionId(),
                 'tx_status' => $status,
                 'tx_error_code' => null,
@@ -328,7 +328,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0,
                 'tx_status' => $status
             ));
@@ -354,7 +354,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0,
                 'tx_status' => $status,
                 'tx_processed_amount' => 0
@@ -421,7 +421,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => $this->_generateRandomMobilpayTransactionId(),
                 'tx_status' => $status
             ));
@@ -450,7 +450,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0,
                 'tx_status' => $status,
                 'tx_error_code' => null,
@@ -491,7 +491,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => $this->_generateRandomMobilpayTransactionId(),
                 'tx_status' => $status,
                 'tx_error_code' => null,
@@ -524,7 +524,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0,
                 'tx_status' => $status
             ));
@@ -550,7 +550,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => 0,
                 'tx_status' => $status
             ));
@@ -581,7 +581,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
         );
 
         foreach ($statuses as $status) {
-            $txData = $this->_generateRandomMobilpayTransactionData(array(
+            $txData = $this->_generateMobilpayTransactionData(array(
                 'tx_id' => $this->_generateRandomMobilpayTransactionId(),
                 'tx_status' => $status
             ));

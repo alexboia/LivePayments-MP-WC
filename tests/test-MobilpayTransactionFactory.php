@@ -74,7 +74,7 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
         $db->startTransaction();
 
         for ($i = 0; $i < 10; $i ++) {
-            $order = $this->_generateRandomWcOrder();
+            $order = $this->_generateAndSaveRandomWcOrder();
             if (!is_wp_error($order)) {
                 $this->_testWcOrdersWoTransaction[$order->get_id()] = $order;
                 $orderIds[] = $order->get_id();
@@ -84,17 +84,9 @@ class MobilpayTransactionFactoryTests extends WP_UnitTestCase {
         }
 
         for ($i = 0; $i < 10; $i ++) {
-            $order = $this->_generateRandomWcOrder();
+            $order = $this->_generateAndSaveRandomWcOrder();
             if (!is_wp_error($order)) {
-                $txData = $this->_generateRandomMobilpayTransactionData(array(
-                    'tx_order_id' => $order->get_id(),
-                    'tx_amount' => $order->get_total(),
-                    'tx_currency' => $order->get_currency(),
-                    'tx_order_user_id' => $order->get_user_id(),
-                    'tx_processed_amount' => 0,
-                    'tx_ip_address' => $order->get_customer_ip_address(),
-                    'tx_transaction_id' => $order->get_order_key()
-                ));
+                $txData = $this->_generateMobilpayTransactionDataFromWcOrder($order);
 
                 $txId = $db->insert($env->getPaymentTransactionsTableName(), 
                     $txData);

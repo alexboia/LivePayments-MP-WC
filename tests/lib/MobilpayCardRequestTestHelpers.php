@@ -29,17 +29,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-use \Mobilpay_Payment_Request_Card;
-
 trait MobilpayCardRequestTestHelpers {
     use GenericTestHelpers;
 
-    protected function _createCardPaymentRequestFromOrder(\Wc_Order $order) {
+    /**
+     * @return \Mobilpay_Payment_Request_Card 
+     */
+    protected function _generateCardPaymentRequestFromOrder(\WC_Order $order) {
         $faker = $this->_getFaker();
 
         $paymentRequest = new \Mobilpay_Payment_Request_Card();
         $paymentRequest->signature = $this->_generateMobilpayAccountId();
-        $paymentRequest->orderId = $order->get_id();
+        $paymentRequest->orderId = $faker->uuid;
         
         $paymentRequest->confirmUrl = $faker->url;
         $paymentRequest->returnUrl = $faker->url;
@@ -56,6 +57,25 @@ trait MobilpayCardRequestTestHelpers {
         );
         
         return $paymentRequest;
+    }
+
+    /**
+     * @return \Mobilpay_Payment_Request_Card 
+     */
+    protected function _generateFullPaymentCompletedCardPaymentRequestFromOrder(\WC_Order $order) {
+        $faker = $this->_getFaker();
+        $request = $this->_generateCardPaymentRequestFromOrder($order);
+
+        $request->objPmNotify = new \Mobilpay_Payment_Request_Notify();
+        $request->objPmNotify->action = 'confirmed';
+        $request->objPmNotify->originalAmount = $request->invoice->amount;
+        $request->objPmNotify->processedAmount = $request->invoice->amount;
+        $request->objPmNotify->pan_masked = $faker->creditCardNumber;
+        $request->objPmNotify->errorCode = 0;
+        $request->objPmNotify->errorMessage = '';
+        $request->objPmNotify->purchaseId = $faker->uuid;
+
+        return $request;
     }
 
     private function _generateMobilpayAccountId() {

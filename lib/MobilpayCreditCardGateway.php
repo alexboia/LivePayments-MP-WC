@@ -1545,7 +1545,7 @@ namespace LvdWcMc {
 
         private function _getX509CertificateFilePath() {
             $replace = $this->_getPaymentAssetFileReplaceData();
-            
+
             $fileName = str_ireplace(array_keys($replace), 
                 array_values($replace), 
                 $this->_paymentAssetFileTemplates['public_key_certificate']);
