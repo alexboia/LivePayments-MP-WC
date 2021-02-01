@@ -51,7 +51,12 @@ namespace LvdWcMc {
         public function __construct() {
             $this->_env = lvdwcmc_get_env();
             $this->_logger = wc_get_logger();
-            $this->_transactionFactory = new MobilpayTransactionFactory();
+
+            if (func_num_args() == 1 && (func_get_arg(0) instanceof MobilpayTransactionFactory)) {
+                $this->_transactionFactory = func_get_arg(0);
+            } else {
+                $this->_transactionFactory = new MobilpayTransactionFactory();
+            }
 
             add_action('woocommerce_order_fully_refunded_status', 
                 array($this, 'onOrderFullyRefundedGetRefundedStatus'), 

@@ -157,7 +157,9 @@ function _manually_install_own_plugin() {
 		die('Failed to activate plugin. Cannot continue testing.' . PHP_EOL);
 	}
 
-	_set_own_plugin_installed();	
+	_set_own_plugin_installed();
+
+	require_once 'lib/AlwaysReturnNullMobilpayTransactionFactory.php';
 }
 
 function _manually_load_plugins() {

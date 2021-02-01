@@ -149,17 +149,48 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
         }
     }
 
+    public function test_tryProcessPaymentInitialized_noTransactionReturnedFromOrder_withHooks() {
+        for ($i = 0; $i < 10; $i ++) {
+            $hookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_initialized', 2);
+            $this->_testTryProcessPaymentInitializedNoTransactionReturnedForOrder();
+            $this->assertFalse($hookTester->wasCalled());
+        }
+    }
+
+    public function test_tryProcessPaymentInitialized_noTransactionReturnedFromOrder_withoutHooks() {
+        for ($i = 0; $i < 10; $i ++) {
+            $this->_testTryProcessPaymentInitializedNoTransactionReturnedForOrder();
+        }
+    }
+
     private function _testCanProcessPaymentInitializedForExistingOrder(\WC_Order $order) {
         $processor = new MobilpayCardPaymentProcessor();
         $transactionFactory = new MobilpayTransactionFactory();
 
-        $result = $processor->processPaymentInitialized($order, $this->_generateCardPaymentRequestFromOrder($order));
-        $this->assertEquals(MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK, $result);
+        $result = $processor->processPaymentInitialized($order, 
+            $this->_generateCardPaymentRequestFromOrder($order));
+
+        $this->assertEquals(MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK, 
+            $result);
 
         $transaction = $transactionFactory->existingFromOrder($order);
         $this->assertNotNull($transaction);
 
         return $transaction;
+    }
+
+    private function _testTryProcessPaymentInitializedNoTransactionReturnedForOrder() {
+        $processor = new MobilpayCardPaymentProcessor(
+            new AlwaysReturnNullMobilpayTransactionFactory()
+        );
+
+        $order = $this->_generateRandomWcPendingOrderForOurGateway();
+
+        $result = $processor->processPaymentInitialized($order, 
+            $this->_generateCardPaymentRequestFromOrder($order));
+        
+        $this->assertEquals(MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION, 
+            $result);
     }
 
     public function test_canProcessConfirmedPayment_newTransaction_completePayment_needsProcessing_withHooks() {
