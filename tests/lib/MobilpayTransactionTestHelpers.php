@@ -91,7 +91,7 @@ trait MobilpayTransactionTestHelpers {
 
     protected function _generateMobilpayTransactionDataFromWcOrder(WC_Order $order, $status = null) {
         $override = array(
-            'tx_order_id' => $order->get_id(),
+            'tx_order_id' => $order->get_id(),  
             'tx_amount' => $order->get_total(),
             'tx_currency' => $order->get_currency(),
             'tx_order_user_id' => $order->get_user_id(),

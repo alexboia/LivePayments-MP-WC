@@ -31,10 +31,10 @@
 
 require_once 'faker/autoload.php';
 require_once 'lib/MobilpayConstants.php';
-require_once 'lib/IntegerIdGenerator.php';
-require_once 'lib/FractionsFakerDataProvider.php';
 require_once 'lib/GenericTestHelpers.php';
 require_once 'lib/DbTestHelpers.php';
+require_once 'lib/IntegerIdGenerator.php';
+require_once 'lib/FractionsFakerDataProvider.php';
 require_once 'lib/MobilpayTransactionTestHelpers.php';
 require_once 'lib/WcOrderHelpers.php';
 require_once 'lib/MobilpayCardRequestTestHelpers.php';

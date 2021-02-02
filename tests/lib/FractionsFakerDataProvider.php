@@ -9,14 +9,18 @@ class FractionsFakerDataProvider extends \Faker\Provider\Base {
         $amounts = array();
         $fractions = $this->generateFractionsOfUnit($precision);
         $fractionsCount = count($fractions);
-        
+
         for ($i = 0; $i < $fractionsCount; $i ++) {
-            $amounts[$i] = round($fractions[$i] * $amount, $precision);
+            $amounts[$i] = round($fractions[$i] * $amount, 
+                $precision, 
+                PHP_ROUND_HALF_DOWN);
         }
 
         $testSum = array_sum($amounts);
-        if ($testSum < 1) {
-            $amounts[$fractionsCount - 1] += (1 - $testSum);
+        if ($testSum < $amount) {
+            $amounts[$fractionsCount - 1] += ($amount - $testSum);
+        } else if ($testSum > $amount) {
+            $amounts[$fractionsCount - 1] -= ($testSum - $amount);
         }
 
         return $amounts;
@@ -44,12 +48,16 @@ class FractionsFakerDataProvider extends \Faker\Provider\Base {
         }
 
         for ($i = 0; $i < $partsCount; $i ++) {
-            $fractions[$i] = round($fractions[$i], $precision);
+            $fractions[$i] = round($fractions[$i], 
+                $precision, 
+                PHP_ROUND_HALF_DOWN);
         }
 
         $testSum = array_sum($fractions);
         if ($testSum < 1) {
             $fractions[$partsCount - 1] += (1 - $testSum);
+        } else if ($testSum > 1) {
+            $fractions[$partsCount - 1] -= ($testSum - 1);
         }
 
         return $fractions;

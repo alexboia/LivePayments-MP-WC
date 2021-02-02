@@ -147,7 +147,11 @@ class WordPressHookTester {
 
         if ($this->_wasCalled) {
             if (isset($this->_wasCalledWithArgs[$index])) {
-                $wasCalledAccordingly = $this->_wasCalledWithArgs[$index] == $expectedValue;
+                if (!is_callable($expectedValue)) {
+                    $wasCalledAccordingly = $this->_wasCalledWithArgs[$index] == $expectedValue;
+                } else {
+                    $wasCalledAccordingly = $expectedValue($this->_wasCalledWithArgs[$index]);
+                }
             }
         }
 

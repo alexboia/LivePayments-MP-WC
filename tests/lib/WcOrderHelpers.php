@@ -50,6 +50,7 @@ trait WcOrderHelpers {
 
         $email = $faker->email;
         $wpUser = get_user_by('email', $email);
+
         if ($wpUser instanceof \WP_User) {
             $customerId = $wpUser->ID;
         } else {

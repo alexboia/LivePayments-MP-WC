@@ -87,4 +87,8 @@ class WcOrderProcessingTester {
     public function currentCustomerOrderNotesCountDiffersBy($diff) {
         return $this->orderExists() && $this->_orderNotesTester->currentCustomerOrderNotesCountDiffersBy($diff);
     }
+
+    public function getOrder() {
+        return $this->_order;
+    }
 }

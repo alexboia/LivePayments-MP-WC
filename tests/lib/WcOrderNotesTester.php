@@ -46,11 +46,13 @@ class WcOrderNotesTester {
     }
 
     public function currentInternalOrderNotesCountDiffersBy($diff) {
+        wp_cache_flush();
         return ($this->_countInternalOrderNotes() - $this->_initialInternalOrderNotesCount) 
             == $diff;
     }
 
     public function currentCustomerOrderNotesCountDiffersBy($diff) {
+        wp_cache_flush();
         return ($this->_countCustomerOrderNotes() - $this->_initialCustomerOrderNotesCount)
             == $diff;
     }

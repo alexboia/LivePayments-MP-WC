@@ -42,16 +42,10 @@ class IntegerIdGenerator {
      */
     private $_excludedIds = array();
 
-    /**
-     * @var \Faker\Generator
-     */
-    private $_faker;
-
     private $_range;
 
     public function __construct($range = 1000, array $initiallyExcludedIds = array()) {
         $this->_range = $range;
-        $this->_faker = $this->_getFaker();
         $this->_addExcludedIds($initiallyExcludedIds);
     }
 
@@ -76,7 +70,7 @@ class IntegerIdGenerator {
 
     private function _generateNextId() {
         $max = $this->_getMaxExcludedId();
-        return $this->_faker->numberBetween($max + 1, $max + $this->_range + 1);
+        return $this->_getFaker()->numberBetween($max + 1, $max + $this->_range + 1);
     }
 
     private function _registerGeneratedId($nextId) {
