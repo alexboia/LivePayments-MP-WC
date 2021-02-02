@@ -144,6 +144,7 @@ function _manually_install_woocommerce() {
 	_set_wc_installed();
 
 	require_once 'lib/WcOrderProxy.php';
+	require_once 'lib/WcOrderNotesTester.php';
 }
 
 function _manually_install_own_plugin() {
@@ -160,6 +161,7 @@ function _manually_install_own_plugin() {
 	_set_own_plugin_installed();
 
 	require_once 'lib/AlwaysReturnNullMobilpayTransactionFactory.php';
+	require_once 'lib/MobilpayTransactionProcessingTester.php';
 }
 
 function _manually_load_plugins() {

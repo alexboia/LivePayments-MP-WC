@@ -78,6 +78,32 @@ trait MobilpayCardRequestTestHelpers {
         return $request;
     }
 
+    /**
+     * @return \Mobilpay_Payment_Request_Card 
+     */
+    protected function _generatePartialPaymentCompletedCardPaymentRequestFromOrder(\WC_Order $order) {
+        $faker = $this->_getFaker();
+        $request = $this->_generateCardPaymentRequestFromOrder($order);
+
+        $request->objPmNotify = new \Mobilpay_Payment_Request_Notify();
+        $request->objPmNotify->action = 'confirmed';
+        $request->objPmNotify->originalAmount = $request->invoice->amount;
+        $request->objPmNotify->processedAmount = $this->_generatePartialProcessAmount($request);
+        $request->objPmNotify->pan_masked = $faker->creditCardNumber;
+        $request->objPmNotify->errorCode = 0;
+        $request->objPmNotify->errorMessage = '';
+        $request->objPmNotify->purchaseId = $faker->uuid;
+    }
+
+    private function _generatePartialProcessAmount(\Mobilpay_Payment_Request_Card $request) {
+        $minProcessAmount = 0.01;
+        $maxProcessAmount = round(0.90 * $request->invoice->amount, 2, 
+            PHP_ROUND_HALF_DOWN);
+
+        $faker = $this->_getFaker();
+        return $faker->randomFloat(2, $minProcessAmount, $maxProcessAmount);
+    }
+
     private function _generateMobilpayAccountId() {
         return $this->_getFaker()->uuid;
     }

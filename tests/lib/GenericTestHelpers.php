@@ -69,6 +69,6 @@ trait GenericTestHelpers {
     }
 
     protected function _writeLine($message) {
-        echo PHP_EOL . $message . PHP_EOL;
+        echo PHP_EOL . strip_tags($message) . PHP_EOL;
     }
 }

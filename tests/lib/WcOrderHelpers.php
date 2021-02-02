@@ -34,12 +34,29 @@ use LvdWcMc\MobilpayCreditCardGateway;
 trait WcOrderHelpers {
     use GenericTestHelpers;
 
+    protected function _clearOrderCache($orderId = 0) {
+        wp_cache_flush();
+        wc_delete_shop_order_transients($orderId);
+    }
+
+    protected function _getFreshOrderById($orderId) {
+        $this->_clearOrderCache($orderId);
+        return wc_get_order($orderId);
+    }
+
     protected function _generateAndSaveRandomWcOrder($status = null, $gateway = null) {
         $order = null;
         $faker = self::_getFaker();
-        $customerId = wc_create_new_customer($faker->email, 
-            $faker->userName, 
-            $faker->password);
+
+        $email = $faker->email;
+        $wpUser = get_user_by('email', $email);
+        if ($wpUser instanceof \WP_User) {
+            $customerId = $wpUser->ID;
+        } else {
+            $customerId = wc_create_new_customer($faker->email, 
+                $faker->userName, 
+                $faker->password);
+        }
 
         if (!is_wp_error($customerId)) {
             $orderArgs = array(

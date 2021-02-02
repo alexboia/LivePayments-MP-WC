@@ -32,6 +32,7 @@
 use LvdWcMc\MobilpayTransaction;
 
 class MobilpayTransactionTests extends WP_UnitTestCase {
+    use WcOrderHelpers;
     use MobilpayTransactionTestHelpers;
     use DbTestHelpers;
 
@@ -49,6 +50,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
 
     public function setUp() {
         parent::setUp();
+        $this->_clearOrderCache();
         $this->_installTestData();
     }
 
@@ -78,6 +80,7 @@ class MobilpayTransactionTests extends WP_UnitTestCase {
     public function tearDown() { 
         parent::tearDown();
         $this->_clearTestData();
+        $this->_clearOrderCache();
     }
 
     private function _clearTestData() {
