@@ -41,6 +41,7 @@ trait GenericTestHelpers {
     protected static function _getFaker() {
         if (self::$_faker == null) {
             self::$_faker = Faker\Factory::create();
+            self::$_faker->addProvider(new FractionsFakerDataProvider(self::$_faker));
         }
 
         return self::$_faker;

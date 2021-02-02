@@ -68,7 +68,7 @@ trait WcOrderHelpers {
             $order = wc_create_order($orderArgs);
             if (!is_wp_error($order)) {
                 if ($order->get_id()) {
-                    $order->set_total($faker->randomFloat(2, 1, PHP_FLOAT_MAX));
+                    $order->set_total($faker->randomFloat(2, 1, 1000000));
                     $order->set_order_key(wc_generate_order_key());
                     $order->set_payment_method(!empty($gateway) ? $gateway : MobilpayCreditCardGateway::GATEWAY_ID);
                     $order->save();

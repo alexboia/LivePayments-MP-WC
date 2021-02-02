@@ -1,4 +1,7 @@
 <?php
+
+use Automattic\Jetpack\Constants;
+
 /**
  * Copyright (c) 2019-2020 Alexandru Boia
  *
@@ -75,24 +78,64 @@ trait MobilpayCardRequestTestHelpers {
         $request->objPmNotify->errorMessage = '';
         $request->objPmNotify->purchaseId = $faker->uuid;
 
-        return $request;
+        return $this->_generateAndAddPaymentRequestResponseNotification($request, 
+            MobilpayConstants::MOBILPAY_ACTION_CONFIRMED, 
+            $request->invoice->amount);
     }
 
     /**
      * @return \Mobilpay_Payment_Request_Card 
      */
     protected function _generatePartialPaymentCompletedCardPaymentRequestFromOrder(\WC_Order $order) {
-        $faker = $this->_getFaker();
         $request = $this->_generateCardPaymentRequestFromOrder($order);
+        $processedAmount = $this->_generatePartialProcessAmount($request);
+
+        return $this->_generateAndAddPaymentRequestResponseNotification($request, 
+            MobilpayConstants::MOBILPAY_ACTION_CONFIRMED, 
+            $processedAmount);
+    }
+
+    /**
+     * @return \Mobilpay_Payment_Request_Card[]
+     */
+    protected function _generatePartialPaymentCardPaymentSplitRequestsFromOrder(\WC_Order $order) {
+        $amounts = $this->_generateWcOrderAmountSplit($order);
+        $amountsCount = count($amounts);
+        $requests = array();
+
+        for ($i = 0; $i < $amountsCount; $i ++) {
+            $request = $this->_generateCardPaymentRequestFromOrder($order);
+            $request = $this->_generateAndAddPaymentRequestResponseNotification($request, 
+                MobilpayConstants::MOBILPAY_ACTION_CONFIRMED, 
+                $amounts[$i]);
+
+            $requests[] = $request;
+        }
+
+        return $requests;
+    }
+
+    /**
+     * @return \Mobilpay_Payment_Request_Card
+     */
+    private function _generateAndAddPaymentRequestResponseNotification(\Mobilpay_Payment_Request_Card $request, $action, $processedAmount) {
+        $faker = $this->_getFaker();
 
         $request->objPmNotify = new \Mobilpay_Payment_Request_Notify();
-        $request->objPmNotify->action = 'confirmed';
+        $request->objPmNotify->action = $action;
         $request->objPmNotify->originalAmount = $request->invoice->amount;
-        $request->objPmNotify->processedAmount = $this->_generatePartialProcessAmount($request);
+        $request->objPmNotify->processedAmount = $processedAmount;
         $request->objPmNotify->pan_masked = $faker->creditCardNumber;
         $request->objPmNotify->errorCode = 0;
         $request->objPmNotify->errorMessage = '';
         $request->objPmNotify->purchaseId = $faker->uuid;
+
+        return $request;
+    }
+
+    private function _generateWcOrderAmountSplit(\WC_Order $order) {
+        return $this->_getFaker()->generateFractionsOfAmount($order->get_total(), 
+            wc_get_price_decimals());
     }
 
     private function _generatePartialProcessAmount(\Mobilpay_Payment_Request_Card $request) {

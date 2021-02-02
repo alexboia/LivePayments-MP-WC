@@ -29,28 +29,62 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-class WcOrderProxy extends \WC_Order {
+class WcOrderProcessingTester {
+    private $_id;
+    
     /**
-     * @var array
+     * @var WC_Order
      */
-    private $_methodOverrides = array();
+    private $_order;
 
-    public static function overrideNeedsProcessing($forOrder, $needsProcessing) {
-        return new WcOrderProxy($forOrder, array(
-            'needs_processing' => $needsProcessing
-        ));
-    }
+    private $_initialStatus;
 
-    public function __construct(\WC_Order $target, $methodOverrides) {
-        parent::__construct($target);
-        $this->_methodOverrides = $methodOverrides;
-    }
+    /**
+     * @var WcOrderNotesTester
+     */
+    private $_orderNotesTester;
 
-    public function needs_processing() {
-        if (isset($this->_methodOverrides['needs_processing'])) {
-            return $this->_methodOverrides['needs_processing'];
+    public function __construct($descriptor) {
+        if ($descriptor instanceof \WC_Order) {
+            $order = $descriptor;
         } else {
-            return parent::needs_processing();
+            $order = wc_get_order($descriptor);
         }
+
+        if (!empty($order)) {
+            $this->_id = $order->get_id();
+            $this->_order = $order;
+            $this->_initialStatus = $order->get_status();
+            $this->_orderNotesTester = new WcOrderNotesTester($order);
+        }
+    }
+
+    public function refresh() {
+        if ($this->orderExists()) {
+            wp_cache_flush();
+            wc_delete_shop_order_transients($this->_id);
+            $this->_initialStatus = $this->_order->get_status();
+            $this->_order = wc_get_order($this->_id);
+        }
+    }
+
+    public function orderExists() {
+        return !empty($this->_order);
+    }
+
+    public function orderHadStatus($status) {
+        return $this->orderExists() && $this->_initialStatus == $status;
+    }
+
+    public function orderHasStatus($status) {
+        return $this->orderExists() && $this->_order->has_status($status);
+    }
+
+    public function currentInternalOrderNotesCountDiffersBy($diff) {
+        return $this->orderExists() && $this->_orderNotesTester->currentInternalOrderNotesCountDiffersBy($diff);
+    }
+
+    public function currentCustomerOrderNotesCountDiffersBy($diff) {
+        return $this->orderExists() && $this->_orderNotesTester->currentCustomerOrderNotesCountDiffersBy($diff);
     }
 }

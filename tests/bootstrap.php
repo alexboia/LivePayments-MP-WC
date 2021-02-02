@@ -30,7 +30,9 @@
  */
 
 require_once 'faker/autoload.php';
+require_once 'lib/MobilpayConstants.php';
 require_once 'lib/IntegerIdGenerator.php';
+require_once 'lib/FractionsFakerDataProvider.php';
 require_once 'lib/GenericTestHelpers.php';
 require_once 'lib/DbTestHelpers.php';
 require_once 'lib/MobilpayTransactionTestHelpers.php';
@@ -145,6 +147,7 @@ function _manually_install_woocommerce() {
 
 	require_once 'lib/WcOrderProxy.php';
 	require_once 'lib/WcOrderNotesTester.php';
+	require_once 'lib/WcOrderProcessingTester.php';
 }
 
 function _manually_install_own_plugin() {

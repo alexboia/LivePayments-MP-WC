@@ -71,6 +71,8 @@ class MobilpayTransactionProcessingTester {
 
     public function refresh() {
         if ($this->transactionExists()) {
+            $this->_initialStatus = $this->_mobilpayTransaction->getStatus();
+            $this->_initialProcessedAmount = $this->_mobilpayTransaction->getProcessedAmount();
             $this->_mobilpayTransaction = $this->_mobilpayTransactionFactory->fromTransactionId($this->_id);
         }
     }
@@ -99,6 +101,11 @@ class MobilpayTransactionProcessingTester {
         return $this->transactionExists() 
             && empty($this->_mobilpayTransaction->getErrorCode())
             && empty($this->_mobilpayTransaction->getErrorMessage());
+    }
+
+    public function isTransactionAmountCompletelyProcessed() {
+        return $this->transactionExists() 
+            && $this->_mobilpayTransaction->isAmountCompletelyProcessed();
     }
 
     public function getTransaction() {

@@ -30,6 +30,8 @@
  */
 
 class IntegerIdGenerator {
+    use GenericTestHelpers;
+
     /**
      * @var array
      */
@@ -49,7 +51,7 @@ class IntegerIdGenerator {
 
     public function __construct($range = 1000, array $initiallyExcludedIds = array()) {
         $this->_range = $range;
-        $this->_faker = Faker\Factory::create();
+        $this->_faker = $this->_getFaker();
         $this->_addExcludedIds($initiallyExcludedIds);
     }
 
