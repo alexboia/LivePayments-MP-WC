@@ -88,6 +88,10 @@ class WcOrderProcessingTester {
         return $this->orderExists() && $this->_orderNotesTester->currentCustomerOrderNotesCountDiffersBy($diff);
     }
 
+    public function orderHasRefunds($count) {
+        return $this->orderExists() && count($this->_order->get_refunds()) == $count;
+    }
+
     public function getOrder() {
         return $this->_order;
     }

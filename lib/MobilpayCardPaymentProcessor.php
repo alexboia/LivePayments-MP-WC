@@ -58,7 +58,7 @@ namespace LvdWcMc {
                 $this->_transactionFactory = new MobilpayTransactionFactory();
             }
 
-            add_action('woocommerce_order_fully_refunded_status', 
+            add_filter('woocommerce_order_fully_refunded_status', 
                 array($this, 'onOrderFullyRefundedGetRefundedStatus'), 
                 PHP_INT_MAX, 
                 3);
@@ -420,7 +420,7 @@ namespace LvdWcMc {
                      */
                     $refundData = apply_filters('lvdwcmc_refund_data', array(
                         'order_id' => $order->get_id(),
-                        'amount' => $processedAmount,
+                        'amount' => min($processedAmount, $order->get_remaining_refund_amount()),
                         'reason' => $this->_getPartialRefundReason($transactionId),
                         'line_items' => array(),
                         'restock_items' => false,
@@ -439,9 +439,33 @@ namespace LvdWcMc {
                                 $this->logDebug('Setting order status to refunded.', 
                                     $context);
 
+                                //See now, WooCommerce has wc_order_fully_refunded attached 
+                                //  to woocommerce_order_status_refunded action hook to ensure that the order
+                                //  has all the amount refunded if its status is set to <refunded>.
+                                //However, the difference between ->get_total() and ->get_total_refunded() 
+                                //  might be a very small negative number, the kind of difference that 
+                                //  can occur even if the numbers are equal, but this function 
+                                //  thinks there's a difference to be covered, so it generates a useless line.
+                                //I just don't have any idea on how to tell it not to, 
+                                //  so I'm just going to remove the action hook before setting the order status
+                                //  and add it back after I've done my thing.
+                                //Good riddance!
+                                $wcActionPriority = has_action('woocommerce_order_status_refunded', 'wc_order_fully_refunded');
+                                if ($wcActionPriority !== false) {
+                                    remove_action('woocommerce_order_status_refunded', 
+                                        'wc_order_fully_refunded', 
+                                        $wcActionPriority);
+                                }
+
                                 $order->update_status('refunded', $this->_getGenericRefundOrderStatusNote());
                                 $order->add_order_note($this->_getGenericRefundOrderCustomerNote($transactionId), 1);
                                 $order->add_order_note($this->_getGenericRefundOrderAdminNote($transactionId), 0);
+
+                                if ($wcActionPriority !== false) {
+                                    add_action('woocommerce_order_status_refunded', 
+                                        'wc_order_fully_refunded', 
+                                        $wcActionPriority);
+                                }
                             } else {
                                 $this->logDebug('Order is already set as refunded. Skipping order status update.', 
                                     $context);

@@ -88,10 +88,10 @@ trait MobilpayCardRequestTestHelpers {
     /**
      * @return \Mobilpay_Payment_Request_Card[]
      */
-    protected function _generatePartialPaymentCardPaymentSplitRequestsFromOrder(\WC_Order $order) {
+    protected function _generatePartialPaymentSplitRequestsFromOrder(\WC_Order $order) {
+        $requests = array();
         $amounts = $this->_generateWcOrderAmountSplit($order);
         $amountsCount = count($amounts);
-        $requests = array();
 
         for ($i = 0; $i < $amountsCount; $i ++) {
             $request = $this->_generateCardPaymentRequestFromOrder($order);
@@ -114,6 +114,26 @@ trait MobilpayCardRequestTestHelpers {
         return $this->_generateAndAddPaymentRequestResponseNotification($request, 
             MobilpayConstants::MOBILPAY_ACTION_CREDITED, 
             $request->invoice->amount);
+    }
+
+    /**
+     * @return \Mobilpay_Payment_Request_Card[]
+     */
+    protected function _generatePartialCreditSplitRequestsFromOrder(\WC_Order $order) {
+        $requests = array();
+        $amounts = $this->_generateWcOrderAmountSplit($order);
+        $amountsCount = count($amounts);
+
+        for ($i = 0; $i < $amountsCount; $i ++) {
+            $request = $this->_generateCardPaymentRequestFromOrder($order);
+            $request = $this->_generateAndAddPaymentRequestResponseNotification($request, 
+                MobilpayConstants::MOBILPAY_ACTION_CREDITED, 
+                $amounts[$i]);
+
+            $requests[] = $request;
+        }
+
+        return $requests;
     }
 
     /**

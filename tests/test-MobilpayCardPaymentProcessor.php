@@ -464,7 +464,7 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
         $transactionTester = new MobilpayTransactionProcessingTester($order);
         $orderTester = new WcOrderProcessingTester($order);
 
-        $paymentRequests = $this->_generatePartialPaymentCardPaymentSplitRequestsFromOrder($order);
+        $paymentRequests = $this->_generatePartialPaymentSplitRequestsFromOrder($order);
         foreach ($paymentRequests as $paymentRequest) {
             $testOrderProxy = WcOrderProxy::overrideNeedsProcessing($orderTester->getOrder(), 
                 $needsProcessing);
@@ -561,6 +561,9 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $this->assertTrue($orderTester
                 ->currentCustomerOrderNotesCountDiffersBy(1));
         }
+        
+        $this->assertTrue($orderTester
+            ->orderHasRefunds(1));
 
         $transactionTester->refresh();
         $this->assertTrue($transactionTester
@@ -569,6 +572,83 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             ->transactionIsCredited());
         $this->assertTrue($transactionTester
             ->transactionMatchesPaymentResponse($paymentRequest));
+
+        return $transactionTester->getTransaction();
+    }
+
+    public function test_canProcessCreditedPayment_completedTransaction_successivePartialPayments_withHooks() {
+        foreach ($this->_testCompletedOrderData as $orderId => $order) {
+            $refundDataFilterHookTester = WordPressHookTester::forFilterHook('lvdwcmc_refund_data', 3);
+            $orderRefundedHookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_refund', 3);
+
+            $transaction = $this->_testCanProcessCreditedPaymentFromCompletedTransactionWithPartialPaymentsUntilCompletion($order);
+
+            $this->assertTrue($refundDataFilterHookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($refundDataFilterHookTester
+                ->wasCalledWithNthArg(1, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($refundDataFilterHookTester
+                ->wasCalledWithNthArg(2, $transaction, $this->_getTransactionIdCallBack));
+
+            $this->assertTrue($orderRefundedHookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($orderRefundedHookTester
+                ->wasCalledWithNthArg(0, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($orderRefundedHookTester
+                ->wasCalledWithNthArg(1, $transaction));
+
+            $refundDataFilterHookTester->unregister();
+            $orderRefundedHookTester->unregister();
+        }
+    }
+
+    public function test_canProcessCreditedPayment_completedTransaction_successivePartialPayments_withoutHooks() {
+        foreach ($this->_testCompletedOrderData as $orderId => $order) {
+            $this->_testCanProcessCreditedPaymentFromCompletedTransactionWithPartialPaymentsUntilCompletion($order);
+        }
+    }
+
+    private function _testCanProcessCreditedPaymentFromCompletedTransactionWithPartialPaymentsUntilCompletion(\WC_Order $order) {
+        $processor = new MobilpayCardPaymentProcessor();
+        $transactionTester = new MobilpayTransactionProcessingTester($order);
+        $orderTester = new WcOrderProcessingTester($order);
+
+        $paymentRequests = $this->_generatePartialCreditSplitRequestsFromOrder($order);
+        foreach ($paymentRequests as $paymentRequest) {
+            $result = $processor->processCreditPaymentResponse($orderTester->getOrder(), $paymentRequest);
+            $this->_assertSuccessfulProcessingResult($result);
+
+            $orderTester->refresh();
+            $this->assertTrue($orderTester->orderExists());
+
+            $expectedStatus = null;
+            $transactionTester->refresh();
+
+            if ($transactionTester->isTransactionAmountCompletelyProcessed()) {
+                $expectedStatus = 'refunded';
+            } else {
+                $expectedStatus = 'completed';
+            }
+
+            $this->_assertOrderStatus($orderTester, 
+                $expectedStatus);
+        }
+
+        $this->assertTrue($orderTester
+            ->currentInternalOrderNotesCountDiffersBy(2));
+        $this->assertTrue($orderTester
+            ->currentCustomerOrderNotesCountDiffersBy(1));
+        
+        $this->assertTrue($orderTester
+            ->orderHasRefunds(count($paymentRequests)));
+
+        $transactionTester->refresh();
+        $this->assertTrue($transactionTester
+            ->transactionExists());
+        $this->assertTrue($transactionTester
+            ->transactionIsCredited());
+        $this->assertTrue($transactionTester
+            ->isTransactionAmountCompletelyProcessed());
 
         return $transactionTester->getTransaction();
     }

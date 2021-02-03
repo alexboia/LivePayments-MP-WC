@@ -11,9 +11,10 @@ class FractionsFakerDataProvider extends \Faker\Provider\Base {
         $fractionsCount = count($fractions);
 
         for ($i = 0; $i < $fractionsCount; $i ++) {
-            $amounts[$i] = round($fractions[$i] * $amount, 
+            $amounts[$i] = floatval(number_format($fractions[$i] * $amount, 
                 $precision, 
-                PHP_ROUND_HALF_DOWN);
+                '.', 
+                ''));
         }
 
         $testSum = array_sum($amounts);
@@ -48,9 +49,10 @@ class FractionsFakerDataProvider extends \Faker\Provider\Base {
         }
 
         for ($i = 0; $i < $partsCount; $i ++) {
-            $fractions[$i] = round($fractions[$i], 
+            $fractions[$i] = floatval(number_format($fractions[$i], 
                 $precision, 
-                PHP_ROUND_HALF_DOWN);
+                '.', 
+                ''));
         }
 
         $testSum = array_sum($fractions);

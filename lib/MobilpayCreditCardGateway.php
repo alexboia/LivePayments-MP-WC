@@ -143,8 +143,7 @@ namespace LvdWcMc {
             $this->title = __('mobilPay&trade; Card Gateway', 'livepayments-mp-wc');
 
             $this->supports = array(
-                'products', 
-                'refunds'
+                'products'
             );
 
             $this->_apiDescriptor = strtolower(str_replace('\\', '_', __CLASS__));

@@ -49,11 +49,9 @@ trait WcOrderHelpers {
         $faker = self::_getFaker();
 
         $email = $faker->email;
-        $wpUser = get_user_by('email', $email);
+        $customerId = email_exists($email);
 
-        if ($wpUser instanceof \WP_User) {
-            $customerId = $wpUser->ID;
-        } else {
+        if ($customerId === false) {
             $customerId = wc_create_new_customer($faker->email, 
                 $faker->userName, 
                 $faker->password);
@@ -99,7 +97,8 @@ trait WcOrderHelpers {
             $env->getDbTablePrefix() . 'postmeta',
             $env->getDbTablePrefix() . 'posts',
             $env->getDbTablePrefix() . 'usermeta',
-            $env->getDbTablePrefix() . 'users'
+            $env->getDbTablePrefix() . 'users',
+            $env->getDbTablePrefix() . 'wc_customer_lookup'
         );
     }
 
