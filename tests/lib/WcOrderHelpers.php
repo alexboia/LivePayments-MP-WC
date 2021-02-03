@@ -53,7 +53,7 @@ trait WcOrderHelpers {
 
         if ($customerId === false) {
             $customerId = wc_create_new_customer($faker->email, 
-                $faker->userName, 
+                sha1($email), 
                 $faker->password);
         }
 
