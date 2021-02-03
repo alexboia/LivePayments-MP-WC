@@ -100,6 +100,11 @@ trait MobilpayTransactionTestHelpers {
             'tx_transaction_id' => $order->get_order_key()
         );
 
+        if ($status == MobilpayTransaction::STATUS_CONFIRMED 
+            || $status == MobilpayTransaction::STATUS_CREDIT) {
+            $override['tx_processed_amount'] = $order->get_total(); 
+        }
+
         if (!empty($status)) {
             $override['tx_status'] = $status;
         }

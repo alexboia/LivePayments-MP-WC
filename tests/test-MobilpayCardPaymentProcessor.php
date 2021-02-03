@@ -85,16 +85,11 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
     }
 
     private function _installTestData() {
-        $db = $this->_getDb();
-        $db->startTransaction();
-
         $this->_installNewOrderData();
         $this->_installInitializedOrderData();
         $this->_installCompletedOrderData();
 
         $this->_orderIdGenerator->setExcludedIds($this->_getAllGeneratedOrderIds());
-
-        $db->commit();
     }
 
     private function _installNewOrderData() {
@@ -301,14 +296,20 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $expectedStatus = 'completed';
         }
 
-        $this->assertTrue($orderTester->orderHasStatus($expectedStatus));
-        $this->assertTrue($orderTester->currentInternalOrderNotesCountDiffersBy(2));
-        $this->assertTrue($orderTester->currentCustomerOrderNotesCountDiffersBy(1));
+        $this->assertTrue($orderTester
+            ->orderHasStatus($expectedStatus));
+        $this->assertTrue($orderTester
+            ->currentInternalOrderNotesCountDiffersBy(2));
+        $this->assertTrue($orderTester
+            ->currentCustomerOrderNotesCountDiffersBy(1));
 
         $transactionTester->refresh();
-        $this->assertTrue($transactionTester->transactionExists());
-        $this->assertTrue($transactionTester->transactionIsConfirmed());
-        $this->assertTrue($transactionTester->transactionMatchesPaymentResponse($paymentRequest));
+        $this->assertTrue($transactionTester
+            ->transactionExists());
+        $this->assertTrue($transactionTester
+            ->transactionIsConfirmed());
+        $this->assertTrue($transactionTester
+            ->transactionMatchesPaymentResponse($paymentRequest));
 
         return $transactionTester->getTransaction();
     }
@@ -380,14 +381,19 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
 
         $this->assertTrue($orderTester->orderHasStatus('on-hold'));
         if (!$orderTester->orderHadStatus('on-hold')) {
-            $this->assertTrue($orderTester->currentInternalOrderNotesCountDiffersBy(2));
-            $this->assertTrue($orderTester->currentCustomerOrderNotesCountDiffersBy(1));
+            $this->assertTrue($orderTester
+                ->currentInternalOrderNotesCountDiffersBy(2));
+            $this->assertTrue($orderTester
+                ->currentCustomerOrderNotesCountDiffersBy(1));
         }
 
         $transactionTester->refresh();
-        $this->assertTrue($transactionTester->transactionExists());
-        $this->assertTrue($transactionTester->transactionIsConfirmed());
-        $this->assertTrue($transactionTester->transactionMatchesPaymentResponse($paymentRequest));
+        $this->assertTrue($transactionTester
+            ->transactionExists());
+        $this->assertTrue($transactionTester
+            ->transactionIsConfirmed());
+        $this->assertTrue($transactionTester
+            ->transactionMatchesPaymentResponse($paymentRequest));
 
         return $transactionTester->getTransaction();
     }
@@ -463,16 +469,22 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
                 $expectedStatus = 'on-hold';
             }
 
-            $this->assertTrue($orderTester->orderHasStatus($expectedStatus));
+            $this->assertTrue($orderTester
+                ->orderHasStatus($expectedStatus));
         }
 
-        $this->assertTrue($orderTester->currentInternalOrderNotesCountDiffersBy(4));
-        $this->assertTrue($orderTester->currentCustomerOrderNotesCountDiffersBy(2));
+        $this->assertTrue($orderTester
+            ->currentInternalOrderNotesCountDiffersBy(4));
+        $this->assertTrue($orderTester
+            ->currentCustomerOrderNotesCountDiffersBy(2));
 
         $transactionTester->refresh();
-        $this->assertTrue($transactionTester->transactionExists());
-        $this->assertTrue($transactionTester->transactionIsConfirmed());
-        $this->assertTrue($transactionTester->isTransactionAmountCompletelyProcessed());
+        $this->assertTrue($transactionTester
+            ->transactionExists());
+        $this->assertTrue($transactionTester
+            ->transactionIsConfirmed());
+        $this->assertTrue($transactionTester
+            ->isTransactionAmountCompletelyProcessed());
 
         return $transactionTester->getTransaction();
     }
