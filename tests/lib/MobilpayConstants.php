@@ -31,4 +31,6 @@
 
 class MobilpayConstants {
     const MOBILPAY_ACTION_CONFIRMED = 'confirmed';
+
+    const MOBILPAY_ACTION_CREDITED = 'credit';
 }

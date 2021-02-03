@@ -71,11 +71,23 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
      */
     private $_orderIdGenerator;
 
+    private $_getOrderIdCallBack;
+
+    private $_getTransactionIdCallBack;
+
     public function __construct() {
         $this->_orderIdGenerator = 
             new IntegerIdGenerator();
         $this->_mobilpayTransactionFactory =
             new MobilpayTransactionFactory();
+
+        $this->_getOrderIdCallBack = function($order) {
+            return $order->get_id();
+        };
+
+        $this->_getTransactionIdCallBack = function($transaction) {
+            return $transaction->getId();
+        };
     }
 
     public function setUp() {
@@ -239,11 +251,12 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $hookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_confirmed', 3);
             $transaction = $this->_testCanProcessConfirmedPaymentFromNewTransactionWithCompletePayment($order, true);
             
-            $this->assertTrue($hookTester->wasCalledWithNumberOfArgs(3));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(0, function($calledWithOrder) use ($order) {
-                return $calledWithOrder->get_id() == $order->get_id();
-            }));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(1, $transaction));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(0, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(1, $transaction));
 
             $hookTester->unregister();
         }
@@ -254,11 +267,12 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $hookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_confirmed', 3);
             $transaction = $this->_testCanProcessConfirmedPaymentFromNewTransactionWithCompletePayment($order, false);
             
-            $this->assertTrue($hookTester->wasCalledWithNumberOfArgs(3));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(0, function($calledWithOrder) use ($order) {
-                return $calledWithOrder->get_id() == $order->get_id();
-            }));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(1, $transaction));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(0, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(1, $transaction));
 
             $hookTester->unregister();
         }
@@ -296,8 +310,8 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $expectedStatus = 'completed';
         }
 
-        $this->assertTrue($orderTester
-            ->orderHasStatus($expectedStatus));
+        $this->_assertOrderStatus($orderTester, 
+            $expectedStatus);
         $this->assertTrue($orderTester
             ->currentInternalOrderNotesCountDiffersBy(2));
         $this->assertTrue($orderTester
@@ -351,11 +365,12 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $hookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_confirmed', 3);
             $transaction = $this->_testCanProcessConfirmedPaymentFromNewTransactionWithPartialPayment($order);
 
-            $this->assertTrue($hookTester->wasCalledWithNumberOfArgs(3));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(0, function($calledWithOrder) use ($order) {
-                return $calledWithOrder->get_id() == $order->get_id();
-            }));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(1, $transaction));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(0, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(1, $transaction));
 
             $hookTester->unregister();
         }
@@ -379,7 +394,9 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
         $orderTester->refresh();
         $this->assertTrue($orderTester->orderExists());
 
-        $this->assertTrue($orderTester->orderHasStatus('on-hold'));
+        $this->_assertOrderStatus($orderTester, 
+            'on-hold');
+
         if (!$orderTester->orderHadStatus('on-hold')) {
             $this->assertTrue($orderTester
                 ->currentInternalOrderNotesCountDiffersBy(2));
@@ -403,11 +420,12 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $hookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_confirmed', 3);
             $transaction = $this->_testCanProcessConfirmedPaymentFromNewTransactionWithPartialPaymentsUntilCompletion($order, true);
             
-            $this->assertTrue($hookTester->wasCalledWithNumberOfArgs(3));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(0, function($calledWithOrder) use ($order) {
-                return $calledWithOrder->get_id() == $order->get_id();
-            }));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(1, $transaction));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(0, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(1, $transaction));
 
             $hookTester->unregister();
         }
@@ -418,11 +436,12 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
             $hookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_confirmed', 3);
             $transaction = $this->_testCanProcessConfirmedPaymentFromNewTransactionWithPartialPaymentsUntilCompletion($order, false);
             
-            $this->assertTrue($hookTester->wasCalledWithNumberOfArgs(3));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(0, function($calledWithOrder) use ($order) {
-                return $calledWithOrder->get_id() == $order->get_id();
-            }));
-            $this->assertTrue($hookTester->wasCalledWithNthArg(1, $transaction));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(0, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($hookTester
+                ->wasCalledWithNthArg(1, $transaction));
 
             $hookTester->unregister();
         }
@@ -469,8 +488,8 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
                 $expectedStatus = 'on-hold';
             }
 
-            $this->assertTrue($orderTester
-                ->orderHasStatus($expectedStatus));
+            $this->_assertOrderStatus($orderTester, 
+                $expectedStatus);
         }
 
         $this->assertTrue($orderTester
@@ -489,6 +508,71 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
         return $transactionTester->getTransaction();
     }
 
+    public function test_canProcessCreditedPayment_completedTransaction_completePayment_withHooks() {
+        foreach ($this->_testCompletedOrderData as $orderId => $order) {
+            $refundDataFilterHookTester = WordPressHookTester::forFilterHook('lvdwcmc_refund_data', 3);
+            $orderRefundedHookTester = WordPressHookTester::forActionHook('lvdwcmc_order_payment_refund', 3);
+
+            $transaction = $this->_testCanProcessCreditedPaymentFromCompletedTransactionWithCompletePayment($order);
+
+            $this->assertTrue($refundDataFilterHookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($refundDataFilterHookTester
+                ->wasCalledWithNthArg(1, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($refundDataFilterHookTester
+                ->wasCalledWithNthArg(2, $transaction, $this->_getTransactionIdCallBack));
+
+            $this->assertTrue($orderRefundedHookTester
+                ->wasCalledWithNumberOfArgs(3));
+            $this->assertTrue($orderRefundedHookTester
+                ->wasCalledWithNthArg(0, $order, $this->_getOrderIdCallBack));
+            $this->assertTrue($orderRefundedHookTester
+                ->wasCalledWithNthArg(1, $transaction));
+
+            $refundDataFilterHookTester->unregister();
+            $orderRefundedHookTester->unregister();
+        }
+    }
+
+    public function test_canProcessCreditedPayment_completedTransaction_completePayment_withoutHooks() {
+        foreach ($this->_testCompletedOrderData as $orderId => $order) {
+            $this->_testCanProcessCreditedPaymentFromCompletedTransactionWithCompletePayment($order);
+        }
+    }
+
+    private function _testCanProcessCreditedPaymentFromCompletedTransactionWithCompletePayment(\WC_Order $order) {
+        $processor = new MobilpayCardPaymentProcessor();
+        $transactionTester = new MobilpayTransactionProcessingTester($order);
+        $orderTester = new WcOrderProcessingTester($order);
+
+        $paymentRequest = $this->_generateFullPaymentCreditedCardPaymentRequestFromOrder($order);
+        $result = $processor->processCreditPaymentResponse($order, $paymentRequest);
+        $this->_assertSuccessfulProcessingResult($result);
+
+        $orderTester->refresh();
+        $this->assertTrue($orderTester->orderExists());
+
+        $this->_assertOrderStatus($orderTester, 
+            'refunded');
+
+        if (!$orderTester->orderHadStatus('refunded')) {
+            $this->assertTrue($orderTester
+                ->currentInternalOrderNotesCountDiffersBy(2));
+            $this->assertTrue($orderTester
+                ->currentCustomerOrderNotesCountDiffersBy(1));
+        }
+
+        $transactionTester->refresh();
+        $this->assertTrue($transactionTester
+            ->transactionExists());
+        $this->assertTrue($transactionTester
+            ->transactionIsCredited());
+        $this->assertTrue($transactionTester
+            ->transactionMatchesPaymentResponse($paymentRequest));
+
+        return $transactionTester->getTransaction();
+    }
+
     private function _assertSuccessfulProcessingResult($result) {
         $this->assertEquals(MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_OK, 
             $result);
@@ -497,6 +581,17 @@ class MobilpayCardPaymentProcessorTests extends WP_UnitTestCase {
     private function _assertFailedWithAppErrorProcessingResult($result) {
         $this->assertEquals(MobilpayCreditCardGateway::GATEWAY_PROCESS_RESPONSE_ERR_APPLICATION, 
             $result);
+    }
+
+    private function _assertOrderStatus(WcOrderProcessingTester $orderTester, $expectedStatus) {
+        $this->assertTrue(
+            $orderTester->orderHasStatus($expectedStatus), 
+            $this->_orderStatusDifferentMessage($expectedStatus, $orderTester->getOrderStatus())
+        );
+    }
+
+    private function _orderStatusDifferentMessage($expected, $actual) {
+        return 'Expected order status <'. $expected . '> but found <' . $actual . '>';
     }
 
     private function _generateNewOrderId() {

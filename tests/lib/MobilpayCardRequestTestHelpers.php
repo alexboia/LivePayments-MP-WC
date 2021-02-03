@@ -66,17 +66,7 @@ trait MobilpayCardRequestTestHelpers {
      * @return \Mobilpay_Payment_Request_Card 
      */
     protected function _generateFullPaymentCompletedCardPaymentRequestFromOrder(\WC_Order $order) {
-        $faker = $this->_getFaker();
         $request = $this->_generateCardPaymentRequestFromOrder($order);
-
-        $request->objPmNotify = new \Mobilpay_Payment_Request_Notify();
-        $request->objPmNotify->action = 'confirmed';
-        $request->objPmNotify->originalAmount = $request->invoice->amount;
-        $request->objPmNotify->processedAmount = $request->invoice->amount;
-        $request->objPmNotify->pan_masked = $faker->creditCardNumber;
-        $request->objPmNotify->errorCode = 0;
-        $request->objPmNotify->errorMessage = '';
-        $request->objPmNotify->purchaseId = $faker->uuid;
 
         return $this->_generateAndAddPaymentRequestResponseNotification($request, 
             MobilpayConstants::MOBILPAY_ACTION_CONFIRMED, 
@@ -113,6 +103,17 @@ trait MobilpayCardRequestTestHelpers {
         }
 
         return $requests;
+    }
+
+    /**
+     * @return \Mobilpay_Payment_Request_Card
+     */
+    protected function _generateFullPaymentCreditedCardPaymentRequestFromOrder(\WC_Order $order) {
+        $request = $this->_generateCardPaymentRequestFromOrder($order);
+
+        return $this->_generateAndAddPaymentRequestResponseNotification($request, 
+            MobilpayConstants::MOBILPAY_ACTION_CREDITED, 
+            $request->invoice->amount);
     }
 
     /**

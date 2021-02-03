@@ -60,7 +60,7 @@ class WordPressHookTester {
     }
 
     public static function forFilterHook($hookName, $expectedNumberOfArgs, $forwardArgIndex = 0) {
-        return new self('action', $hookName, $expectedNumberOfArgs, $forwardArgIndex);
+        return new self('filter', $hookName, $expectedNumberOfArgs, $forwardArgIndex);
     }
 
     private function _register() {
@@ -92,7 +92,7 @@ class WordPressHookTester {
 
     public function __handleFilterHook() {
         $this->_wasCalled = true;
-        $this->_wasCalledWithArgs = func_get_args();   
+        $this->_wasCalledWithArgs = func_get_args();
         return $this->_wasCalledWithArgs[$this->_forwardArgIndex];
     }
 
@@ -111,13 +111,13 @@ class WordPressHookTester {
 
     private function _unregisterTestActionHook() {
         remove_action($this->_hookName, 
-            array($this, '__handleFilterHook'), 
+            array($this, '__handleActionHook'), 
             self::TEST_ACTION_HOOK_PRIORITY);
     }
 
     private function _unregisterTestFilterHook() {
         remove_filter($this->_hookName, 
-            array($this, ''), 
+            array($this, '__handleFilterHook'), 
             self::TEST_FILTER_HOOK_PRIORITY);
     }
 
@@ -142,16 +142,20 @@ class WordPressHookTester {
         return $wasCalledAccordingly;
     }
 
-    public function wasCalledWithNthArg($index, $expectedValue) {
+    public function wasCalledWithNthArg($index, $expectedValue, $transform = null) {
         $wasCalledAccordingly = false;
 
         if ($this->_wasCalled) {
             if (isset($this->_wasCalledWithArgs[$index])) {
-                if (!is_callable($expectedValue)) {
-                    $wasCalledAccordingly = $this->_wasCalledWithArgs[$index] == $expectedValue;
-                } else {
-                    $wasCalledAccordingly = $expectedValue($this->_wasCalledWithArgs[$index]);
+                $testExpectedValue = $expectedValue;
+                $testActualValue = $this->_wasCalledWithArgs[$index];
+                if (!empty($transform) && is_callable($transform)) {
+                    $testExpectedValue = $transform($testExpectedValue);
+                    $testActualValue = $transform($testActualValue);
                 }
+
+                $wasCalledAccordingly = ($testActualValue 
+                    == $testExpectedValue);
             }
         }
 

@@ -91,4 +91,8 @@ class WcOrderProcessingTester {
     public function getOrder() {
         return $this->_order;
     }
+
+    public function getOrderStatus() {
+        return $this->orderExists() ? $this->_order->get_status() : '';
+    }
 }

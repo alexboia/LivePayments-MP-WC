@@ -74,6 +74,14 @@ class MobilpayTransactionProcessingTester {
             $this->_initialStatus = $this->_mobilpayTransaction->getStatus();
             $this->_initialProcessedAmount = $this->_mobilpayTransaction->getProcessedAmount();
             $this->_mobilpayTransaction = $this->_mobilpayTransactionFactory->fromTransactionId($this->_id);
+            $this->_resetInitialProcessedAmountIfNeeded();
+        }
+    }
+
+    private function _resetInitialProcessedAmountIfNeeded() {
+        $cStatus = $this->_mobilpayTransaction->getStatus();
+        if ($cStatus == MobilpayTransaction::STATUS_CREDIT && $cStatus != $this->_initialStatus) {
+            $this->_initialProcessedAmount = 0;
         }
     }
 
@@ -95,6 +103,11 @@ class MobilpayTransactionProcessingTester {
         return $this->transactionExists()
             && $this->_mobilpayTransaction->getStatus() == MobilpayTransaction::STATUS_CONFIRMED
             && $this->transactionHasNoError();
+    }
+
+    public function transactionIsCredited() {
+        return $this->transactionExists()
+            && $this->_mobilpayTransaction->getStatus() == MobilpayTransaction::STATUS_CREDIT;
     }
 
     public function transactionHasNoError() {

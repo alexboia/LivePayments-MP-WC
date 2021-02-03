@@ -179,7 +179,7 @@ namespace LvdWcMc {
         }
 
         public function isAmountCompletelyProcessed() {
-            return abs($this->_amount - $this->_processedAmount) <= 1e-5;
+            return abs($this->_amount - $this->_processedAmount) <= 1e-5;   
         }
 
         public function isFailed() {
