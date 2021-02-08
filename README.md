@@ -6,6 +6,9 @@
 LivePayments is a Credit & Debit Card WooCommerce Payment Gateway that uses the Romanian mobilPay payment processor.
 This plugin is meant to be used by merchants in Romania.
 
+[![WP compatibility](https://plugintests.com/plugins/wporg/wc-mobilpayments-card/wp-badge.svg)](https://plugintests.com/plugins/wporg/wc-mobilpayments-card/latest)
+[![PHP compatibility](https://plugintests.com/plugins/wporg/wc-mobilpayments-card/php-badge.svg)](https://plugintests.com/plugins/wporg/wc-mobilpayments-card/latest)
+
 ## Contents
 
 1. [Is it good for you?](#lvdwcmc-isitgoodforyou)
