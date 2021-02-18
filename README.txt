@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/alexandruboia
 Tags: payment, card, mobilpay, creditcard, woocommerce
 Requires at least: 5.0
 Tested up to: 5.6.1
-Stable tag: 0.1.4
+Stable tag: 0.1.5
 Requires PHP: 5.6.2
 License: BSD New License
 License URI: https://opensource.org/licenses/BSD-3-Clause
@@ -78,6 +78,9 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments
 
 == Changelog ==
 
+= 0.1.5 =
+* Fixed two issues: activation error + missing romanian translations for settings page.
+
 = 0.1.4 =
 * Fixed some minor display issues;
 * Added support for diagnosis and monitoring of the plugin payment gateway's configuration.
@@ -99,6 +102,9 @@ Fixed minor usability issues.
 First officially distributed version.
 
 == Upgrade Notice ==
+
+= 0.1.5 =
+Update to version 0.1.5 for fixed activation error + missing romanian translations for settings page.
 
 = 0.1.4 =
 Update to version 0.1.4 for improved usability and new features.
