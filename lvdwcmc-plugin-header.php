@@ -61,7 +61,7 @@ define('LVD_WCMC_PLUGIN_ID', 'lvd_wc_mc');
  * 
  * @var string
  */
-define('LVD_WCMC_VERSION', '0.1.4');
+define('LVD_WCMC_VERSION', '0.1.5');
 
 /**
  * The absolute path to this file - the plug-in header file

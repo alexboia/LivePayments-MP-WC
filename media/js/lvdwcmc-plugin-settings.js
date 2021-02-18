@@ -105,14 +105,14 @@
         }).done(function(data, status, xhr) {
             _hideProgress();
             if (data && data.success) {
-                _toastMessage(true, 'The settings have been successfully saved.');
+                _toastMessage(true, lvdwcmcPluginSettingsL10n.msgSaveOk);
                 _storeInitialControlValues();
             } else {
-                _toastMessage(false, 'The settings could not be saved. Please try again.');
+                _toastMessage(false, data.message || lvdwcmcPluginSettingsL10n.errSaveFailGeneric);
             }
         }).fail(function(xhr, status, error) {
             _hideProgress();
-            _toastMessage(false, 'The settings could not be saved. Please try again.');
+            _toastMessage(false, lvdwcmcPluginSettingsL10n.errSaveFailNetwork);
         });
     }
 

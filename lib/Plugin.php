@@ -102,13 +102,6 @@ namespace LvdWcMc {
         private $_pluginModules = array();
 
         public function __construct(array $options) {
-            if (!isset($options['mediaIncludes']) || !is_array($options['mediaIncludes'])) {
-                $options['mediaIncludes'] = array(
-                    'refPluginsPath' => LVD_WCMC_MAIN,
-                    'scriptsInFooter' => true
-                );
-            }
-
             $this->_env = lvdwcmc_get_env();
             $this->_installer = new Installer();
             $this->_shortcodes = new Shortcodes();
@@ -130,12 +123,24 @@ namespace LvdWcMc {
                     }
                 ));
 
+			$options = $this->_ensureDefaultOptions($options);
             $this->_mediaIncludes = new MediaIncludes(
                 $options['mediaIncludes']['refPluginsPath'], 
                 $options['mediaIncludes']['scriptsInFooter']
             );
 
             $this->_initModules();
+        }
+		
+		private function _ensureDefaultOptions(array $options) {
+            if (!isset($options['mediaIncludes']) || !is_array($options['mediaIncludes'])) {
+                $options['mediaIncludes'] = array(
+                    'refPluginsPath' => LPWOOTRK_PLUGIN_MAIN,
+                    'scriptsInFooter' => true
+                );
+            }
+            
+            return $options;
         }
 
         private function _initModules() {
@@ -168,43 +173,57 @@ namespace LvdWcMc {
             }
 
             $testInstallationErrorCode = $this->_installer->canBeInstalled();
-            if ($this->_wasInstallationTestSuccessful($testInstallationErrorCode)) {
+            if (!$this->_wasInstallationTestSuccessful($testInstallationErrorCode)) {
                 $message = $this->_getInstallationErrorMessage($testInstallationErrorCode);
-                $this->_abordPluginInstallation($message, 
-                    $this->_installer->getLastError());
+                $this->_abordPluginInstallation($message);
             } else {
                 if (!$this->_installer->activate()) {
                     $message = __('Could not activate plug-in: activation failure.', 'livepayments-mp-wc');
-                    $this->_displayActivationErrrorMessage($message, 
-                        $this->_installer->getLastError());
+                    $this->_displayActivationErrrorMessage($message);
                 }
             }
         }
 
         private function _wasInstallationTestSuccessful($testInstallationErrorCode) {
-            return $testInstallationErrorCode === Installer::INSTALL_OK;
+            return Installer::wasInstallationTestSuccessful($testInstallationErrorCode);
         }
 
         private function _getInstallationErrorMessage($installationErrorCode) {
+			$this->_loadTextDomain();
             $errors = $this->_getInstallationErrorTranslations();
             return isset($errors[$installationErrorCode]) 
                 ? $errors[$installationErrorCode] 
                 : __('Could not activate plug-in: requirements not met.', 'livepayments-mp-wc');
         }
-
-        private function _displayActivationErrrorMessage($message, $lastInstallerError) {
-            $displayMessage = lvdwcmc_append_error($message, 
-                $lastInstallerError);
-                
-            wp_die($displayMessage, 
-                __('Activation error', 'livepayments-mp-wc'));
+		
+		private function _getInstallationErrorTranslations() {
+            return array(
+                Installer::INCOMPATIBLE_PHP_VERSION 
+                    => sprintf(__('Minimum required PHP version is %s.', 'livepayments-mp-wc'), $this->_env->getRequiredPhpVersion()),
+                Installer::INCOMPATIBLE_WP_VERSION 
+                    => sprintf(__('Minimum required WordPress version is %s.', 'livepayments-mp-wc'), $this->_env->getRequiredWpVersion()),
+                Installer::SUPPORT_MYSQLI_NOT_FOUND 
+                    => __('Mysqli extension was not found on your system or is not fully compatible.', 'livepayments-mp-wc'),
+                Installer::SUPPORT_OPENSSL_NOT_FOUND 
+                    => __('Openssl extension was not found on your system or is not fully compatible.', 'livepayments-mp-wc'),
+                Installer::GENERIC_ERROR 
+                    => __('The installation failed.', 'livepayments-mp-wc')
+            );
         }
 
-        private function _abordPluginInstallation($message, $lastInstallerError) {
-            deactivate_plugins(plugin_basename(LVD_WCMC_MAIN));
+        private function _displayActivationErrrorMessage($message) {
+            $displayMessage = lvdwcmc_append_error($message, 
+                $this->_installer->getLastError());
+				
+			$displayTitle = __('Activation error', 
+                'livepayments-mp-wc');
+                
+            wp_die($displayMessage, $displayTitle);
+        }
 
-            $this->_displayActivationErrrorMessage($message, 
-                $lastInstallerError);
+        private function _abordPluginInstallation($message) {
+            deactivate_plugins(plugin_basename(LVD_WCMC_MAIN));
+            $this->_displayActivationErrrorMessage($message);
         }
 
         public function onDeactivatePlugin() {
@@ -236,14 +255,6 @@ namespace LvdWcMc {
             return current_user_can('activate_plugins');
         }
 
-        public function onAdminNoticesRenderMissingPluginsWarning() {
-            $data = new \stdClass();
-            $data->missingPlugins = $this->_pluginDependencyChecker
-                ->getMissingRequiredPlugins();
-            echo $this->_viewEngine->renderView('lvdwcmc-admin-notices-missing-required-plugins.php', 
-                $data);
-        }
-
         public function onPluginsLoaded() {
             if ($this->_checkIfDependenciesSatisfied()) {
                 $this->_setupLogging();
@@ -265,6 +276,14 @@ namespace LvdWcMc {
 
         private function _registerMissingPluginsWarning() {
             add_action('admin_notices', array($this, 'onAdminNoticesRenderMissingPluginsWarning'));
+        }
+		
+		public function onAdminNoticesRenderMissingPluginsWarning() {
+            $data = new \stdClass();
+            $data->missingPlugins = $this->_pluginDependencyChecker
+                ->getMissingRequiredPlugins();
+            echo $this->_viewEngine->renderView('lvdwcmc-admin-notices-missing-required-plugins.php', 
+                $data);
         }
 
         public function onPluginsRestApiInit() {
@@ -291,7 +310,7 @@ namespace LvdWcMc {
         }
 
         public function getPluginSettingsScriptTranslations() {
-            return array();
+            return TranslatedScriptMessages::getPluginSettingsScriptTranslations();
         }
 
         public function getCommonScriptTranslations() {
@@ -343,23 +362,9 @@ namespace LvdWcMc {
         }
 
         private function _loadTextDomain() {
-            load_plugin_textdomain(LVD_WCMC_TEXT_DOMAIN, false, plugin_basename(LVD_WCMC_LANG_DIR));
-        }
-
-        private function _getInstallationErrorTranslations() {
-            $this->_loadTextDomain();
-            return array(
-                Installer::INCOMPATIBLE_PHP_VERSION 
-                    => sprintf(__('Minimum required PHP version is %s.', 'livepayments-mp-wc'), $this->_env->getRequiredPhpVersion()),
-                Installer::INCOMPATIBLE_WP_VERSION 
-                    => sprintf(__('Minimum required WordPress version is %s.', 'livepayments-mp-wc'), $this->_env->getRequiredWpVersion()),
-                Installer::SUPPORT_MYSQLI_NOT_FOUND 
-                    => __('Mysqli extension was not found on your system or is not fully compatible.', 'livepayments-mp-wc'),
-                Installer::SUPPORT_OPENSSL_NOT_FOUND 
-                    => __('Openssl extension was not found on your system or is not fully compatible.', 'livepayments-mp-wc'),
-                Installer::GENERIC_ERROR 
-                    => __('The installation failed.', 'livepayments-mp-wc')
-            );
+            load_plugin_textdomain(LVD_WCMC_TEXT_DOMAIN, 
+				false, 
+				plugin_basename(LVD_WCMC_LANG_DIR));
         }
 
         private function _checkIfDependenciesSatisfied() {

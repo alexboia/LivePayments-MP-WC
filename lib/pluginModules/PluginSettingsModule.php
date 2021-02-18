@@ -147,7 +147,7 @@ namespace LvdWcMc\PluginModules {
 
                 $response->success = true;
             } else {
-                $response->message = esc_html__('The settings could not be saved. Please try again.', 'livepayments-mp-wcs');
+                $response->message = esc_html__('The settings could not be saved. Please try again.', 'livepayments-mp-wc');
             }
 
             return $response;

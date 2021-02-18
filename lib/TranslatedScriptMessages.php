@@ -108,6 +108,14 @@ namespace LvdWcMc {
             );
         }
 
+        public static function getPluginSettingsScriptTranslations() {
+            return array(
+                'msgSaveOk' => __('The settings have been successfully saved.', 'livepayments-mp-wc'),
+                'errSaveFailGeneric' => __('The settings could not be saved. Please try again.', 'livepayments-mp-wc'),
+                'errSaveFailNetwork' => __('The settings could not be saved. Please try again.', 'livepayments-mp-wc')
+            );
+        }
+
         public static function getCommonScriptTranslations() {
             return array(
                 'lblLoading' => __('Please wait...', 'livepayments-mp-wc')

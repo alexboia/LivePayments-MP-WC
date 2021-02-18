@@ -79,6 +79,10 @@ namespace LvdWcMc {
         public function __construct() {
             $this->_env = lvdwcmc_get_env();
         }
+		
+		public static function wasInstallationTestSuccessful($testInstallationErrorCode) {
+            return $testInstallationErrorCode === self::INSTALL_OK;
+        }
 
         /**
          * Retrieves the current plug-in version (not the currently installed one, 

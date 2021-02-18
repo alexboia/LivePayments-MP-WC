@@ -1,8 +1,4 @@
 <?php
-
-use LvdWcMc\Settings;
-use LvdWcMc\MobilpayCreditCardGateway;
-
 /**
  * Copyright (c) 2019-2021 Alexandru Boia
  *
@@ -32,6 +28,9 @@ use LvdWcMc\MobilpayCreditCardGateway;
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+use LvdWcMc\Settings;
+use LvdWcMc\MobilpayCreditCardGateway;
 
 function lvd_wcmc_init_autoloader() {
    require_once LVD_WCMC_LIB_DIR . '/Autoloader.php';
@@ -221,6 +220,7 @@ function lvdwcmc_get_env() {
  */
 function lvdwcmc_plugin() {
    static $plugin = null;
+
    if ($plugin === null) {
 		$plugin = new \LvdWcMc\Plugin(array(
 			'mediaIncludes' => array(
@@ -229,6 +229,7 @@ function lvdwcmc_plugin() {
         	)
       	));
    }
+
    return $plugin;
 }
 
