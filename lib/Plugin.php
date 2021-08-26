@@ -175,7 +175,7 @@ namespace LvdWcMc {
             $testInstallationErrorCode = $this->_installer->canBeInstalled();
             if (!$this->_wasInstallationTestSuccessful($testInstallationErrorCode)) {
                 $message = $this->_getInstallationErrorMessage($testInstallationErrorCode);
-                $this->_abordPluginInstallation($message);
+                $this->_abortPluginInstallation($message);
             } else {
                 if (!$this->_installer->activate()) {
                     $message = __('Could not activate plug-in: activation failure.', 'livepayments-mp-wc');
@@ -221,7 +221,7 @@ namespace LvdWcMc {
             wp_die($displayMessage, $displayTitle);
         }
 
-        private function _abordPluginInstallation($message) {
+        private function _abortPluginInstallation($message) {
             deactivate_plugins(plugin_basename(LVD_WCMC_MAIN));
             $this->_displayActivationErrrorMessage($message);
         }
