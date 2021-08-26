@@ -9,7 +9,7 @@
  * Plugin URI: https://github.com/alexboia/LivePayments-MP-WC
  * Text Domain: livepayments-mp-wc
  * WC requires at least: 3.2.0
- * WC tested up to: 5.0.0
+ * WC tested up to: 5.6.0
  */
 
 /**
