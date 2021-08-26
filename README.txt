@@ -3,8 +3,8 @@ Contributors: alexandruboia
 Donate link: https://ko-fi.com/alexandruboia
 Tags: payment, card, mobilpay, creditcard, woocommerce
 Requires at least: 5.0
-Tested up to: 5.6.1
-Stable tag: 0.1.5
+Tested up to: 5.8.0
+Stable tag: 0.1.6
 Requires PHP: 5.6.2
 License: BSD New License
 License URI: https://opensource.org/licenses/BSD-3-Clause
@@ -78,6 +78,10 @@ Head over to the plug-in's GitHub page (https://github.com/alexboia/LivePayments
 
 == Changelog ==
 
+= 0.1.6 =
+* Fixed "WooCommerce 5.6 Analytics -> Overview not working #16"
+* Fixed "The plugin's loading indicator overlaps with WooCommerce's loading indicator #14"
+
 = 0.1.5 =
 * Fixed two issues: activation error + missing romanian translations for settings page.
 
@@ -102,6 +106,9 @@ Fixed minor usability issues.
 First officially distributed version.
 
 == Upgrade Notice ==
+
+= 0.1.6 =
+Update to version 0.1.6 for compatibility updates with WordPress 5.8.0 and WooCommerce 5.6.0.
 
 = 0.1.5 =
 Update to version 0.1.5 for fixed activation error + missing romanian translations for settings page.
