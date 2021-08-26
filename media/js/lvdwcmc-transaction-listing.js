@@ -29,131 +29,131 @@
  */
 
 (function($) {
-    "use strict";
+	"use strict";
 
-    var _context = null;
-    var _tplTransactionDetails = null;
+	var _context = null;
+	var _tplTransactionDetails = null;
 
-    function _getContextFromInlineData() {
-        return {
-            ajaxBaseUrl: window['lvdwcmc_ajaxBaseUrl'],
-            transactionDetailsAction: window['lvdwcmc_transactionDetailsAction'],
-            transactionDetailsNonce: window['lvdwcmc_transactionDetailsNonce']
-        }
-    }
+	function _getContextFromInlineData() {
+		return {
+			ajaxBaseUrl: window['lvdwcmc_ajaxBaseUrl'],
+			transactionDetailsAction: window['lvdwcmc_transactionDetailsAction'],
+			transactionDetailsNonce: window['lvdwcmc_transactionDetailsNonce']
+		}
+	}
 
-    function _getAjaxGetTransactionDetailsUrl(transactionId) {
-        return URI(_context.ajaxBaseUrl)
-            .addSearch('action', _context.transactionDetailsAction)
-            .addSearch('lvdwcmc_nonce', _context.transactionDetailsNonce)
-            .addSearch('transaction_id', transactionId)
-            .toString();
-    }
+	function _getAjaxGetTransactionDetailsUrl(transactionId) {
+		return URI(_context.ajaxBaseUrl)
+			.addSearch('action', _context.transactionDetailsAction)
+			.addSearch('lvdwcmc_nonce', _context.transactionDetailsNonce)
+			.addSearch('transaction_id', transactionId)
+			.toString();
+	}
 
-    function _toastMessage(success, message) {
-        toastr[success ? 'success' : 'error'](message);
-    }
+	function _toastMessage(success, message) {
+		toastr[success ? 'success' : 'error'](message);
+	}
 
-    function _showProgress() {
-        lvdwcmc.showPleaseWait();
-    }
+	function _showProgress() {
+		lvdwcmc.showPleaseWait();
+	}
 
-    function _hideProgress() {
-        lvdwcmc.hidePleaseWait();
-    }
+	function _hideProgress() {
+		lvdwcmc.hidePleaseWait();
+	}
 
-    function _loadDetails(transactionId) {
-        _showProgress();
-        $.ajax(_getAjaxGetTransactionDetailsUrl(transactionId), {
-            type: 'GET',
-            dataType: 'json',
-        }).done(function(data, status, xhr) {
-            _hideProgress();
-            if (_transactionDetailsSuccessfullyLoaded(data)) {
-                var $html = $(_renerDetailsHtml(data.transaction));
-                _displayTransactionDetailsWindow($html);
-            } else {
-                _toastMessage(false, lvdwcmcTransactionsListL10n.errCannotLoadTransactionDetails);
-            }
-        }).fail(function() {
-            _hideProgress();
-            _toastMessage(false, lvdwcmcTransactionsListL10n.errCannotLoadTransactionDetailsNetwork);
-        });
-    }
+	function _loadDetails(transactionId) {
+		_showProgress();
+		$.ajax(_getAjaxGetTransactionDetailsUrl(transactionId), {
+			type: 'GET',
+			dataType: 'json',
+		}).done(function(data, status, xhr) {
+			_hideProgress();
+			if (_transactionDetailsSuccessfullyLoaded(data)) {
+			    var $html = $(_renerDetailsHtml(data.transaction));
+			    _displayTransactionDetailsWindow($html);
+			} else {
+			    _toastMessage(false, lvdwcmcTransactionsListL10n.errCannotLoadTransactionDetails);
+			}
+		}).fail(function() {
+			_hideProgress();
+			_toastMessage(false, lvdwcmcTransactionsListL10n.errCannotLoadTransactionDetailsNetwork);
+		});
+	}
 
-    function _transactionDetailsSuccessfullyLoaded(data) {
-        return data 
-            && data.success 
-            && data.transaction != null;
-    }
+	function _transactionDetailsSuccessfullyLoaded(data) {
+		return data 
+			&& data.success 
+			&& data.transaction != null;
+	}
 
-    function _renerDetailsHtml(transaction) {
-        if (_tplTransactionDetails == null) {
-            _tplTransactionDetails = kite('#lvdwcmc-tpl-transaction-details');
-        }
-        return _tplTransactionDetails({
-            transaction: transaction
-        });
-    }
+	function _renerDetailsHtml(transaction) {
+		if (_tplTransactionDetails == null) {
+			_tplTransactionDetails = kite('#lvdwcmc-tpl-transaction-details');
+		}
+		return _tplTransactionDetails({
+			transaction: transaction
+		});
+	}
 
-    function _displayTransactionDetailsWindow($detailsHtml) {
-        $.blockUI({
-            message: $detailsHtml,
-            css: {
-                width: '680px',
-                height: 'auto',
-                top: '100px',
-                left: 'calc(50% - 340px)',
-                border: '0px none',
-                boxShadow: '0 5px 15px rgba(0, 0, 0, 0.7)'
-            },
+	function _displayTransactionDetailsWindow($detailsHtml) {
+		$.blockUI({
+			message: $detailsHtml,
+			css: {
+				width: '680px',
+				height: 'auto',
+				top: '100px',
+				left: 'calc(50% - 340px)',
+				border: '0px none',
+				boxShadow: '0 5px 15px rgba(0, 0, 0, 0.7)'
+			},
 
-            onBlock: function() {
-                lvdwcmc.disableWindowScroll();
-            }
-        });
-    }
+			onBlock: function() {
+				lvdwcmc.disableWindowScroll();
+			}
+		});
+	}
 
-    function _loadDetailsForTargetTransaction($elementWithAction) { 
-        var transactionId = parseInt($elementWithAction.attr('data-transactionId'));
-        if (!isNaN(transactionId) && transactionId > 0) {
-            _loadDetails(transactionId);
-        }
-    }
+	function _loadDetailsForTargetTransaction($elementWithAction) { 
+		var transactionId = parseInt($elementWithAction.attr('data-transactionId'));
+		if (!isNaN(transactionId) && transactionId > 0) {
+			_loadDetails(transactionId);
+		}
+	}
 
-    function _closeDetails() {
-        $.unblockUI({
-            onUnblock: function() {
-                lvdwcmc.enableWindowScroll();
-            }
-        });
-    }
+	function _closeDetails() {
+		$.unblockUI({
+			onUnblock: function() {
+				lvdwcmc.enableWindowScroll();
+			}
+		});
+	}
 
-    function _initToastMessages() {
-        toastr.options = $.extend(toastr.options, {
-            target: 'body',
-            positionClass: 'toast-bottom-right',
-            timeOut: 4000
-        });
-    }
+	function _initToastMessages() {
+		toastr.options = $.extend(toastr.options, {
+			target: 'body',
+			positionClass: 'toast-bottom-right',
+			timeOut: 4000
+		});
+	}
 
-    function _initListeners() {
-        $('#lvdwcmc-tx-listing').on('click', 'a.lvdwcmc-tx-action', function(e) {
-            _loadDetailsForTargetTransaction($(this));
-        });
+	function _initListeners() {
+		$('#lvdwcmc-tx-listing').on('click', 'a.lvdwcmc-tx-action', function(e) {
+			_loadDetailsForTargetTransaction($(this));
+		});
 
-        $(document).on('click', '#lvdwcmc-admin-transaction-details-close', function() {
-            _closeDetails();
-        });
-    }
+		$(document).on('click', '#lvdwcmc-admin-transaction-details-close', function() {
+			_closeDetails();
+		});
+	}
 
-    function _initState() {
-        _context = _getContextFromInlineData();
-    }
+	function _initState() {
+		_context = _getContextFromInlineData();
+	}
 
-    $(document).ready(function() {
-        _initState();
-        _initToastMessages();
-        _initListeners();
-    });
+	$(document).ready(function() {
+		_initState();
+		_initToastMessages();
+		_initListeners();
+	});
 })(jQuery);

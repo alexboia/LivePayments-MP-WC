@@ -79,9 +79,9 @@ namespace LvdWcMc\PluginModules {
 
         private function _registerWebPageAssets() {
             add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueScripts'), 9998);
+                array($this, 'onAdminEnqueueScripts'), 99998);
             add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueStyles'), 9998);
+                array($this, 'onAdminEnqueueStyles'), 99998);
         }
 
         public function onAdminEnqueueScripts() {

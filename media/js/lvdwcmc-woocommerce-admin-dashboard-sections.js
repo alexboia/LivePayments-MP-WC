@@ -29,390 +29,434 @@
  */
 
 (function($, wp, wc) {
-    "use strict";
+	"use strict";
 
-    var STORE_KEY = 'lvd/livepayments-mp-wc/transaction-reporting';
+	var STORE_KEY = 'lvd/livepayments-mp-wc/transaction-reporting';
 
-    var e = wp.element.createElement;
-    var apiFetch = wp.apiFetch;
-    
-    var WpComponent = wp.element.Component;
-    var WcSpinner = wc.components.Spinner;
-    var WcEmptyContent = wc.components.EmptyContent;
-    var WcCard = wc.components.Card;
-    var WcSectionHeader = wc.components.SectionHeader;
+	var e = wp.element.createElement;
+	var apiFetch = wp.apiFetch;
+	
+	var WpComponent = wp.element.Component;
+	var WcSpinner = wc.components.Spinner;
+	var WcEmptyContent = wc.components.EmptyContent;
+	var WcCard = wc.components.Card;
+	var WcSectionHeader = wc.components.SectionHeader;
 
-    var initialState = {
-        transactionsStatusCounts: _getEmptyData(),
-        lastTransctionDetails: _getEmptyData()
-    };
+	var WpCard = wp.components.Card;
+	var WpCardHeader = wp.components.CardHeader;
+	var WpCardBody = wp.components.CardBody;
 
-    var actionCodes = {
-        LOAD_TRANSACTIONS_STATUS_COUNTS: 'LVDWCMC_LOAD_TRANSACTIONS_STATUS_COUNTS',
-        SET_TRANSACTIONS_STATUS_COUNTS: 'LVDWCMC_SET_TRANSACTIONS_STATUS_COUNTS',
-        LOAD_LAST_TRANSACTION_DETAILS: 'LVDWCMC_LOAD_LAST_TRANSACTION_DETAILS',
-        SET_LAST_TRANSACTION_DETAILS: 'LVDWCMC_SET_LAST_TRANSACTION_DETAILS'
-    };
+	var initialState = {
+		transactionsStatusCounts: _getEmptyData(),
+		lastTransctionDetails: _getEmptyData()
+	};
 
-    var storeActions = {
-        setTransactionsStatusCounts: function(countsData) {
-            return {
-                type: actionCodes.SET_TRANSACTIONS_STATUS_COUNTS,
-                countsData: countsData
-            };
-        },
-        loadTransactionsStatusCounts: function(fromUrl) {
-            return {
-                type: actionCodes.LOAD_TRANSACTIONS_STATUS_COUNTS,
-                path: fromUrl
-            };
-        },
-        setLastTransactionDetails: function(txDetailsData) {
-            return {
-                type: actionCodes.SET_LAST_TRANSACTION_DETAILS,
-                txDetailsData: txDetailsData
-            };
-        },
-        loadLastTransactionDetails: function(fromUrl) {
-            return {
-                type: actionCodes.LOAD_LAST_TRANSACTION_DETAILS,
-                path: fromUrl
-            };
-        }
-    };
+	var actionCodes = {
+		LOAD_TRANSACTIONS_STATUS_COUNTS: 'LVDWCMC_LOAD_TRANSACTIONS_STATUS_COUNTS',
+		SET_TRANSACTIONS_STATUS_COUNTS: 'LVDWCMC_SET_TRANSACTIONS_STATUS_COUNTS',
+		LOAD_LAST_TRANSACTION_DETAILS: 'LVDWCMC_LOAD_LAST_TRANSACTION_DETAILS',
+		SET_LAST_TRANSACTION_DETAILS: 'LVDWCMC_SET_LAST_TRANSACTION_DETAILS'
+	};
 
-    var storeSelectors = {
-        getTransactionsStatusCounts: function(state) {
-            return $.extend({}, state.transactionsStatusCounts);
-        },
-        getLastTransactionDetails: function(state) {
-            return $.extend({}, state.lastTransctionDetails);
-        }
-    };
+	var storeActions = {
+		setTransactionsStatusCounts: function(countsData) {
+			return {
+				type: actionCodes.SET_TRANSACTIONS_STATUS_COUNTS,
+				countsData: countsData
+			};
+		},
+		loadTransactionsStatusCounts: function(fromUrl) {
+			return {
+				type: actionCodes.LOAD_TRANSACTIONS_STATUS_COUNTS,
+				path: fromUrl
+			};
+		},
+		setLastTransactionDetails: function(txDetailsData) {
+			return {
+				type: actionCodes.SET_LAST_TRANSACTION_DETAILS,
+				txDetailsData: txDetailsData
+			};
+		},
+		loadLastTransactionDetails: function(fromUrl) {
+			return {
+				type: actionCodes.LOAD_LAST_TRANSACTION_DETAILS,
+				path: fromUrl
+			};
+		}
+	};
 
-    var storeResolvers = {
-        getTransactionsStatusCounts: _createResolver({
-            selectorName: 'getTransactionsStatusCounts',
-            path: '/livepayments-mp-wc/reports/transctions-status-counts',
-            onBeforeLoadSelectorData: function() {
-                _dispatch().loadTransactionsStatusCounts()    
-            },
-            onSelectorDataLoaded: function(data) {
-                _dispatch().setTransactionsStatusCounts(data);
-            },
-            onSelectorDataFailedToLoad: function(data) {
-                _dispatch().setTransactionsStatusCounts(data);
-            }
-        }),
+	var storeSelectors = {
+		getTransactionsStatusCounts: function(state) {
+			return $.extend({}, state.transactionsStatusCounts);
+		},
+		getLastTransactionDetails: function(state) {
+			return $.extend({}, state.lastTransctionDetails);
+		}
+	};
 
-        getLastTransactionDetails: _createResolver({
-            selectorName: 'getLastTransactionDetails',
-            path: '/livepayments-mp-wc/reports/last-transaction-details',
-            onBeforeLoadSelectorData: function() {
-                _dispatch().loadLastTransactionDetails()    
-            },
-            onSelectorDataLoaded: function(data) {
-                _dispatch().setLastTransactionDetails(data);
-            },
-            onSelectorDataFailedToLoad: function(data) {
-                _dispatch().setLastTransactionDetails(data);
-            }
-        })
-    };
+	var storeResolvers = {
+		getTransactionsStatusCounts: _createResolver({
+			selectorName: 'getTransactionsStatusCounts',
+			path: '/livepayments-mp-wc/reports/transctions-status-counts',
+			onBeforeLoadSelectorData: function() {
+				_dispatch().loadTransactionsStatusCounts()    
+			},
+			onSelectorDataLoaded: function(data) {
+				_dispatch().setTransactionsStatusCounts(data);
+			},
+			onSelectorDataFailedToLoad: function(data) {
+				_dispatch().setTransactionsStatusCounts(data);
+			}
+		}),
 
-    function _dispatch() {
-        return wp.data.dispatch(STORE_KEY);
-    };
+		getLastTransactionDetails: _createResolver({
+			selectorName: 'getLastTransactionDetails',
+			path: '/livepayments-mp-wc/reports/last-transaction-details',
+			onBeforeLoadSelectorData: function() {
+				_dispatch().loadLastTransactionDetails()    
+			},
+			onSelectorDataLoaded: function(data) {
+				_dispatch().setLastTransactionDetails(data);
+			},
+			onSelectorDataFailedToLoad: function(data) {
+				_dispatch().setLastTransactionDetails(data);
+			}
+		})
+	};
 
-    function _select() {
-        return wp.data.select(STORE_KEY);
-    }
+	function _dispatch() {
+		return wp.data.dispatch(STORE_KEY);
+	};
 
-    function _setStartedResolutionIfNeeded(selector) {
-        if (!_select().hasStartedResolution(selector)) {
-            _dispatch().startResolution(selector);
-        }
-    }
+	function _select() {
+		return wp.data.select(STORE_KEY);
+	}
 
-    function _setFinishedResolution(selector) {
-        _dispatch().finishResolution(selector);
-    }
+	function _setStartedResolutionIfNeeded(selector) {
+		if (!_select().hasStartedResolution(selector)) {
+			_dispatch().startResolution(selector);
+		}
+	}
 
-    function _createResolver(spec) {
-        return function() {
-            _setStartedResolutionIfNeeded(spec.selectorName);
-            spec.onBeforeLoadSelectorData();
-            apiFetch({ path: spec.path, cache: 'no-cache' })
-                .then(function(result) {
-                    spec.onSelectorDataLoaded(_getDataWithResult(result));
-                    _setFinishedResolution(spec.selectorName);
-                }).catch(function(reason) {
-                    spec.onSelectorDataFailedToLoad(_getFailedLoadedData());
-                    _setFinishedResolution(spec.selectorName);
-                });
-        };
-    }
+	function _setFinishedResolution(selector) {
+		_dispatch().finishResolution(selector);
+	}
 
-    function _stateReducer(state, action) {
-        if (!state) {
-            state = initialState;
-        }
+	function _createResolver(spec) {
+		return function() {
+			_setStartedResolutionIfNeeded(spec.selectorName);
+			spec.onBeforeLoadSelectorData();
+			apiFetch({ path: spec.path, cache: 'no-cache' })
+				.then(function(result) {
+					spec.onSelectorDataLoaded(_getDataWithResult(result));
+					_setFinishedResolution(spec.selectorName);
+				}).catch(function(reason) {
+					spec.onSelectorDataFailedToLoad(_getFailedLoadedData());
+					_setFinishedResolution(spec.selectorName);
+				});
+		};
+	}
 
-        switch (action.type) {
-            case actionCodes.LOAD_TRANSACTIONS_STATUS_COUNTS:
-                state = $.extend(state, {
-                    transactionsStatusCounts:_getDataLoading()
-                });
-                break;
-            case actionCodes.LOAD_LAST_TRANSACTION_DETAILS:
-                state = $.extend(state, {
-                    lastTransctionDetails: _getDataLoading()
-                });
-                break;
-            case actionCodes.SET_TRANSACTIONS_STATUS_COUNTS:
-                state = $.extend(state, {
-                    transactionsStatusCounts: action.countsData
-                });
-                break;
-            case actionCodes.SET_LAST_TRANSACTION_DETAILS:
-                state = $.extend(state, {
-                    lastTransctionDetails: action.txDetailsData
-                });
-                break;
-        }
+	function _stateReducer(state, action) {
+		if (!state) {
+			state = initialState;
+		}
 
-        return state;
-    }
+		switch (action.type) {
+			case actionCodes.LOAD_TRANSACTIONS_STATUS_COUNTS:
+				state = $.extend(state, {
+					transactionsStatusCounts:_getDataLoading()
+				});
+				break;
+			case actionCodes.LOAD_LAST_TRANSACTION_DETAILS:
+				state = $.extend(state, {
+					lastTransctionDetails: _getDataLoading()
+				});
+				break;
+			case actionCodes.SET_TRANSACTIONS_STATUS_COUNTS:
+				state = $.extend(state, {
+					transactionsStatusCounts: action.countsData
+				});
+				break;
+			case actionCodes.SET_LAST_TRANSACTION_DETAILS:
+				state = $.extend(state, {
+					lastTransctionDetails: action.txDetailsData
+				});
+				break;
+		}
 
-    function _getEmptyData() {
-        return {
-            items: null,
-            loaded: false,
-            loading: false,
-            success: false
-        };
-    }
+		return state;
+	}
 
-    function _getDataLoading() {
-        return $.extend(_getEmptyData(), {
-            loading: true
-        });
-    }
+	function _getEmptyData() {
+		return {
+			items: null,
+			loaded: false,
+			loading: false,
+			success: false
+		};
+	}
 
-    function _getDataWithResult(result) {
-        return {
-            items: result.data,
-            loaded: true,
-            loading: false,
-            success: !!result && !!result.success
-        };
-    }
+	function _getDataLoading() {
+		return $.extend(_getEmptyData(), {
+			loading: true
+		});
+	}
 
-    function _getFailedLoadedData() {
-        return {
-            loaded: true,
-            loading: false,
-            success: false,
-            items: null
-        };
-    }
+	function _getDataWithResult(result) {
+		return {
+			items: result.data,
+			loaded: true,
+			loading: false,
+			success: !!result && !!result.success
+		};
+	}
 
-    function _createComponent(spec) {
-        function LvdWcMcComponent(props) {
-            wp.element.Component.call(this, props);
-            this.props = props;
-        }
+	function _getFailedLoadedData() {
+		return {
+			loaded: true,
+			loading: false,
+			success: false,
+			items: null
+		};
+	}
 
-        LvdWcMcComponent.prototype = WpComponent.prototype;
-        LvdWcMcComponent.prototype.constructor = LvdWcMcComponent;
+	function _createComponent(spec) {
+		function LvdWcMcComponent(props) {
+			wp.element.Component.call(this, props);
+			this.props = props;
+		}
 
-        for (var key in spec) {
-            if (spec.hasOwnProperty(key)) {
-                LvdWcMcComponent.prototype[key] = spec[key];
-            }
-        }
+		LvdWcMcComponent.prototype = WpComponent.prototype;
+		LvdWcMcComponent.prototype.constructor = LvdWcMcComponent;
 
-        return LvdWcMcComponent;
-    }
+		for (var key in spec) {
+			if (spec.hasOwnProperty(key)) {
+				LvdWcMcComponent.prototype[key] = spec[key];
+			}
+		}
 
-    function _renderLoadingIndicator() {
-        return e('div', {
-            className: 'lvdwcmc-dashboard-panel-loading-container'
-        }, e(WcSpinner, {
-            className: 'lvdwcmc-dashboard-panel-loading'
-        }, null));
-    }
+		return LvdWcMcComponent;
+	}
 
-    function _renderContentWarning(title, message) {
-        return e(WcEmptyContent, {
-            title: title,
-            message: message,
-            actionLabel: lvdwcmcWooAdminDashboardSectionsL10n.lblReloadPageBtn,
-            illustrationWidth: 180,
-            actionCallback: function() {
-                window.location.reload();
-            }
-        });
-    }
+	function _renderLoadingIndicator() {
+		return e('div', {
+			className: 'lvdwcmc-dashboard-panel-loading-container'
+		}, e(WcSpinner, {
+			className: 'lvdwcmc-dashboard-panel-loading'
+		}, null));
+	}
 
-    function _renderSectionHeader() {
-        return e(WcSectionHeader, {
-            title: lvdwcmcWooAdminDashboardSectionsL10n.lblSectionTitle
-        }, null);
-    }
+	function _renderContentWarning(title, message) {
+		return e(WcEmptyContent, {
+			title: title,
+			message: message,
+			actionLabel: lvdwcmcWooAdminDashboardSectionsL10n.lblReloadPageBtn,
+			illustrationWidth: 180,
+			actionCallback: function() {
+				window.location.reload();
+			}
+		});
+	}
 
-    function _renderCard(title, content) {
-        return e(WcCard, {
-            className: 'woocommerce-dashboard__lvdwcmc-dashboard-card',
-            title: title
-        }, content);
-    }
+	function _renderSectionHeader() {
+		return e(WcSectionHeader, {
+			title: lvdwcmcWooAdminDashboardSectionsL10n.lblSectionTitle
+		}, null);
+	}
 
-    function _renderTransactionStatusCountsCardContents(countsData) {
-        var items = [];
-        var content = null;
+	function _renderCard(title, content) {
+		if (_isWcCardApiAvailable()) {
+			return _renderWcCard(title, content);
+		} else if (_isWpCardApiAvailable()) {
+			return _renderWpCard(title, content);
+		} else {
+			return _renderFailoverCard(title, content);
+		}
+	}
 
-        if (countsData.items) {
-            for (status in countsData.items) {
-                if (countsData.items.hasOwnProperty(status)) {
-                    var countItem = countsData.items[status];
-                    items.push(e('li', { className: status },
-                        e('span', { className: 'lvdwcmc-status-count' }, countItem.count),
-                        e('h5', { className: 'lvdwcmc-status-label' }, countItem.label),
-                        e('div', { className: 'lvdwcmc-clear' }, null)
-                    ));
-                }
-            }
-        }
+	function _isWcCardApiAvailable() {
+		return !!WcCard;
+	}
 
-        if(items.length > 0) {
-            content = e('ul', { 
-                className:'lvdwcmc-dashboard-transaction-status' 
-            }, items);
-        } else {
-            content = _renderContentWarning(
-                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
-                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTransactionsStatusCounts
-            );
-        }
+	function _renderWcCard(title, content) {
+		return e(WcCard, {
+			className: 'woocommerce-dashboard__lvdwcmc-dashboard-card',
+			title: title
+		}, content);
+	}
 
-        return content;
-    }
+	function _isWpCardApiAvailable() {
+		return!!WpCard 
+			&& !!WpCardHeader 
+			&& !!WpCardBody;
+	}
 
-    function _renderTransactionStatusCountsCard(countsData) {
-        var content = null;
+	function _renderWpCard(title, content) {
+		return e(WpCard, {
+				className: 'woocommerce-dashboard__lvdwcmc-dashboard-card'
+			}, 
+			e(WpCardHeader, {}, e('h3', {
+				className: 'woocommerce-card__header_wpcard'
+			}, title)),
+			e(WpCardBody, {}, content)
+		);
+	}
 
-        if (countsData.loaded) {
-            if (countsData.success) {
-                content = _renderTransactionStatusCountsCardContents(countsData);
-            } else {
-                content = _renderContentWarning(
-                    lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTitle, 
-                    lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTransactionsStatusCounts
-                );
-            }
-        } else if (countsData.loading) {
-            content = _renderLoadingIndicator();
-        }
+	function _renderFailoverCard(title, content) {
+		return null;
+	}
 
-        return _renderCard(lvdwcmcWooAdminDashboardSectionsL10n.lblTitleTransactionsStatusCounts, 
-            content);
-    }
+	function _renderTransactionStatusCountsCardContents(countsData) {
+		var items = [];
+		var content = null;
 
-    function _renderLastTransDetailsCardContents(txDetailsData) {
-        var items = [];
-        var content = null;
+		if (countsData.items) {
+			for (status in countsData.items) {
+				if (countsData.items.hasOwnProperty(status)) {
+					var itemKey = 'txCountsItem-' + items.length;
+					var countItem = countsData.items[status];
+					
+					items.push(e('li', { className: status, key: itemKey },
+						e('span', { className: 'lvdwcmc-status-count' }, countItem.count),
+						e('h5', { className: 'lvdwcmc-status-label' }, countItem.label),
+						e('div', { className: 'lvdwcmc-clear' }, null)
+					));
+				}
+			}
+		}
 
-        if (txDetailsData.items) {
-            for (var i = 0; i < txDetailsData.items.length; i ++) {
-                var txDataItem = txDetailsData.items[i];
-                items.push(e('tr', {}, 
-                    e('th', { scope: 'row' }, txDataItem.label),
-                    e('td', { scope: 'row' }, txDataItem.value || '-')
-                ));
-            }
-        }
+		if(items.length > 0) {
+			content = e('ul', { 
+				className:'lvdwcmc-dashboard-transaction-status' 
+			}, items);
+		} else {
+			content = _renderContentWarning(
+				lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
+				lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTransactionsStatusCounts
+			);
+		}
 
-        if(items.length > 0) {
-            content = e('table', { 
-                className:'lvdwcmc-admin-transaction-details-list' 
-            }, e('tbody', {}, items));
-        } else {
-            content = _renderContentWarning(
-                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
-                lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundLastTransactionDetails
-            );
-        }
+		return content;
+	}
 
-        return content;
-    }
+	function _renderTransactionStatusCountsCard(countsData) {
+		var content = null;
 
-    function _renderLastTransDetailsCard(txDetailsData) {
-        var items = [];
-        var content = null;
+		if (countsData.loaded) {
+			if (countsData.success) {
+				content = _renderTransactionStatusCountsCardContents(countsData);
+			} else {
+				content = _renderContentWarning(
+					lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTitle, 
+					lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTransactionsStatusCounts
+				);
+			}
+		} else if (countsData.loading) {
+			content = _renderLoadingIndicator();
+		}
 
-        if (txDetailsData.loaded) {
-            if (txDetailsData.success) {
-                content = _renderLastTransDetailsCardContents(txDetailsData);
-            } else {
-                content = _renderContentWarning(
-                    lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTitle, 
-                    lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorLastTransactionDetails
-                );
-            }
-        } else {
-            content = _renderLoadingIndicator();
-        }
+		return _renderCard(lvdwcmcWooAdminDashboardSectionsL10n.lblTitleTransactionsStatusCounts, 
+			content);
+	}
 
-        return _renderCard(lvdwcmcWooAdminDashboardSectionsL10n.lblTitleLastTransactionDetails, 
-            content);
-    }
+	function _renderLastTransDetailsCardContents(txDetailsData) {
+		var items = [];
+		var content = null;
 
-    function _renderSectionContents(sectionData) {
-         return e('div', {
-            className: 'woocommerce-dashboard__columns'
-        }, 
-            _renderTransactionStatusCountsCard(sectionData.transactionsStatusCounts),
-            _renderLastTransDetailsCard(sectionData.lastTransctionDetails));
-    }
+		if (txDetailsData.items) {
+			for (var i = 0; i < txDetailsData.items.length; i ++) {
+				var txDataItem = txDetailsData.items[i];
+				var itemKey = 'lastTxDetailsItem-' + items.length;
 
-    var TransactionsStatusDashboardSection = _createComponent({
-        render: function() {
-            return e('div', null, 
-                _renderSectionHeader(),
-                _renderSectionContents({
-                    transactionsStatusCounts: this.props.transactionsStatusCounts,
-                    lastTransctionDetails: this.props.lastTransctionDetails
-                }));
-        }
-    });
+				items.push(e('tr', { key: itemKey }, 
+					e('th', { scope: 'row' }, txDataItem.label),
+					e('td', { scope: 'row' }, txDataItem.value || '-')
+				));
+			}
+		}
 
-    //Register store
-    wp.data.registerStore(STORE_KEY, {
-        reducer: _stateReducer,
-        actions: storeActions,
-        selectors: storeSelectors,
-        controls: null,
-        resolvers: storeResolvers
-    });
+		if(items.length > 0) {
+			content = e('table', { 
+				className:'lvdwcmc-admin-transaction-details-list' 
+			}, e('tbody', {}, items));
+		} else {
+			content = _renderContentWarning(
+				lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundTitle, 
+				lvdwcmcWooAdminDashboardSectionsL10n.warnDataNotFoundLastTransactionDetails
+			);
+		}
 
-    //Hook on to the dashboard sections filter
-    wp.hooks.addFilter('woocommerce_dashboard_default_sections', 'lvdwcmc/add-tx-status-dashoard-section', function(sections) {
-        sections.unshift({
-            key: 'lvdwcmc-transactions-status-dashboard-section',
-			component: wp.data.withSelect(function(select, ownProps) {
-                var store = select(STORE_KEY);
-                return {
-                    transactionsStatusCounts: store.getTransactionsStatusCounts(),
-                    lastTransctionDetails: store.getLastTransactionDetails()
-                };
-            })(TransactionsStatusDashboardSection),
-			title: lvdwcmcWooAdminDashboardSectionsL10n.lblSectionTitle,
-			isVisible: true,
-			icon: 'arrow-right-alt',
-			hiddenBlocks: []
-        });
+		return content;
+	}
 
-        return sections;
-    });
+	function _renderLastTransDetailsCard(txDetailsData) {
+		var content = null;
+
+		if (txDetailsData.loaded) {
+			if (txDetailsData.success) {
+				content = _renderLastTransDetailsCardContents(txDetailsData);
+			} else {
+				content = _renderContentWarning(
+					lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorTitle, 
+					lvdwcmcWooAdminDashboardSectionsL10n.errDataLoadingErrorLastTransactionDetails
+				);
+			}
+		} else {
+			content = _renderLoadingIndicator();
+		}
+
+		return _renderCard(lvdwcmcWooAdminDashboardSectionsL10n.lblTitleLastTransactionDetails, 
+			content);
+	}
+
+	function _renderSectionContents(sectionData) {
+		 return e('div', {
+			className: 'woocommerce-dashboard__columns'
+		}, 
+			_renderTransactionStatusCountsCard(sectionData.transactionsStatusCounts),
+			_renderLastTransDetailsCard(sectionData.lastTransctionDetails));
+	}
+
+	var TransactionsStatusDashboardSection = _createComponent({
+		render: function() {
+			return e('div', null, 
+				_renderSectionHeader(),
+				_renderSectionContents({
+					transactionsStatusCounts: this.props.transactionsStatusCounts,
+					lastTransctionDetails: this.props.lastTransctionDetails
+				}));
+		}
+	});
+
+	//Register store
+	wp.data.registerStore(STORE_KEY, {
+		reducer: _stateReducer,
+		actions: storeActions,
+		selectors: storeSelectors,
+		controls: null,
+		resolvers: storeResolvers
+	});
+
+	//Hook on to the dashboard sections filter
+	wp.hooks.addFilter('woocommerce_dashboard_default_sections', 'lvdwcmc/add-tx-status-dashoard-section', function(sections) {
+		if (_isWpCardApiAvailable() || _isWcCardApiAvailable()) {
+			sections.unshift({
+				key: 'lvdwcmc-transactions-status-dashboard-section',
+				component: wp.data.withSelect(function(select, ownProps) {
+					var store = select(STORE_KEY);
+					return {
+						transactionsStatusCounts: store.getTransactionsStatusCounts(),
+						lastTransctionDetails: store.getLastTransactionDetails()
+					};
+				})(TransactionsStatusDashboardSection),
+				title: lvdwcmcWooAdminDashboardSectionsL10n.lblSectionTitle,
+				isVisible: true,
+				icon: 'arrow-right-alt',
+				hiddenBlocks: []
+			});
+		}
+
+		return sections;
+	});
 })(jQuery, wp, wc);

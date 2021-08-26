@@ -53,6 +53,10 @@
                 color: '#fff' 
             },
 
+            overlayCSS: {
+                backgroundImage: 'none'
+            },
+
             onBlock: disableWindowScroll
         });
     }

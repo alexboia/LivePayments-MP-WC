@@ -28,8 +28,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.blockUI.blockOverlay:before {
+ .blockUI.blockOverlay::before {
     content: none;
+    /*because fuck you, that's why*/
+    background: none !important;
+    background-image: none !important;
 }
 
 .lvdwcmc-please-wait-spinner {
