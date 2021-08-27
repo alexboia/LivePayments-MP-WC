@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WC MobilPayments Card 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/livepayments-mp-wc\n"
-"POT-Creation-Date: 2021-08-27 21:07+0300\n"
-"PO-Revision-Date: 2021-08-27 21:14+0300\n"
+"POT-Creation-Date: 2021-08-27 21:37+0300\n"
+"PO-Revision-Date: 2021-08-27 21:38+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ro_RO\n"
@@ -616,27 +616,36 @@ msgstr "Instalarea a eșuat"
 msgid "Activation error"
 msgstr "Eroare la activare"
 
-#: lib/PluginMenu.php:26 lib/PluginMenu.php:27
+#: lib/PluginMenu.php:28 lib/PluginMenu.php:29
 msgid "LivePayments Card Transactions"
 msgstr "Istoric Tranzacții LivePayments"
 
-#: lib/PluginMenu.php:33
+#: lib/PluginMenu.php:35
 msgid "Livepayments-MP-WC"
 msgstr "Livepayments-MP-WC"
 
-#: lib/PluginMenu.php:34 lib/PluginMenu.php:42 views/lvdwcmc-plugin-settings.php:43
+#: lib/PluginMenu.php:36 lib/PluginMenu.php:44 views/lvdwcmc-plugin-settings.php:43
 msgid "LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Settings"
 msgstr "LivePayments - mobilPay Card WooCommerce Payment Gateway - Configurare Plugin"
 
-#: lib/PluginMenu.php:41
+#: lib/PluginMenu.php:43
 msgid "Plugin Settings"
 msgstr "Configurare Plugin"
 
-#: lib/PluginMenu.php:46
+#: lib/PluginMenu.php:48
+msgid "Gateway Settings"
+msgstr "Configurare Gateway"
+
+#: lib/PluginMenu.php:49
+msgid "LivePayments - mobilPay Card WooCommerce Payment Gateway - Gateway Settings"
+msgstr ""
+"LivePayments - mobilPay Card WooCommerce Payment Gateway - Configurare Gateway"
+
+#: lib/PluginMenu.php:53
 msgid "Plugin Diagnostics"
 msgstr "Diagnoză plugin"
 
-#: lib/PluginMenu.php:47 views/lvdwcmc-plugin-diagnostics.php:35
+#: lib/PluginMenu.php:54 views/lvdwcmc-plugin-diagnostics.php:35
 msgid "LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Diagnostics"
 msgstr "LivePayments - mobilPay Card WooCommerce Payment Gateway - Diagnoză plugin"
 
@@ -653,14 +662,14 @@ msgstr "&raquo;"
 msgid "Payment transaction details"
 msgstr "Detalii tranzacție"
 
-#: lib/pluginModules/PluginSettingsModule.php:131
+#: lib/pluginModules/PluginSettingsModule.php:135
 msgid ""
 "Please fill in a valid e-mail address to which diagnostics warnings will be sent."
 msgstr ""
 "Trebuie să introduci adresa de e-mail la care vor fi trimise avertizările "
 "referitoare la starea gateway-ului de plată"
 
-#: lib/pluginModules/PluginSettingsModule.php:151 lib/TranslatedScriptMessages.php:114
+#: lib/pluginModules/PluginSettingsModule.php:155 lib/TranslatedScriptMessages.php:114
 #: lib/TranslatedScriptMessages.php:115
 msgid "The settings could not be saved. Please try again."
 msgstr "Setările nu au putut fi salvate. Te rugăm să reîncerci."
@@ -910,19 +919,19 @@ msgstr "Ștergere"
 msgid "Chose a file from disk"
 msgstr "Alege un fișier de pe disc"
 
-#: views/lvdwcmc-payment-form.php:69
+#: views/lvdwcmc-payment-form.php:93
 msgid "You will be automatically redirected to the payment page in"
 msgstr "Vei fi redirecționat către pagina procesatorului de plăți în"
 
-#: views/lvdwcmc-payment-form.php:71
+#: views/lvdwcmc-payment-form.php:95
 msgid "seconds"
 msgstr "secunde"
 
-#: views/lvdwcmc-payment-form.php:79
+#: views/lvdwcmc-payment-form.php:115
 msgid "Pay via mobilPay&trade;"
 msgstr "Plătește via mobilPay&trade;"
 
-#: views/lvdwcmc-payment-form.php:83
+#: views/lvdwcmc-payment-form.php:131
 msgid ""
 "The payment could not be initialized. This is usually due to an issue with the "
 "store itself, so please contact its administrator."
@@ -930,7 +939,7 @@ msgstr ""
 "Plata nu a putut fi inițializată. Acest lucru se întâmplă de obicei din cauza unei "
 "probleme cu site-ul web, deci te rugăm să contactezi administratorul"
 
-#: views/lvdwcmc-payment-form.php:90
+#: views/lvdwcmc-payment-form.php:150
 msgid "Retry"
 msgstr "Reîncearcă"
 

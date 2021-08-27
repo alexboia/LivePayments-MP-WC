@@ -31,165 +31,169 @@
 
 namespace LvdWcMc\PluginModules {
 
-    use LvdWcMc\Plugin;
-    use LvdWcMc\PluginMenu;
+	use LvdWcMc\Plugin;
+	use LvdWcMc\PluginMenu;
 
-    class PluginSettingsModule extends PluginModule {
-        const ACTION_SAVE_SETTINGS = 'lvdwcmc_save_settings';
+	class PluginSettingsModule extends PluginModule {
+		const ACTION_SAVE_SETTINGS = 'lvdwcmc_save_settings';
 
-        /**
-         * @var \LvdWcMc\WordPressAdminAjaxAction
-         */
-        private $_saveSettingsAction;
+		const MENU_HOOK_ORDER = 10;
 
-        public function __construct(Plugin $plugin) {
-            parent::__construct($plugin);
-            $this->_saveSettingsAction = $this
-                ->_createAdminAjaxAction(self::ACTION_SAVE_SETTINGS, 
-                    array($this, 'saveSettings'), 
-                    true, 
-                    'manage_options');
-        }
+		/**
+		 * @var \LvdWcMc\WordPressAdminAjaxAction
+		 */
+		private $_saveSettingsAction;
 
-        public function load() {
-            $this->_registerWebPageAssets();
-            $this->_registerMenuHook();
+		public function __construct(Plugin $plugin) {
+			parent::__construct($plugin);
+			$this->_saveSettingsAction = $this
+				->_createAdminAjaxAction(self::ACTION_SAVE_SETTINGS, 
+					array($this, 'saveSettings'), 
+					true, 
+					'manage_options');
+		}
 
-            $this->_saveSettingsAction
-                ->register();
-        }
+		public function load() {
+			$this->_registerWebPageAssets();
+			$this->_registerMenuHook();
 
-        private function _registerWebPageAssets() {
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueScripts'), 9998);
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueStyles'), 9998);
-        }
+			$this->_saveSettingsAction
+				->register();
+		}
 
-        public function onAdminEnqueueScripts() {
-            if ($this->_env->isViewingAdminPluginSettingsPage()) {
-                $this->_mediaIncludes->includeScriptPluginSettings(
-                    $this->_plugin->getPluginSettingsScriptTranslations(), 
-                    $this->_plugin->getCommonScriptTranslations()
-                );
-            }
-        }
+		private function _registerWebPageAssets() {
+			add_action('admin_enqueue_scripts', 
+				array($this, 'onAdminEnqueueScripts'), 9998);
+			add_action('admin_enqueue_scripts', 
+				array($this, 'onAdminEnqueueStyles'), 9998);
+		}
 
-        public function onAdminEnqueueStyles() {
-            if ($this->_env->isViewingAdminPluginSettingsPage()) {
-                $this->_mediaIncludes->includeStylePluginSettings();
-            }
-        }
+		public function onAdminEnqueueScripts() {
+			if ($this->_env->isViewingAdminPluginSettingsPage()) {
+				$this->_mediaIncludes->includeScriptPluginSettings(
+					$this->_plugin->getPluginSettingsScriptTranslations(), 
+					$this->_plugin->getCommonScriptTranslations()
+				);
+			}
+		}
 
-        private function _registerMenuHook() {
-            add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
-        }
+		public function onAdminEnqueueStyles() {
+			if ($this->_env->isViewingAdminPluginSettingsPage()) {
+				$this->_mediaIncludes->includeStylePluginSettings();
+			}
+		}
 
-        public function onAddAdminMenuEntries() {
-            $callback = array($this, 'showSettingsForm');
-            PluginMenu::registerMenuEntryWithCallback(PluginMenu::MAIN_ENTRY, 
-                $callback);
-            PluginMenu::registerSubMenuEntryWithCallback(PluginMenu::MAIN_ENTRY, 
-                PluginMenu::SETTINGS_ENTRY, 
-                $callback);
-        }
+		private function _registerMenuHook() {
+			add_action('admin_menu', 
+				array($this, 'onAddAdminMenuEntries'),
+				self::MENU_HOOK_ORDER);
+		}
 
-        public function showSettingsForm() {
-            if (!$this->_currentUserCanManageOptions()) {
-                die;
-            }
+		public function onAddAdminMenuEntries() {
+			$callback = array($this, 'showSettingsForm');
+			PluginMenu::registerMenuEntryWithCallback(PluginMenu::MAIN_ENTRY, 
+				$callback);
+			PluginMenu::registerSubMenuEntryWithCallback(PluginMenu::MAIN_ENTRY, 
+				PluginMenu::SETTINGS_ENTRY, 
+				$callback);
+		}
 
-            $settings = $this->_getSettings();
+		public function showSettingsForm() {
+			if (!$this->_currentUserCanManageOptions()) {
+				die;
+			}
 
-            $data = new \stdClass();
-            $data->ajaxBaseUrl = $this->_getAjaxBaseUrl();
-            $data->saveSettingsAction = self::ACTION_SAVE_SETTINGS;
-            $data->saveSettingsNonce = $this->_saveSettingsAction
-                ->generateNonce();
+			$settings = $this->_getSettings();
 
-            $data->adminEmailAddress = $this->_getBlogAdminEmailAddress();
-            $data->settings = $settings
-                ->asPlainObject();
+			$data = new \stdClass();
+			$data->ajaxBaseUrl = $this->_getAjaxBaseUrl();
+			$data->saveSettingsAction = self::ACTION_SAVE_SETTINGS;
+			$data->saveSettingsNonce = $this->_saveSettingsAction
+				->generateNonce();
 
-            echo $this->_viewEngine->renderView('lvdwcmc-plugin-settings.php', 
-                $data);
-        }
+			$data->adminEmailAddress = $this->_getBlogAdminEmailAddress();
+			$data->settings = $settings
+				->asPlainObject();
 
-        public function saveSettings() {
-            if (!$this->_env->isHttpPost()) {
-                die;
-            }
+			echo $this->_viewEngine->renderView('lvdwcmc-plugin-settings.php', 
+				$data);
+		}
 
-            $settings = $this->_getSettings();
-            $response = lvdwcmc_get_ajax_response();
+		public function saveSettings() {
+			if (!$this->_env->isHttpPost()) {
+				die;
+			}
 
-            $monitorDiagnostics = $this->_getMonitorDiagnosticsFromHttpPost();
+			$settings = $this->_getSettings();
+			$response = lvdwcmc_get_ajax_response();
 
-            if ($monitorDiagnostics) {
-                $sendDiagnosticsWarningToEmail = $this->_getSendDiagnosticsWarningToEmailFromHttpPost();
-                if ($this->_isValidEmailAddress($sendDiagnosticsWarningToEmail)) {
-                    $response->message = __('Please fill in a valid e-mail address to which diagnostics warnings will be sent.', 'livepayments-mp-wc');
-                    return $response;
-                }
-            } else {
-                $sendDiagnosticsWarningToEmail = null;
-            }
+			$monitorDiagnostics = $this->_getMonitorDiagnosticsFromHttpPost();
 
-            $settings->setMonitorDiagnostics($monitorDiagnostics);
-            $settings->setSendDiagnosticsWarningToEmail($sendDiagnosticsWarningToEmail);
-            $settings->setCheckoutAutoRedirectSeconds($this->_getCheckoutAutoRedirectSecondsFromHttpPost());
+			if ($monitorDiagnostics) {
+				$sendDiagnosticsWarningToEmail = $this->_getSendDiagnosticsWarningToEmailFromHttpPost();
+				if ($this->_isValidEmailAddress($sendDiagnosticsWarningToEmail)) {
+					$response->message = __('Please fill in a valid e-mail address to which diagnostics warnings will be sent.', 'livepayments-mp-wc');
+					return $response;
+				}
+			} else {
+				$sendDiagnosticsWarningToEmail = null;
+			}
 
-            if ($settings->saveSettings()) {
-                if ($monitorDiagnostics) {
-                    $this->_scheduleGatewayDiagnosticsCron();
-                } else {
-                    $this->_unscheduleGatewayDiagnosticsCron();
-                }
+			$settings->setMonitorDiagnostics($monitorDiagnostics);
+			$settings->setSendDiagnosticsWarningToEmail($sendDiagnosticsWarningToEmail);
+			$settings->setCheckoutAutoRedirectSeconds($this->_getCheckoutAutoRedirectSecondsFromHttpPost());
 
-                $response->success = true;
-            } else {
-                $response->message = esc_html__('The settings could not be saved. Please try again.', 'livepayments-mp-wc');
-            }
+			if ($settings->saveSettings()) {
+				if ($monitorDiagnostics) {
+					$this->_scheduleGatewayDiagnosticsCron();
+				} else {
+					$this->_unscheduleGatewayDiagnosticsCron();
+				}
 
-            return $response;
-        }
+				$response->success = true;
+			} else {
+				$response->message = esc_html__('The settings could not be saved. Please try again.', 'livepayments-mp-wc');
+			}
 
-        private function _scheduleGatewayDiagnosticsCron() {
-            if (wp_next_scheduled('lvdwcmc_auto_gateway_diagnostics') === false) {
-                wp_schedule_event(time() + 60, 'daily', 'lvdwcmc_auto_gateway_diagnostics');
-            }
-        }
+			return $response;
+		}
 
-        private function _unscheduleGatewayDiagnosticsCron() {
-            if (($timestamp = wp_next_scheduled('lvdwcmc_auto_gateway_diagnostics')) !== false) {
-                wp_unschedule_event($timestamp, 'lvdwcmc_auto_gateway_diagnostics');
-            }
-        }
+		private function _scheduleGatewayDiagnosticsCron() {
+			if (wp_next_scheduled('lvdwcmc_auto_gateway_diagnostics') === false) {
+				wp_schedule_event(time() + 60, 'daily', 'lvdwcmc_auto_gateway_diagnostics');
+			}
+		}
 
-        private function _getMonitorDiagnosticsFromHttpPost() {
-            return isset($_POST['monitorDiagnostics'])
-                ? $_POST['monitorDiagnostics'] === '1'
-                : false;
-        }
+		private function _unscheduleGatewayDiagnosticsCron() {
+			if (($timestamp = wp_next_scheduled('lvdwcmc_auto_gateway_diagnostics')) !== false) {
+				wp_unschedule_event($timestamp, 'lvdwcmc_auto_gateway_diagnostics');
+			}
+		}
 
-        private function _getSendDiagnosticsWarningToEmailFromHttpPost() {
-            return isset($_POST['sendDiagnosticsWarningToEmail'])
-                ? sanitize_email(strip_tags($_POST['sendDiagnosticsWarningToEmail']))
-                : null;
-        }
+		private function _getMonitorDiagnosticsFromHttpPost() {
+			return isset($_POST['monitorDiagnostics'])
+				? $_POST['monitorDiagnostics'] === '1'
+				: false;
+		}
 
-        private function _getCheckoutAutoRedirectSecondsFromHttpPost() {
-            return isset($_POST['checkoutAutoRedirectSeconds'])
-                ? max(intval($_POST['checkoutAutoRedirectSeconds']), 0)
-                : 0;
-        }
+		private function _getSendDiagnosticsWarningToEmailFromHttpPost() {
+			return isset($_POST['sendDiagnosticsWarningToEmail'])
+				? sanitize_email(strip_tags($_POST['sendDiagnosticsWarningToEmail']))
+				: null;
+		}
 
-        private function _isValidEmailAddress($email) {
-            return empty($email) || !is_email($email);
-        }
+		private function _getCheckoutAutoRedirectSecondsFromHttpPost() {
+			return isset($_POST['checkoutAutoRedirectSeconds'])
+				? max(intval($_POST['checkoutAutoRedirectSeconds']), 0)
+				: 0;
+		}
 
-        private function _getBlogAdminEmailAddress() {
-            return get_option('admin_email');
-        }
-    }
+		private function _isValidEmailAddress($email) {
+			return empty($email) || !is_email($email);
+		}
+
+		private function _getBlogAdminEmailAddress() {
+			return get_option('admin_email');
+		}
+	}
 }

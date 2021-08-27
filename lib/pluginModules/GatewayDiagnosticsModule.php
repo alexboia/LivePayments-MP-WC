@@ -38,6 +38,8 @@ namespace LvdWcMc\PluginModules {
     use LvdWcMc\SystemInfoPropertiesProvider;
 
     class GatewayDiagnosticsModule extends PluginModule {
+        const MENU_HOOK_ORDER = 30;
+
         /**
          * @var \LvdWcMc\SystemInfoPropertiesProvider
          */
@@ -107,7 +109,9 @@ namespace LvdWcMc\PluginModules {
         }
 
         private function _registerMenuHook() {
-            add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
+            add_action('admin_menu', 
+                array($this, 'onAddAdminMenuEntries'), 
+                self::MENU_HOOK_ORDER);
         }
 
         public function onAddAdminMenuEntries() {

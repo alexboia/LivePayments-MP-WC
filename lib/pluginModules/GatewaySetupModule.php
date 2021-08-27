@@ -31,25 +31,51 @@
 
 namespace LvdWcMc\PluginModules {
 
+    use LvdWcMc\MobilpayCreditCardGateway;
     use LvdWcMc\Plugin;
+    use LvdWcMc\PluginMenu;
 
-    class GatewaySetupModule extends PluginModule {
-        public function __construct(Plugin $plugin) {
-            parent::__construct($plugin);
-        }
+	class GatewaySetupModule extends PluginModule {
+		const MENU_HOOK_ORDER = 20;
 
-        public function load() {
-            $this->_registerPaymentGateways();
-        }
+		public function __construct(Plugin $plugin) {
+			parent::__construct($plugin);
+		}
 
-        private function _registerPaymentGateways() {
-            add_filter('woocommerce_payment_gateways', 
-                array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
-        }
+		public function load() {
+			$this->_registerMenuHook();
+			$this->_registerPaymentGateways();
+		}
 
-        public function onWooCommercePaymentGatewaysRequested($methods) {
-            $methods[] = '\LvdWcMc\MobilpayCreditCardGateway';
-            return $methods;
-        }
-    }
+		private function _registerMenuHook() {
+			add_action('admin_menu', 
+				array($this, 'onAddAdminMenuEntries'),
+				self::MENU_HOOK_ORDER);
+		}
+
+		public function onAddAdminMenuEntries() {
+			$callback = array($this, 'redirectToGatewaySettingspage');
+			PluginMenu::registerSubMenuEntryWithCallback(PluginMenu::MAIN_ENTRY, 
+				PluginMenu::GATEWAY_SETTINGS_ENTRY, 
+				$callback);
+		}
+
+		public function redirectToGatewaySettingspage() {
+			wp_redirect($this->_getGatewaySettingsUrl(), 302);
+		}
+
+		private function _getGatewaySettingsUrl() {
+			return $this->_env->getPaymentGatewayWooCommerceSettingsPageUrl(MobilpayCreditCardGateway::GATEWAY_ID);
+		}
+
+		private function _registerPaymentGateways() {
+			add_filter('woocommerce_payment_gateways', 
+				array($this, 'onWooCommercePaymentGatewaysRequested'), 10, 1);
+		}
+
+		public function onWooCommercePaymentGatewaysRequested($methods) {
+			$methods[] = '\LvdWcMc\MobilpayCreditCardGateway';
+			return $methods;
+		}
+	}
 }

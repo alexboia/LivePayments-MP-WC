@@ -10,6 +10,8 @@ namespace LvdWcMc {
 
         const SETTINGS_ENTRY = 'lvdwcmc-plugin-settings';
 
+        const GATEWAY_SETTINGS_ENTRY = 'lvdwcmc-gateway-settigns';
+
         const DIAGNOSTICS_ENTRY = 'lvdwcmc-plugin-diagnostics';
 
         const CARD_TRANSACTIONS_LISTING_ENTRY = 'lvdwcmc-card-transactions-listing';
@@ -40,6 +42,11 @@ namespace LvdWcMc {
                             self::SETTINGS_ENTRY => array(
                                 'label' => __('Plugin Settings', 'livepayments-mp-wc'),
                                 'page_title' => __('LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Settings', 'livepayments-mp-wc'),
+                                'capability' => 'manage_options'
+                            ),
+                            self::GATEWAY_SETTINGS_ENTRY => array(
+                                'label' => __('Gateway Settings', 'livepayments-mp-wc'),
+                                'page_title' => __('LivePayments - mobilPay Card WooCommerce Payment Gateway - Gateway Settings', 'livepayments-mp-wc'),
                                 'capability' => 'manage_options'
                             ),
                             self::DIAGNOSTICS_ENTRY => array(

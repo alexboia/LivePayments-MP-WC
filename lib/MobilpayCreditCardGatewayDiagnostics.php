@@ -9,7 +9,13 @@ namespace LvdWcMc {
 
         private $_diagnosticMessages = null;
 
+        /**
+         * @var \LvdWcMc\Env
+         */
+        private $_env = null;
+
         public function __construct() {
+            $this->_env = lvdwcmc_get_env();
             $this->_paymentGateway = lvdwcmc_get_mobilpay_credit_card_gateway();
         }
 
@@ -28,7 +34,7 @@ namespace LvdWcMc {
         }
 
         public function getGatewaySettingsPageUrl() {
-            return admin_url('admin.php?page=wc-settings&tab=checkout&section=' . MobilpayCreditCardGateway::GATEWAY_ID);
+            return $this->_env->getPaymentGatewayWooCommerceSettingsPageUrl(MobilpayCreditCardGateway::GATEWAY_ID);
         }
 
         public function canSendGatewayDiagnosticsWarningNotification() {

@@ -280,6 +280,10 @@ namespace LvdWcMc {
             }
         }
 
+        public function getPaymentGatewayWooCommerceSettingsPageUrl($gatewayId) {
+            return admin_url('admin.php?page=wc-settings&tab=checkout&section=' . $gatewayId);
+        }
+
         public function getAjaxBaseUrl() {
             return get_admin_url(null, 'admin-ajax.php', 'admin');
         }
