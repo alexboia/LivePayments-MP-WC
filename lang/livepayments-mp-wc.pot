@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the LivePayments - mobilPay Card WooCommerce Payment Gateway plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: LivePayments - mobilPay Card WooCommerce Payment Gateway 0.1.4\n"
+"Project-Id-Version: LivePayments - mobilPay Card WooCommerce Payment Gateway 0.1.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/livepayments-mp-wc\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-02-18T14:25:42+00:00\n"
+"POT-Creation-Date: 2021-08-27T11:24:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.3.0\n"
 "X-Domain: livepayments-mp-wc\n"
@@ -283,162 +283,162 @@ msgstr ""
 msgid "The payment has been successfully received. The order is currently being processed."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:130
+#: lib/MobilpayCreditCardGateway.php:136
 msgid "LivePayments Card Gateway via mobilPay"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:131
+#: lib/MobilpayCreditCardGateway.php:137
 msgid "LivePayments - mobilPay Payment Gateway for WooCommerce"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:143
+#: lib/MobilpayCreditCardGateway.php:149
 msgid "mobilPay&trade; Card Gateway"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:315
+#: lib/MobilpayCreditCardGateway.php:321
 msgid "Enable / Disable"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:316
+#: lib/MobilpayCreditCardGateway.php:322
 msgid "Enable this payment gateway"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:321
+#: lib/MobilpayCreditCardGateway.php:327
 msgid "mobilPay&trade; Sandbox / Test Mode"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:322
+#: lib/MobilpayCreditCardGateway.php:328
 msgid "Enable Test Mode"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:324
+#: lib/MobilpayCreditCardGateway.php:330
 msgid "Place the payment gateway in test mode."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:328
+#: lib/MobilpayCreditCardGateway.php:334
 msgid "Title"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:330
+#: lib/MobilpayCreditCardGateway.php:336
 msgid "Payment title the customer will see during the checkout process."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:331
+#: lib/MobilpayCreditCardGateway.php:337
 msgid "LivePayments via mobilPay"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:334
+#: lib/MobilpayCreditCardGateway.php:340
 msgid "Description"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:336
+#: lib/MobilpayCreditCardGateway.php:342
 msgid "Payment description the customer will see during the checkout process."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:340
+#: lib/MobilpayCreditCardGateway.php:346
 msgid "Seller Account ID"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:342
+#: lib/MobilpayCreditCardGateway.php:348
 msgid "This is Account ID provided by MobilPay when you signed up for an account. Unique key for your seller account for the payment process."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:345
+#: lib/MobilpayCreditCardGateway.php:351
 msgid "Return URL"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:347
+#: lib/MobilpayCreditCardGateway.php:353
 msgid "You must create a new page and in the content field enter the shortcode [lvdwcmc_display_mobilpay_order_status] so that the user can see the message that is returned by the Mobilpay server regarding their transaction. Or any content you want to thank for buying."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:351
+#: lib/MobilpayCreditCardGateway.php:357
 msgid "mobilPay&trade; digital certificate for the live environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:352
+#: lib/MobilpayCreditCardGateway.php:358
 msgid "The public key used for securing communication with the mobilPay&trade; gateway in the live environment."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:356
-#: lib/MobilpayCreditCardGateway.php:367
-#: lib/MobilpayCreditCardGateway.php:378
-#: lib/MobilpayCreditCardGateway.php:389
+#: lib/MobilpayCreditCardGateway.php:362
+#: lib/MobilpayCreditCardGateway.php:373
+#: lib/MobilpayCreditCardGateway.php:384
+#: lib/MobilpayCreditCardGateway.php:395
 msgid "allowed file types: %s"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:362
+#: lib/MobilpayCreditCardGateway.php:368
 msgid "The private key for the live environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:363
+#: lib/MobilpayCreditCardGateway.php:369
 msgid "The private key used for securing communication with the mobilPay&trade; gateway in the live environment."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:373
+#: lib/MobilpayCreditCardGateway.php:379
 msgid "mobilPay&trade; digital certificate for the sandbox environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:374
+#: lib/MobilpayCreditCardGateway.php:380
 msgid "The public key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:384
+#: lib/MobilpayCreditCardGateway.php:390
 msgid "The private key for the sandbox environment"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:385
+#: lib/MobilpayCreditCardGateway.php:391
 msgid "The private key used for securing communication with the mobilPay&trade; gateway in the sandbox environment (used when \"MobilPay Sandbox / Test Mode\"  is checked)."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:452
+#: lib/MobilpayCreditCardGateway.php:458
 msgid "The %s payment gateway requires further configuration until it can be used to accept payments. The following fields are missing or require your attention:"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:455
+#: lib/MobilpayCreditCardGateway.php:461
 msgid "The %s payment gateway is configured and ready to use."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:730
+#: lib/MobilpayCreditCardGateway.php:736
 msgid "Payment asset file successfully removed."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:731
+#: lib/MobilpayCreditCardGateway.php:737
 msgid "Payment asset file could not be removed."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:786
+#: lib/MobilpayCreditCardGateway.php:792
 msgid "Thank you for your order"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:889
+#: lib/MobilpayCreditCardGateway.php:895
 msgid "The value for the field %s is a valid URL, but no longer corresponds to an existing local page"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:894
+#: lib/MobilpayCreditCardGateway.php:900
 msgid "The value for the field %s is no longer a valid URL"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:911
+#: lib/MobilpayCreditCardGateway.php:917
 msgid "The payment asset file %s is not a valid public key certificate"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:916
+#: lib/MobilpayCreditCardGateway.php:922
 msgid "The payment asset file %s is not a valid private key"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:921
+#: lib/MobilpayCreditCardGateway.php:927
 msgid "The payment asset file %s is empty"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:925
+#: lib/MobilpayCreditCardGateway.php:931
 msgid "The payment asset file %s was not found"
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:1088
+#: lib/MobilpayCreditCardGateway.php:1094
 msgid "Error initiating MobilPay card payment."
 msgstr ""
 
-#: lib/MobilpayCreditCardGateway.php:1351
+#: lib/MobilpayCreditCardGateway.php:1358
 msgid "Payment for order #%s."
 msgstr ""
 
@@ -483,35 +483,35 @@ msgstr ""
 msgid "Pending payment"
 msgstr ""
 
-#: lib/Plugin.php:181
+#: lib/Plugin.php:187
 msgid "Could not activate plug-in: activation failure."
 msgstr ""
 
-#: lib/Plugin.php:196
+#: lib/Plugin.php:202
 msgid "Could not activate plug-in: requirements not met."
 msgstr ""
 
-#: lib/Plugin.php:202
+#: lib/Plugin.php:208
 msgid "Minimum required PHP version is %s."
 msgstr ""
 
-#: lib/Plugin.php:204
+#: lib/Plugin.php:210
 msgid "Minimum required WordPress version is %s."
 msgstr ""
 
-#: lib/Plugin.php:206
+#: lib/Plugin.php:212
 msgid "Mysqli extension was not found on your system or is not fully compatible."
 msgstr ""
 
-#: lib/Plugin.php:208
+#: lib/Plugin.php:214
 msgid "Openssl extension was not found on your system or is not fully compatible."
 msgstr ""
 
-#: lib/Plugin.php:210
+#: lib/Plugin.php:216
 msgid "The installation failed."
 msgstr ""
 
-#: lib/Plugin.php:218
+#: lib/Plugin.php:224
 msgid "Activation error"
 msgstr ""
 
@@ -560,7 +560,7 @@ msgstr ""
 msgid "Please fill in a valid e-mail address to which diagnostics warnings will be sent."
 msgstr ""
 
-#: lib/pluginModules/PluginSettingsModule.php:150
+#: lib/pluginModules/PluginSettingsModule.php:151
 #: lib/TranslatedScriptMessages.php:114
 #: lib/TranslatedScriptMessages.php:115
 msgid "The settings could not be saved. Please try again."
@@ -800,15 +800,23 @@ msgstr ""
 msgid "Chose a file from disk"
 msgstr ""
 
-#: views/lvdwcmc-payment-form.php:47
+#: views/lvdwcmc-payment-form.php:69
+msgid "You will be automatically redirected to the payment page in"
+msgstr ""
+
+#: views/lvdwcmc-payment-form.php:71
+msgid "seconds"
+msgstr ""
+
+#: views/lvdwcmc-payment-form.php:79
 msgid "Pay via mobilPay&trade;"
 msgstr ""
 
-#: views/lvdwcmc-payment-form.php:51
+#: views/lvdwcmc-payment-form.php:83
 msgid "The payment could not be initialized. This is usually due to an issue with the store itself, so please contact its administrator."
 msgstr ""
 
-#: views/lvdwcmc-payment-form.php:56
+#: views/lvdwcmc-payment-form.php:90
 msgid "Retry"
 msgstr ""
 
@@ -833,17 +841,34 @@ msgid "Go to gateway configuration"
 msgstr ""
 
 #: views/lvdwcmc-plugin-settings.php:53
-msgid "Diagnostics options"
+msgid "Checkout payment workflow options"
 msgstr ""
 
 #: views/lvdwcmc-plugin-settings.php:62
+msgid "Automatically redirect customer to payment page"
+msgstr ""
+
+#: views/lvdwcmc-plugin-settings.php:75
+msgid "Automatically redirect customer to payment page after this number of seconds"
+msgstr ""
+
+#: views/lvdwcmc-plugin-settings.php:93
+msgid "Do not wait, redirect immediately"
+msgstr ""
+
+#: views/lvdwcmc-plugin-settings.php:107
+#: views/lvdwcmc-plugin-settings.php:163
+msgid "Save settings"
+msgstr ""
+
+#: views/lvdwcmc-plugin-settings.php:119
+msgid "Diagnostics options"
+msgstr ""
+
+#: views/lvdwcmc-plugin-settings.php:128
 msgid "Monitor gateway diagnostics"
 msgstr ""
 
-#: views/lvdwcmc-plugin-settings.php:74
+#: views/lvdwcmc-plugin-settings.php:141
 msgid "Send gateway diagnostics warnings to this address"
-msgstr ""
-
-#: views/lvdwcmc-plugin-settings.php:95
-msgid "Save settings"
 msgstr ""
