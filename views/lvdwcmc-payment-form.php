@@ -50,10 +50,22 @@
 
 	#lvdwcmc-mobilpay-autoredirect-notice-seconds-counter {
 		font-weight: bold;
-		margin-right: 5px;
-		margin-left: 5px;
+		margin-right: 3px;
+		margin-left: 3px;
 	}
 </style>
+
+<?php 
+	/** 
+	 * Fires before the payment form is rendered, 
+	 * 	but after the default stylesheet is rendered
+	 * 
+	 * @hook lvdwcmc_payment_form_before_begin
+	 * 
+	 * @param \stdClass $data The payment data view model
+	 */
+	do_action('lvdwcmc_payment_form_before_begin', $data);
+?>
 
 <?php if ($data->success): ?>
 	<script type="text/javascript">
@@ -64,6 +76,18 @@
 		<input type="hidden" name="env_key" value="<?php echo esc_attr($data->envKey); ?>"/>
 		<input type="hidden" name="data" value="<?php echo esc_attr($data->encData); ?>"/>	
 
+		<?php 
+			/**
+			 * Fires right after the payment form data payload 
+			 * 	hidden HTML fields have been rendered
+			 * 
+			 * @hook lvdwcmc_payment_form_after_payment_data_payload_fields
+			 * 
+			 * @param \stdClass $data The payment data view model
+			 */
+			do_action('lvdwcmc_payment_form_after_payment_data_payload_fields', $data);
+		?>
+
 		<?php if ($data->settings->checkoutAutoRedirectSeconds > 0): ?>
 			<div id="lvdwcmc-mobilpay-autoredirect-notice">
 				<span id="lvdwcmc-mobilpay-autoredirect-notice-text"><?php echo esc_html__('You will be automatically redirected to the payment page in', 'livepayments-mp-wc'); ?></span>
@@ -72,20 +96,79 @@
 			</div>
 		<?php endif; ?>
 
+		<?php 
+			/**
+			 * Fires rght before the payment form submit button 
+			 * 	is rendered
+			 * 
+			 * @hook lvdwcmc_payment_form_before_payment_submit_button
+			 * 
+			 * @param \stdClass $data The payment data view model
+			 */
+			do_action('lvdwcmc_payment_form_before_payment_submit_button', $data);
+		?>
+
 		<input type="submit" 
 			name="lvdwcmc-submit-mobilpay-payment-form" 
 			id="lvdwcmc-submit-mobilpay-payment-form" 
 			class="lvdwcmc-submit-mobilpay-payment-form"
 			value="<?php echo esc_attr__('Pay via mobilPay&trade;', 'livepayments-mp-wc') ?>" />
+
+		<?php 
+			/**
+			 * Fires rght before the payment form submit button 
+			 * 	has been rendered
+			 * 
+			 * @hook lvdwcmc_payment_form_after_payment_submit_button
+			 * 
+			 * @param \stdClass $data The payment data view model
+			 */
+			do_action('lvdwcmc_payment_form_after_payment_submit_button', $data);
+		?>
 	</form>
 <?php else: ?>
 	<ul class="woocommerce-error" role="alert">
 		<li><?php echo esc_attr__('The payment could not be initialized. This is usually due to an issue with the store itself, so please contact its administrator.', 'livepayments-mp-wc'); ?></li>
 	</ul>
 
+	<?php 
+		/**
+		 * Fires right before the payment error screen 
+		 * 	refresh button is rendered
+		 * 
+		 * @hook lvdwcmc_payment_form_before_payment_error_refresh_button
+		 * 
+		 * @param \stdClass $data The payment data view model
+		 */
+		do_action('lvdwcmc_payment_form_before_payment_error_refresh_button', $data);
+	?>
+
 	<input type="button" 
 		name="lvdwcmc-submit-mobilpay-payment-form-reload-on-error" 
 		id="lvdwcmc-submit-mobilpay-payment-form-reload-on-error" 
 		class="lvdwcmc-submit-mobilpay-payment-form-reload-on-error"
 		value="<?php echo esc_attr__('Retry', 'livepayments-mp-wc') ?>" >
+
+	<?php 
+		/**
+		 * Fires right before the payment error screen 
+		 * 	refresh button has been rendered
+		 * 
+		 * @hook lvdwcmc_payment_form_after_payment_error_refresh_button
+		 * 
+		 * @param \stdClass $data The payment data view model
+		 */
+		do_action('lvdwcmc_payment_form_after_payment_error_refresh_button', $data);
+	?>
 <?php endif; ?>
+
+<?php 
+	/** 
+	 * Fires after the payment form has bee rendered
+	 * 
+	 * @hook lvdwcmc_payment_form_before_after_end
+	 * 
+	 * @param \stdClass $data The payment data view model
+	 */
+	do_action('lvdwcmc_payment_form_before_after_end', $data);
+?>
