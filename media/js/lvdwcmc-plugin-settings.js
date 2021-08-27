@@ -133,7 +133,7 @@
         $ctlSettingsForm = $('#lvdwcmc-settings-form');
         $ctlMonitorDiagnostics = $('#lvdwcmc-monitor-diagnostics');
         $ctlSendDiagnosticsWarningToEmail = $('#lvdwcmc-send-diagnsotics-warning-to-email');
-        $ctlButtonSubmitSettings = $('#lvdwcmc-submit-settings');
+        $ctlButtonSubmitSettings = $('.lvdwcmc-form-submit-btn');
     }
 
     function _initToastMessages() {

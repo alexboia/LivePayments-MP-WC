@@ -35,6 +35,8 @@ namespace LvdWcMc {
 
         const OPT_SEND_DIAGNOSTICS_WARNING_TO_EMAIL = 'sendDiagnosticsWarningToEmail';
 
+        const OPT_CHECKOUT_AUTO_REDIRECT_SECONDS = 'checkoutAutoRedirectSeconds';
+
         const OPT_SETTINGS_KEY = LVD_WCMC_PLUGIN_ID . '_settings';
 
         /**
@@ -107,10 +109,20 @@ namespace LvdWcMc {
             return $this;
         }
 
+        public function getCheckoutAutoRedirectSeconds() {
+            return $this->_getOption(self::OPT_CHECKOUT_AUTO_REDIRECT_SECONDS, -1);
+        }
+
+        public function setCheckoutAutoRedirectSeconds($seconds) {
+            $this->_setOption(self::OPT_CHECKOUT_AUTO_REDIRECT_SECONDS, $seconds);
+            return $this;
+        }
+
         public function asPlainObject() {
             $data = new \stdClass();
             $data->monitorDiagnostics = $this->getMonitorDiagnostics();
             $data->sendDiagnosticsWarningToEmail = $this->getSendDiagnosticsWarningToEmail();
+            $data->checkoutAutoRedirectSeconds = $this->getCheckoutAutoRedirectSeconds();
             return $data;
         }
 

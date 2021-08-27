@@ -28,30 +28,64 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-    defined('LVD_WCMC_LOADED') or die;
+	defined('LVD_WCMC_LOADED') or die;
 ?>
 
 <style type="text/css">
-    #submit_mobilpay_payment_form_reload_on_error {
-        margin-bottom: 10px;
-    }
+	#lvdwcmc-submit-mobilpay-payment-form-reload-on-error {
+		margin-bottom: 10px;
+	}
+
+	#lvdwcmc-mobilpay-autoredirect-notice {
+		display: block;
+		line-height: 19px;
+		padding: 11px 15px;
+		font-size: 14px;
+		text-align: left;
+		margin-bottom: 15px;
+		color: #856404;
+		background-color: #fff3cd;
+		border: 1px solid #ffeeba;
+	}
+
+	#lvdwcmc-mobilpay-autoredirect-notice-seconds-counter {
+		font-weight: bold;
+		margin-right: 5px;
+		margin-left: 5px;
+	}
 </style>
 
 <?php if ($data->success): ?>
-    <form method="post" id="lvdWcMcMobilpayRedirect" action="<?php echo $data->paymentUrl; ?>">
-        <input type="hidden" name="env_key" value="<?php echo esc_attr($data->envKey); ?>"/>
-        <input type="hidden" name="data" value="<?php echo esc_attr($data->encData); ?>"/>	
+	<script type="text/javascript">
+		var _checkoutAutoRedirectSeconds = <?php echo esc_js($data->settings->checkoutAutoRedirectSeconds); ?>;
+	</script>
 
-        <input type="submit" name="submit_mobilpay_payment_form" 
-            id="submit_mobilpay_payment_form" 
-            value="<?php echo esc_attr__('Pay via mobilPay&trade;', 'livepayments-mp-wc') ?>" />
-    </form>
+	<form method="post" id="lvdwcmc-mobilpay-redirect-form" action="<?php echo $data->paymentUrl; ?>">
+		<input type="hidden" name="env_key" value="<?php echo esc_attr($data->envKey); ?>"/>
+		<input type="hidden" name="data" value="<?php echo esc_attr($data->encData); ?>"/>	
+
+		<?php if ($data->settings->checkoutAutoRedirectSeconds > 0): ?>
+			<div id="lvdwcmc-mobilpay-autoredirect-notice">
+				<span id="lvdwcmc-mobilpay-autoredirect-notice-text"><?php echo esc_html__('You will be automatically redirected to the payment page in', 'livepayments-mp-wc'); ?></span>
+				<span id="lvdwcmc-mobilpay-autoredirect-notice-seconds-counter"><?php echo esc_html($data->settings->checkoutAutoRedirectSeconds); ?></span>
+				<span id="lvdwcmc-mobilpay-autoredirect-notice-seconds-suffix"><?php echo esc_html__('seconds', 'livepayments-mp-wc'); ?></span>
+			</div>
+		<?php endif; ?>
+
+		<input type="submit" 
+			name="lvdwcmc-submit-mobilpay-payment-form" 
+			id="lvdwcmc-submit-mobilpay-payment-form" 
+			class="lvdwcmc-submit-mobilpay-payment-form"
+			value="<?php echo esc_attr__('Pay via mobilPay&trade;', 'livepayments-mp-wc') ?>" />
+	</form>
 <?php else: ?>
-    <ul class="woocommerce-error" role="alert">
-        <li><?php echo esc_attr__('The payment could not be initialized. This is usually due to an issue with the store itself, so please contact its administrator.', 'livepayments-mp-wc'); ?></li>
-    </ul>
+	<ul class="woocommerce-error" role="alert">
+		<li><?php echo esc_attr__('The payment could not be initialized. This is usually due to an issue with the store itself, so please contact its administrator.', 'livepayments-mp-wc'); ?></li>
+	</ul>
 
-    <input type="button" name="submit_mobilpay_payment_form_reload_on_error" 
-        id="submit_mobilpay_payment_form_reload_on_error" 
-        value="<?php echo esc_attr__('Retry', 'livepayments-mp-wc') ?>" >
+	<input type="button" 
+		name="lvdwcmc-submit-mobilpay-payment-form-reload-on-error" 
+		id="lvdwcmc-submit-mobilpay-payment-form-reload-on-error" 
+		class="lvdwcmc-submit-mobilpay-payment-form-reload-on-error"
+		value="<?php echo esc_attr__('Retry', 'livepayments-mp-wc') ?>" >
 <?php endif; ?>

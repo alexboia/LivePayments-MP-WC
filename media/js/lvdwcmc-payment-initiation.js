@@ -29,28 +29,103 @@
  */
 
 (function($) {
-    "use strict";
+	"use strict";
 
-    function showLoading() {
-        $.blockUI({
-            message: null,
-            overlayCSS: {
-                background: '#fff',
-                opacity: 0.6
-            }
-        });
-    }
+	var CHECKOUT_AUTOREDIRECT_TICK_INTERVAL_MILLISECONDS = 1000;
 
-    $(document).ready(function() {
-        $('#submit_mobilpay_payment_form').click(function() {
-            showLoading(); 
-        });
+	var _context = null;
+	var _autoRedirectRemainingSeconds = 0;
+	var _autoRedirectTimer = null;
 
-        $('#submit_mobilpay_payment_form_reload_on_error').on('click', function(e) {
-            showLoading();
-            window.location.reload();
-            e.preventDefault();
-            e.stopPropagation();
-        });
-    });
+	var $ctlPaymentForm = null;
+	var $ctlAutoRedirectNoticeSecondsCounter = null;
+
+	function getContext() {
+		return {
+			checkoutAutoRedirectSeconds: window['_checkoutAutoRedirectSeconds'] != undefined 
+				? _checkoutAutoRedirectSeconds 
+				: -1
+		};
+	}
+
+	function showLoading() {
+		$.blockUI({
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6
+			}
+		});
+	}
+
+	function initContext() {
+		_context = getContext();
+	}
+
+	function initControls() {
+		$ctlPaymentForm = $('#lvdwcmc-mobilpay-redirect-form');
+		$ctlAutoRedirectNoticeSecondsCounter = $('#lvdwcmc-mobilpay-autoredirect-notice-seconds-counter');
+	}
+
+	function initEvents() {
+		if (isPaymentPayloadCorrectlyGenerated()) {
+			setupPaymentForm();
+		} else {
+			setupPaymentErrorForm();
+		}
+	} 
+
+	function isPaymentPayloadCorrectlyGenerated() {
+		return $ctlPaymentForm.size() > 0;
+	}
+
+	function setupPaymentForm() {
+		console.log(_context);
+		if (_context.checkoutAutoRedirectSeconds > 0) {
+			startAutoRedirectCountdown();
+		} else if (_context.checkoutAutoRedirectSeconds == 0) {
+			showLoading();
+			submitPaymentForm();
+		}
+
+		$('#lvdwcmc-submit-mobilpay-payment-form').on('click', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			showLoading(); 
+		});
+	}
+
+	function setupPaymentErrorForm() {
+		$('#lvdwcmc-submit-mobilpay-payment-form-reload-on-error').on('click', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			showLoading();
+			window.location.reload();
+		});
+	}
+
+	function startAutoRedirectCountdown() {
+		_autoRedirectRemainingSeconds = _context.checkoutAutoRedirectSeconds;
+		_autoRedirectTimer = window.setInterval(autoredirectTick, CHECKOUT_AUTOREDIRECT_TICK_INTERVAL_MILLISECONDS);
+	}
+
+	function autoredirectTick() {
+		if (_autoRedirectRemainingSeconds > 0) {
+			_autoRedirectRemainingSeconds -= 1;
+			$ctlAutoRedirectNoticeSecondsCounter.text(_autoRedirectRemainingSeconds);
+		} else {
+			showLoading();
+			submitPaymentForm();
+		}
+	}
+
+	function submitPaymentForm() {
+		$ctlPaymentForm.submit();
+	}
+
+	$(document).ready(function() {
+		initContext();
+		initControls();
+		initEvents();
+	});
 })(jQuery);

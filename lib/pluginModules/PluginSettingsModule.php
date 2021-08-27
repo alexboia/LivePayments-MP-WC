@@ -137,6 +137,7 @@ namespace LvdWcMc\PluginModules {
 
             $settings->setMonitorDiagnostics($monitorDiagnostics);
             $settings->setSendDiagnosticsWarningToEmail($sendDiagnosticsWarningToEmail);
+            $settings->setCheckoutAutoRedirectSeconds($this->_getCheckoutAutoRedirectSecondsFromHttpPost());
 
             if ($settings->saveSettings()) {
                 if ($monitorDiagnostics) {
@@ -175,6 +176,12 @@ namespace LvdWcMc\PluginModules {
             return isset($_POST['sendDiagnosticsWarningToEmail'])
                 ? sanitize_email(strip_tags($_POST['sendDiagnosticsWarningToEmail']))
                 : null;
+        }
+
+        private function _getCheckoutAutoRedirectSecondsFromHttpPost() {
+            return isset($_POST['checkoutAutoRedirectSeconds'])
+                ? max(intval($_POST['checkoutAutoRedirectSeconds']), 0)
+                : 0;
         }
 
         private function _isValidEmailAddress($email) {

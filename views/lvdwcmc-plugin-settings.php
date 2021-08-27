@@ -28,76 +28,116 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-    defined('LVD_WCMC_LOADED') or die;
+	defined('LVD_WCMC_LOADED') or die;
 ?>
 
 <script type="text/javascript">
-    var lvdwcmc_ajaxBaseUrl = '<?php echo esc_js($data->ajaxBaseUrl); ?>';
-    var lvdwcmc_saveSettingsNonce = '<?php echo esc_js($data->saveSettingsNonce); ?>';
-    var lvdwcmc_saveSettingsAction = '<?php echo esc_js($data->saveSettingsAction); ?>';
-    var lvdwcmc_adminEmailAddress = '<?php echo esc_js($data->adminEmailAddress); ?>';
+	var lvdwcmc_ajaxBaseUrl = '<?php echo esc_js($data->ajaxBaseUrl); ?>';
+	var lvdwcmc_saveSettingsNonce = '<?php echo esc_js($data->saveSettingsNonce); ?>';
+	var lvdwcmc_saveSettingsAction = '<?php echo esc_js($data->saveSettingsAction); ?>';
+	var lvdwcmc_adminEmailAddress = '<?php echo esc_js($data->adminEmailAddress); ?>';
 </script>
 
 <div id="lvdwcmc-settings-page">
-    <form id="lvdwcmc-settings-form" method="post">
-        <h2><?php echo __('LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Settings', 'livepayments-mp-wc'); ?></h2>
+	<form id="lvdwcmc-settings-form" method="post">
+		<h2><?php echo __('LivePayments - mobilPay Card WooCommerce Payment Gateway - Plugin Settings', 'livepayments-mp-wc'); ?></h2>
 
-        <div class="wrap lvdwmc-settings-container">
-            <div id="lvdwcmc-settings-save-result" 
-                class="updated settings-error lvdwcmc-settings-save-result" 
-                style="display:none"></div>
+		<div class="wrap lvdwmc-settings-container">
+			<div id="lvdwcmc-settings-save-result" 
+				class="updated settings-error lvdwcmc-settings-save-result" 
+				style="display:none"></div>
 
-            <table class="widefat" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th><h3><?php echo esc_html__('Diagnostics options', 'livepayments-mp-wc'); ?></h3></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <table class="form-table">
-                                <tr>
-                                    <th scope="row">
-                                        <label for="lvdwcmc-monitor-diagnostics"><?php echo esc_html__('Monitor gateway diagnostics', 'livepayments-mp-wc'); ?>:</label>
-                                    </th>
-                                    <td>
-                                        <input type="checkbox" 
-                                            name="monitorDiagnostics" 
-                                            id="lvdwcmc-monitor-diagnostics" 
-                                            value="1" 
-                                            <?php echo $data->settings->monitorDiagnostics ? 'checked="checked"' : ''; ?> /> 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="lvdwcmc-send-diagnsotics-warning-to-email"><?php echo esc_html__('Send gateway diagnostics warnings to this address', 'livepayments-mp-wc'); ?>:</label>
-                                    </th>
-                                    <td>
-                                        <input type="text" 
-                                            name="sendDiagnosticsWarningToEmail" 
-                                            id="lvdwcmc-send-diagnsotics-warning-to-email"
-                                            class="input-text regular-input"
-                                            value="<?php echo esc_attr($data->settings->sendDiagnosticsWarningToEmail); ?>" 
-                                            <?php echo !$data->settings->monitorDiagnostics ? 'disabled="disabled"' : ''; ?> /> 
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="submit">
-                                <input type="button" 
-                                    id="lvdwcmc-submit-settings" 
-                                    name="lvdwcmc-submit-settings" 
-                                    class="button button-primary lvdwcmc-form-submit-btn" 
-                                    value="<?php echo esc_html__('Save settings', 'livepayments-mp-wc'); ?>" />
-                            </p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </form>
+			<table class="widefat" cellspacing="0">
+				<thead>
+					<tr>
+						<th><h3><?php echo esc_html__('Workflow options', 'livepayments-mp-wc'); ?></h3></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<table class="form-table">
+								<tr>
+									<th scope="row">
+										<label for="lvdwcmc-checkout-auto-redirect-seconds"><?php echo esc_html__('Autoredirect customer to payment page after this number of seconds', 'livepayments-mp-wcs') ?></label>
+									</th>
+									<td>
+										<input type="text" 
+											name="checkoutAutoRedirectSeconds"
+											id="lvdwcmc-checkout-auto-redirect-seconds"
+											value="<?php echo esc_attr($data->settings->checkoutAutoRedirectSeconds); ?>"
+										/>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<p class="submit">
+								<input type="button" 
+									id="lvdwcmc-submit-settings-workflow" 
+									name="lvdwcmc-submit-settings-workflow" 
+									class="button button-primary lvdwcmc-form-submit-btn" 
+									value="<?php echo esc_html__('Save settings', 'livepayments-mp-wc'); ?>" />
+							</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+
+			<table class="widefat" cellspacing="0">
+				<thead>
+					<tr>
+						<th><h3><?php echo esc_html__('Diagnostics options', 'livepayments-mp-wc'); ?></h3></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<table class="form-table">
+								<tr>
+									<th scope="row">
+										<label for="lvdwcmc-monitor-diagnostics"><?php echo esc_html__('Monitor gateway diagnostics', 'livepayments-mp-wc'); ?>:</label>
+									</th>
+									<td>
+										<input type="checkbox" 
+											name="monitorDiagnostics" 
+											id="lvdwcmc-monitor-diagnostics" 
+											value="1" 
+											<?php echo $data->settings->monitorDiagnostics ? 'checked="checked"' : ''; ?> /> 
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">
+										<label for="lvdwcmc-send-diagnsotics-warning-to-email"><?php echo esc_html__('Send gateway diagnostics warnings to this address', 'livepayments-mp-wc'); ?>:</label>
+									</th>
+									<td>
+										<input type="text" 
+											name="sendDiagnosticsWarningToEmail" 
+											id="lvdwcmc-send-diagnsotics-warning-to-email"
+											class="input-text regular-input"
+											value="<?php echo esc_attr($data->settings->sendDiagnosticsWarningToEmail); ?>" 
+											<?php echo !$data->settings->monitorDiagnostics ? 'disabled="disabled"' : ''; ?> /> 
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<p class="submit">
+								<input type="button" 
+									id="lvdwcmc-submit-settings" 
+									name="lvdwcmc-submit-settings" 
+									class="button button-primary lvdwcmc-form-submit-btn" 
+									value="<?php echo esc_html__('Save settings', 'livepayments-mp-wc'); ?>" />
+							</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</form>
 </div>

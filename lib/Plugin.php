@@ -97,6 +97,11 @@ namespace LvdWcMc {
         private $_viewEngine = null;
 
         /**
+         * @var \LvdWcMc\Settings
+         */
+        private $_settings = null;
+
+        /**
          * @var \LvdWcMc\PluginModules\PluginModule[]
          */
         private $_pluginModules = array();
@@ -109,6 +114,7 @@ namespace LvdWcMc {
             $this->_report = new TransactionReport();
             $this->_apiServer = new ApiServer();
             $this->_formatters = new Formatters();
+            $this->_settings = lvdwcmc_get_settings();
 
             $this->_loggingFormatter = new WooCommerceLoggingFormatter(LVD_WCMC_WOOCOMMERCE_CC_GATEWAY_ID);
             $this->_viewEngine = new PluginViewEngine();
@@ -355,6 +361,10 @@ namespace LvdWcMc {
 
         public function getReport() {
             return $this->_report;
+        }
+
+        public function getSettings() {
+            return $this->_settings;
         }
 
         public function getAjaxBaseUrl() {
