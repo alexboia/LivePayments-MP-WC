@@ -106,10 +106,10 @@
 
 	function startAutoRedirectCountdown() {
 		_autoRedirectRemainingSeconds = _context.checkoutAutoRedirectSeconds;
-		_autoRedirectTimer = window.setInterval(autoredirectTick, CHECKOUT_AUTOREDIRECT_TICK_INTERVAL_MILLISECONDS);
+		_autoRedirectTimer = window.setInterval(autoRedirectTick, CHECKOUT_AUTOREDIRECT_TICK_INTERVAL_MILLISECONDS);
 	}
 
-	function autoredirectTick() {
+	function autoRedirectTick() {
 		if (_autoRedirectRemainingSeconds > 0) {
 			_autoRedirectRemainingSeconds -= 1;
 			$ctlAutoRedirectNoticeSecondsCounter.text(_autoRedirectRemainingSeconds);

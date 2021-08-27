@@ -29,131 +29,206 @@
  */
 
 (function($) {
-    "use strict";
+	"use strict";
 
-    var _context = null;
-    var _intitalElementValues = null;
+	var CHECKOUT_AUTOREDIRECT_DISABLED = -1;
+	var CHECKOUT_AUTOREDIRECT_INSTANT = 0;
+	var CHECKOUT_AUTOREDIRECT_INITIAL = 5;
 
-    var $ctlSettingsForm = null;
-    var $ctlMonitorDiagnostics = null;
-    var $ctlSendDiagnosticsWarningToEmail = null;
-    var $ctlButtonSubmitSettings = null;
+	var _context = null;
+	var _intitalElementValues = null;
 
-    function _showProgress() {
-        lvdwcmc.showPleaseWait();
-    }
+	var $ctlSettingsForm = null;
+	var $ctlMonitorDiagnostics = null;
+	var $ctlAutoRedirectEnable = null;
+	var $ctlAutoRedirectInstant = null;
+	var $ctlAutoRedirectSeconds = null;
+	var $ctlSendDiagnosticsWarningToEmail = null;
+	var $ctlButtonSubmitSettings = null;
 
-    function _hideProgress() {
-        lvdwcmc.hidePleaseWait();
-    }
+	function _showProgress() {
+		lvdwcmc.showPleaseWait();
+	}
 
-    function _getContextFromInlineData() {
-        return {
-            ajaxBaseUrl: window['lvdwcmc_ajaxBaseUrl'],
-            saveSettingsAction: window['lvdwcmc_saveSettingsAction'],
-            saveSettingsNonce: window['lvdwcmc_saveSettingsNonce'],
-            adminEmailAddress: window['lvdwcmc_adminEmailAddress']
-        }
-    }
+	function _hideProgress() {
+		lvdwcmc.hidePleaseWait();
+	}
 
-    function _toastMessage(success, message) {
-        toastr[success ? 'success' : 'error'](message);
-    }
+	function _getContextFromInlineData() {
+		return {
+			ajaxBaseUrl: window['lvdwcmc_ajaxBaseUrl'],
+			saveSettingsAction: window['lvdwcmc_saveSettingsAction'],
+			saveSettingsNonce: window['lvdwcmc_saveSettingsNonce'],
+			adminEmailAddress: window['lvdwcmc_adminEmailAddress']
+		}
+	}
 
-    function _getFormSaveUrl() {
-        return URI(_context.ajaxBaseUrl)
-            .addSearch('action', _context.saveSettingsAction)
-            .addSearch('lvdwcmc_nonce', _context.saveSettingsNonce)
-            .toString();
-    }
+	function _toastMessage(success, message) {
+		toastr[success ? 'success' : 'error'](message);
+	}
 
-    function _handleMonitorDiagnosticsChanged() {
-        var isChecked = $ctlMonitorDiagnostics.is(':checked');
-        if (isChecked) {
-            _monitorDiagnosticsHasBeenEnabled();
-        } else {
-            _monitorDiagnosticsHasBeenDisabled();
-        }
-    }
+	function _getFormSaveUrl() {
+		return URI(_context.ajaxBaseUrl)
+			.addSearch('action', _context.saveSettingsAction)
+			.addSearch('lvdwcmc_nonce', _context.saveSettingsNonce)
+			.toString();
+	}
 
-    function _monitorDiagnosticsHasBeenEnabled() {
-        $ctlSendDiagnosticsWarningToEmail.enableElement();
-        $ctlSendDiagnosticsWarningToEmail.val(_getPrefillValueForSendDiagnosticsWarningToEmailField());
-    }
+	function _handleMonitorDiagnosticsChanged() {
+		var isChecked = $ctlMonitorDiagnostics.is(':checked');
+		if (isChecked) {
+			_monitorDiagnosticsHasBeenEnabled();
+		} else {
+			_monitorDiagnosticsHasBeenDisabled();
+		}
+	}
 
-    function _getPrefillValueForSendDiagnosticsWarningToEmailField() {
-        var prefillValue = $ctlSendDiagnosticsWarningToEmail.data('savedValue');
-        if (!prefillValue) {
-            prefillValue = _context.adminEmailAddress;
-        }
+	function _monitorDiagnosticsHasBeenEnabled() {
+		$ctlSendDiagnosticsWarningToEmail.enableElement();
+		$ctlSendDiagnosticsWarningToEmail.val(_getPrefillValueForSendDiagnosticsWarningToEmailField());
+	}
 
-        return prefillValue;
-    }
+	function _getPrefillValueForSendDiagnosticsWarningToEmailField() {
+		var prefillValue = $ctlSendDiagnosticsWarningToEmail.data('savedValue');
+		if (!prefillValue) {
+			prefillValue = _context.adminEmailAddress;
+		}
 
-    function _monitorDiagnosticsHasBeenDisabled() {
-        $ctlSendDiagnosticsWarningToEmail.disableElement();
-        $ctlSendDiagnosticsWarningToEmail.val('');
-    }
+		return prefillValue;
+	}
 
-    function _saveSettings() {
-        _showProgress();
-        $.ajax(_getFormSaveUrl(), {
-            type: 'POST',
-            dataType: 'json',
-            cache: false,
-            data: _getSettingsInputData()
-        }).done(function(data, status, xhr) {
-            _hideProgress();
-            if (data && data.success) {
-                _toastMessage(true, lvdwcmcPluginSettingsL10n.msgSaveOk);
-                _storeInitialControlValues();
-            } else {
-                _toastMessage(false, data.message || lvdwcmcPluginSettingsL10n.errSaveFailGeneric);
-            }
-        }).fail(function(xhr, status, error) {
-            _hideProgress();
-            _toastMessage(false, lvdwcmcPluginSettingsL10n.errSaveFailNetwork);
-        });
-    }
+	function _monitorDiagnosticsHasBeenDisabled() {
+		$ctlSendDiagnosticsWarningToEmail.disableElement();
+		$ctlSendDiagnosticsWarningToEmail.val('');
+	}
 
-    function _getSettingsInputData() {
-        return $ctlSettingsForm.serialize();
-    }
+	function _handleAutoRedirectEnabledChanged() {
+		var isChecked = $ctlAutoRedirectEnable.is(':checked');
+		if (isChecked) {
+			_autoRedirectHasBeenEnabled();	
+		} else {
+			_autoRedirectHasBeenDisabled();
+		}
+	}
 
-    function _initState() {
-        _context = _getContextFromInlineData();
-    }
+	function _autoRedirectHasBeenEnabled() {
+		$ctlAutoRedirectSeconds.enableElement();
+		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_INITIAL);
 
-    function _initListeners() {
-        $ctlMonitorDiagnostics.on('change', _handleMonitorDiagnosticsChanged);
-        $ctlButtonSubmitSettings.on('click', _saveSettings);
-    }
+		$ctlAutoRedirectInstant.enableElement();
+		$ctlAutoRedirectInstant.prop('checked', false);
+	}
 
-    function _initControls() {
-        $ctlSettingsForm = $('#lvdwcmc-settings-form');
-        $ctlMonitorDiagnostics = $('#lvdwcmc-monitor-diagnostics');
-        $ctlSendDiagnosticsWarningToEmail = $('#lvdwcmc-send-diagnsotics-warning-to-email');
-        $ctlButtonSubmitSettings = $('.lvdwcmc-form-submit-btn');
-    }
+	function _autoRedirectHasBeenDisabled() {
+		$ctlAutoRedirectSeconds.disableElement();
+		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_DISABLED);
 
-    function _initToastMessages() {
-        toastr.options = $.extend(toastr.options, {
-            target: 'body',
-            positionClass: 'toast-bottom-right',
-            timeOut: 4000
-        });
-    }
+		$ctlAutoRedirectInstant.disableElement();
+		$ctlAutoRedirectInstant.prop('checked', false);
+	}
 
-    function _storeInitialControlValues() {
-        $ctlSendDiagnosticsWarningToEmail.data('savedValue', 
-            $ctlSendDiagnosticsWarningToEmail.val());
-    }
+	function _handleAutoRedirectInstantChanged() {
+		var isChecked = $ctlAutoRedirectInstant.is(':checked');
+		if (isChecked) {
+			_instantAutoRedirectHasBeenEnabled();
+		} else {
+			_instantAutoRedirectHasBeenDisabled();
+		}
+	}
 
-    $(document).ready(function() {
-        _initState();
-        _initControls();
-        _storeInitialControlValues();
-        _initListeners();
-        _initToastMessages();
-    });
+	function _instantAutoRedirectHasBeenEnabled() {
+		$ctlAutoRedirectSeconds.disableElement();
+		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_INSTANT);
+	}
+
+	function _instantAutoRedirectHasBeenDisabled() {
+		$ctlAutoRedirectSeconds.enableElement();
+		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_INITIAL);
+	}
+
+	function _handleAutoRedirectSecondsChanged() {
+		var value = parseInt($ctlAutoRedirectSeconds.val());
+		if (isNaN(value)) {
+			value = CHECKOUT_AUTOREDIRECT_INITIAL;
+		} else {
+			value = Math.max(CHECKOUT_AUTOREDIRECT_DISABLED, value);
+		}
+
+		if (value == CHECKOUT_AUTOREDIRECT_DISABLED) {
+			$ctlAutoRedirectEnable.prop('checked', false)
+				.trigger('change');
+		} else if (value == CHECKOUT_AUTOREDIRECT_INSTANT) {
+			console.log('Instant');
+			$ctlAutoRedirectInstant.prop('checked', true)
+				.trigger('change');
+		}
+	}
+
+	function _saveSettings() {
+		_showProgress();
+		$.ajax(_getFormSaveUrl(), {
+			type: 'POST',
+			dataType: 'json',
+			cache: false,
+			data: _getSettingsInputData()
+		}).done(function(data, status, xhr) {
+			_hideProgress();
+			if (data && data.success) {
+				_toastMessage(true, lvdwcmcPluginSettingsL10n.msgSaveOk);
+				_storeInitialControlValues();
+			} else {
+				_toastMessage(false, data.message || lvdwcmcPluginSettingsL10n.errSaveFailGeneric);
+			}
+		}).fail(function(xhr, status, error) {
+			_hideProgress();
+			_toastMessage(false, lvdwcmcPluginSettingsL10n.errSaveFailNetwork);
+		});
+	}
+
+	function _getSettingsInputData() {
+		return $ctlSettingsForm.serialize();
+	}
+
+	function _initState() {
+		_context = _getContextFromInlineData();
+	}
+
+	function _initListeners() {
+		$ctlMonitorDiagnostics.on('change', _handleMonitorDiagnosticsChanged);
+		$ctlAutoRedirectEnable.on('change', _handleAutoRedirectEnabledChanged);
+		$ctlAutoRedirectInstant.on('change', _handleAutoRedirectInstantChanged);
+		$ctlAutoRedirectSeconds.on('change', _handleAutoRedirectSecondsChanged);
+		$ctlButtonSubmitSettings.on('click', _saveSettings);
+	}
+
+	function _initControls() {
+		$ctlSettingsForm = $('#lvdwcmc-settings-form');
+		$ctlAutoRedirectEnable = $('#lvdwcmc-checkout-auto-redirect-enable');
+		$ctlAutoRedirectInstant = $('#lvdwcmc-checkout-auto-redirect-instant');
+		$ctlAutoRedirectSeconds = $('#lvdwcmc-checkout-auto-redirect-seconds');
+		$ctlMonitorDiagnostics = $('#lvdwcmc-monitor-diagnostics');
+		$ctlSendDiagnosticsWarningToEmail = $('#lvdwcmc-send-diagnsotics-warning-to-email');
+		$ctlButtonSubmitSettings = $('.lvdwcmc-form-submit-btn');
+	}
+
+	function _initToastMessages() {
+		toastr.options = $.extend(toastr.options, {
+			target: 'body',
+			positionClass: 'toast-bottom-right',
+			timeOut: 4000
+		});
+	}
+
+	function _storeInitialControlValues() {
+		$ctlSendDiagnosticsWarningToEmail.data('savedValue', 
+			$ctlSendDiagnosticsWarningToEmail.val());
+	}
+
+	$(document).ready(function() {
+		_initState();
+		_initControls();
+		_storeInitialControlValues();
+		_initListeners();
+		_initToastMessages();
+	});
 })(jQuery);

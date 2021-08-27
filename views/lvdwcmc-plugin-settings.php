@@ -50,7 +50,7 @@
 			<table class="widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th><h3><?php echo esc_html__('Workflow options', 'livepayments-mp-wc'); ?></h3></th>
+						<th><h3><?php echo esc_html__('Checkout payment workflow options', 'livepayments-mp-wc'); ?></h3></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -59,14 +59,39 @@
 							<table class="form-table">
 								<tr>
 									<th scope="row">
-										<label for="lvdwcmc-checkout-auto-redirect-seconds"><?php echo esc_html__('Autoredirect customer to payment page after this number of seconds', 'livepayments-mp-wcs') ?></label>
+										<label for="lvdwcmc-checkout-auto-redirect-enable"><?php echo esc_html__('Automatically redirect customer to payment page', 'livepayments-mp-wc'); ?></label>
+									</th>
+									<td>
+										<input type="checkbox" 
+											name="checkoutAutoRedirect" 
+											id="lvdwcmc-checkout-auto-redirect-enable" 
+											value="1" 
+											<?php echo $data->settings->checkoutAutoRedirectSeconds >= 0 ? 'checked="checked"' : ''; ?>
+										/>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">
+										<label for="lvdwcmc-checkout-auto-redirect-seconds"><?php echo esc_html__('Automatically redirect customer to payment page after this number of seconds', 'livepayments-mp-wc') ?></label>
 									</th>
 									<td>
 										<input type="text" 
 											name="checkoutAutoRedirectSeconds"
 											id="lvdwcmc-checkout-auto-redirect-seconds"
+											class="input-text regular-input"
 											value="<?php echo esc_attr($data->settings->checkoutAutoRedirectSeconds); ?>"
+											<?php echo $data->settings->checkoutAutoRedirectSeconds <= 0 ? 'disabled="disabled"' : ''; ?> 
 										/>
+
+										<span class="lvdwcmc-checkout-auto-redirect-instant-container">
+											<input type="checkbox" 
+												name="checkoutAutoRedirectInstant" 
+												id="lvdwcmc-checkout-auto-redirect-instant" 
+												value="1" 
+												<?php echo $data->settings->checkoutAutoRedirectSeconds == 0 ? 'checked="checked"' : ''; ?>
+											/>
+											<label for="lvdwcmc-checkout-auto-redirect-instant"><?php echo esc_html__('Do not wait, redirect immediately', 'livepayments-mp-wc'); ?></label>
+										</span>
 									</td>
 								</tr>
 							</table>
@@ -79,7 +104,8 @@
 									id="lvdwcmc-submit-settings-workflow" 
 									name="lvdwcmc-submit-settings-workflow" 
 									class="button button-primary lvdwcmc-form-submit-btn" 
-									value="<?php echo esc_html__('Save settings', 'livepayments-mp-wc'); ?>" />
+									value="<?php echo esc_html__('Save settings', 'livepayments-mp-wc'); ?>" 
+								/>
 							</p>
 						</td>
 					</tr>
@@ -106,7 +132,8 @@
 											name="monitorDiagnostics" 
 											id="lvdwcmc-monitor-diagnostics" 
 											value="1" 
-											<?php echo $data->settings->monitorDiagnostics ? 'checked="checked"' : ''; ?> /> 
+											<?php echo $data->settings->monitorDiagnostics ? 'checked="checked"' : ''; ?> 
+										/> 
 									</td>
 								</tr>
 								<tr>
@@ -119,7 +146,8 @@
 											id="lvdwcmc-send-diagnsotics-warning-to-email"
 											class="input-text regular-input"
 											value="<?php echo esc_attr($data->settings->sendDiagnosticsWarningToEmail); ?>" 
-											<?php echo !$data->settings->monitorDiagnostics ? 'disabled="disabled"' : ''; ?> /> 
+											<?php echo !$data->settings->monitorDiagnostics ? 'disabled="disabled"' : ''; ?> 
+										/> 
 									</td>
 								</tr>
 							</table>
@@ -132,7 +160,8 @@
 									id="lvdwcmc-submit-settings" 
 									name="lvdwcmc-submit-settings" 
 									class="button button-primary lvdwcmc-form-submit-btn" 
-									value="<?php echo esc_html__('Save settings', 'livepayments-mp-wc'); ?>" />
+									value="<?php echo esc_html__('Save settings', 'livepayments-mp-wc'); ?>" 
+								/>
 							</p>
 						</td>
 					</tr>

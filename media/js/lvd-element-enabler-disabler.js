@@ -32,12 +32,12 @@
     "use strict";
 
     $.fn.enableElement = function() {
-        this.removeAttr('disabled');
+        this.prop('disabled', false);
         return this;
     };
 
     $.fn.disableElement = function() {
-        this.attr('disabled', 'disabled');
+        this.prop('disabled', true);
         return this;
     };
 })(jQuery);
