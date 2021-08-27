@@ -31,292 +31,296 @@
 
 namespace LvdWcMc\PluginModules {
 
-    use LvdWcMc\MobilpayTransaction;
-    use LvdWcMc\Plugin;
-    use LvdWcMc\PluginMenu;
-    use LvdWcMc\WordPressAdminAjaxAction;
+	use LvdWcMc\MobilpayTransaction;
+	use LvdWcMc\Plugin;
+	use LvdWcMc\PluginMenu;
 
-    class AdminTransactionDetailsModule extends PluginModule {
-        const ACTION_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details';
+	class AdminTransactionDetailsModule extends PluginModule {
+		const WEB_PAGE_ASSETS_HOOKS_ORDER = 99998;
 
-        /**
-         * @var \LvdWcMc\WordPressAdminAjaxAction
-         */
-        private $_getAdminTransactionDetailsAction;
+		const ACTION_GET_ADMIN_TRANSACTION_DETAILS = 'lvdwcmc_get_admin_transaction_details';
 
-        /**
-         * @var \LvdWcMc\Formatters
-         */
-        private $_formatters;
+		/**
+		 * @var \LvdWcMc\WordPressAdminAjaxAction
+		 */
+		private $_getAdminTransactionDetailsAction;
 
-        /**
-         * @var \LvdWcMc\MobilpayTransactionFactory
-         */
-        private $_transactionFactory;
+		/**
+		 * @var \LvdWcMc\Formatters
+		 */
+		private $_formatters;
 
-        public function __construct(Plugin $plugin) {
-            parent::__construct($plugin);
+		/**
+		 * @var \LvdWcMc\MobilpayTransactionFactory
+		 */
+		private $_transactionFactory;
 
-            $this->_formatters = $plugin
-                ->getFormatters();
-            $this->_transactionFactory = $plugin
-                ->getTransactionFactory();
+		public function __construct(Plugin $plugin) {
+			parent::__construct($plugin);
 
-            $this->_getAdminTransactionDetailsAction = $this
-                ->_createAdminAjaxAction(self::ACTION_GET_ADMIN_TRANSACTION_DETAILS, 
-                    array($this, 'getAdminTransactionDetails'), 
-                    true, 
-                    'manage_woocommerce');
-        }
-        
-        public function load() {
-            $this->_registerWebPageAssets();
-            $this->_registerMenuHooks();
+			$this->_formatters = $plugin
+				->getFormatters();
+			$this->_transactionFactory = $plugin
+				->getTransactionFactory();
 
-            $this->_getAdminTransactionDetailsAction
-                ->register();
-        }
+			$this->_getAdminTransactionDetailsAction = $this
+				->_createAdminAjaxAction(self::ACTION_GET_ADMIN_TRANSACTION_DETAILS, 
+					array($this, 'getAdminTransactionDetails'), 
+					true, 
+					'manage_woocommerce');
+		}
+		
+		public function load() {
+			$this->_registerWebPageAssets();
+			$this->_registerMenuHooks();
 
-        private function _registerWebPageAssets() {
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueScripts'), 99998);
-            add_action('admin_enqueue_scripts', 
-                array($this, 'onAdminEnqueueStyles'), 99998);
-        }
+			$this->_getAdminTransactionDetailsAction
+				->register();
+		}
 
-        public function onAdminEnqueueScripts() {
-            if ($this->_env->isViewingAdminTransactionListing()) {
-                $this->_mediaIncludes
-                    ->includeScriptTransactionListing(
-                        $this->_plugin->getTransactionsListingScriptTranslations(), 
-                        $this->_plugin->getCommonScriptTranslations()
-                    );
-            }
-        }
+		private function _registerWebPageAssets() {
+			add_action('admin_enqueue_scripts', 
+				array($this, 'onAdminEnqueueScripts'), 
+				self::WEB_PAGE_ASSETS_HOOKS_ORDER);
 
-        public function onAdminEnqueueStyles() {
-            if ($this->_env->isViewingAdminTransactionListing()) {
-                $this->_mediaIncludes
-                    ->includeStyleAdminTransactionListing();
-            }
-        }
+			add_action('admin_enqueue_scripts', 
+				array($this, 'onAdminEnqueueStyles'), 
+				self::WEB_PAGE_ASSETS_HOOKS_ORDER);
+		}
 
-        private function _registerMenuHooks() {
-            add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
-        }
+		public function onAdminEnqueueScripts() {
+			if ($this->_env->isViewingAdminTransactionListing()) {
+				$this->_mediaIncludes
+					->includeScriptTransactionListing(
+						$this->_plugin->getTransactionsListingScriptTranslations(), 
+						$this->_plugin->getCommonScriptTranslations()
+					);
+			}
+		}
 
-        public function onAddAdminMenuEntries() {
-            PluginMenu::registerSubMenuEntryWithCallback(PluginMenu::WOOCOMMERCE_ENTRY, 
-                PluginMenu::CARD_TRANSACTIONS_LISTING_ENTRY, 
-                array($this, 'showAdminTransactionsListing'));
-        }
+		public function onAdminEnqueueStyles() {
+			if ($this->_env->isViewingAdminTransactionListing()) {
+				$this->_mediaIncludes
+					->includeStyleAdminTransactionListing();
+			}
+		}
 
-        public function showAdminTransactionsListing() {
-            if (!$this->_currentUserCanManageWooCommerce()) {
-                die;
-            }
+		private function _registerMenuHooks() {
+			add_action('admin_menu', array($this, 'onAddAdminMenuEntries'));
+		}
 
-            $currentPage = $this->_getTransactionsListingCurrentPageFromUrl();
-            $totalRecords = $this->_countTotalTransactions();
-            $totalPages = $this->_calculateTotalTransactionsListingPageCount($totalRecords);
-            $offsetAndLimit = $this->_getTransactionsListingOffsetAndLimit($currentPage);
+		public function onAddAdminMenuEntries() {
+			PluginMenu::registerSubMenuEntryWithCallback(PluginMenu::WOOCOMMERCE_ENTRY, 
+				PluginMenu::CARD_TRANSACTIONS_LISTING_ENTRY, 
+				array($this, 'showAdminTransactionsListing'));
+		}
 
-            $transactions = $this->_getTransactionsFromDb($offsetAndLimit);
-            $listingContext = array(
-                'pageNum' => $currentPage,
-                'totalRecords' => $totalRecords,
-                'totalPages' => $totalPages
-            );
+		public function showAdminTransactionsListing() {
+			if (!$this->_currentUserCanManageWooCommerce()) {
+				die;
+			}
 
-            foreach ($transactions as $key => $transactionItem) {
-                $transactions[$key] = $this->_prepareTransactionItemForDisplay($transactionItem, 
-                    $listingContext);
-            }
+			$currentPage = $this->_getTransactionsListingCurrentPageFromUrl();
+			$totalRecords = $this->_countTotalTransactions();
+			$totalPages = $this->_calculateTotalTransactionsListingPageCount($totalRecords);
+			$offsetAndLimit = $this->_getTransactionsListingOffsetAndLimit($currentPage);
 
-            $data = new \stdClass();
-            $data->additionalColumns = array();
-            $data->pageTitle = get_admin_page_title();
+			$transactions = $this->_getTransactionsFromDb($offsetAndLimit);
+			$listingContext = array(
+				'pageNum' => $currentPage,
+				'totalRecords' => $totalRecords,
+				'totalPages' => $totalPages
+			);
 
-            $data->transactions = $transactions;
-            $data->hasTransactions = !empty($transactions);
+			foreach ($transactions as $key => $transactionItem) {
+				$transactions[$key] = $this->_prepareTransactionItemForDisplay($transactionItem, 
+					$listingContext);
+			}
 
-            $data->ajaxBaseUrl = $this->_getAjaxBaseUrl();
-            $data->transactionDetailsAction = self::ACTION_GET_ADMIN_TRANSACTION_DETAILS;
-            $data->transactionDetailsNonce = $this->_getAdminTransactionDetailsAction
-                ->generateNonce();
+			$data = new \stdClass();
+			$data->additionalColumns = array();
+			$data->pageTitle = get_admin_page_title();
 
-            $data->totalPages = $totalPages;
-            $data->totalRecords = $totalRecords;
-            $data->currentPage = $currentPage;
-            $data->paginateLinksArgs = $this->_getTransactionListingLinkPaginationArgs($totalPages, 
-                $currentPage);
+			$data->transactions = $transactions;
+			$data->hasTransactions = !empty($transactions);
 
-            /**
-             * Filters the view model of the admin transactions listing page, 
-             *  thus allowing additional data to be added to it.
-             * 
-             * @hook lvdwcmc_get_admin_transansactions_listing_data
-             * 
-             * @param \stdClass $data The view model, initially provided by LivePayments-MP-WC
-             * @param array $args Additional arguments to establish the context of the operation
-             * 
-             * @return \stdClass The view model, as returned by the registered filters
-             */
-            $data = apply_filters('lvdwcmc_get_admin_transansactions_listing_data', 
-                $data, 
-                $listingContext);
+			$data->ajaxBaseUrl = $this->_getAjaxBaseUrl();
+			$data->transactionDetailsAction = self::ACTION_GET_ADMIN_TRANSACTION_DETAILS;
+			$data->transactionDetailsNonce = $this->_getAdminTransactionDetailsAction
+				->generateNonce();
 
-            echo $this->_viewEngine->renderView('lvdwcmc-admin-transactions-listing.php', 
-                $data);
-        }
+			$data->totalPages = $totalPages;
+			$data->totalRecords = $totalRecords;
+			$data->currentPage = $currentPage;
+			$data->paginateLinksArgs = $this->_getTransactionListingLinkPaginationArgs($totalPages, 
+				$currentPage);
 
-        private function _getTransactionsListingCurrentPageFromUrl() {
-            return max(isset($_GET['page_num']) 
-                ? intval($_GET['page_num']) 
-                : 1, 1);
-        }
+			/**
+			 * Filters the view model of the admin transactions listing page, 
+			 *  thus allowing additional data to be added to it.
+			 * 
+			 * @hook lvdwcmc_get_admin_transansactions_listing_data
+			 * 
+			 * @param \stdClass $data The view model, initially provided by LivePayments-MP-WC
+			 * @param array $args Additional arguments to establish the context of the operation
+			 * 
+			 * @return \stdClass The view model, as returned by the registered filters
+			 */
+			$data = apply_filters('lvdwcmc_get_admin_transansactions_listing_data', 
+				$data, 
+				$listingContext);
 
-        private function _countTotalTransactions() {
-            return $this->_getDb()->getValue(
-                $this->_env->getPaymentTransactionsTableName(), 
-                'COUNT(tx_id)'
-            );
-        }
+			echo $this->_viewEngine->renderView('lvdwcmc-admin-transactions-listing.php', 
+				$data);
+		}
 
-        private function _getTransactionsListingOffsetAndLimit($currentPage) {
-            $limit = LVD_WCMC_RECORDS_PER_PAGE;
-            $offset = ($currentPage - 1) * $limit;
-            return array(
-                $offset,
-                $limit
-            );
-        }
+		private function _getTransactionsListingCurrentPageFromUrl() {
+			return max(isset($_GET['page_num']) 
+				? intval($_GET['page_num']) 
+				: 1, 1);
+		}
 
-        private function _calculateTotalTransactionsListingPageCount($totalRecords) {
-            return ceil($totalRecords / LVD_WCMC_RECORDS_PER_PAGE);
-        }
+		private function _countTotalTransactions() {
+			return $this->_getDb()->getValue(
+				$this->_env->getPaymentTransactionsTableName(), 
+				'COUNT(tx_id)'
+			);
+		}
 
-        private function _getTransactionsFromDb(array $offsetAndLimit) {
-            $db = $this->_getDb();
-            $db->join($this->_env->getPostsTableName() . ' wp', 
-                'wp.ID = tx.tx_order_id', 
-                'LEFT');
+		private function _getTransactionsListingOffsetAndLimit($currentPage) {
+			$limit = LVD_WCMC_RECORDS_PER_PAGE;
+			$offset = ($currentPage - 1) * $limit;
+			return array(
+				$offset,
+				$limit
+			);
+		}
 
-            $db->orderBy('tx.tx_timestamp_last_updated', 'DESC');
-            $db->orderBy('tx.tx_timestamp_initiated', 'DESC');
+		private function _calculateTotalTransactionsListingPageCount($totalRecords) {
+			return ceil($totalRecords / LVD_WCMC_RECORDS_PER_PAGE);
+		}
 
-            return $db->get($this->_env->getPaymentTransactionsTableName() . ' tx', 
-                $offsetAndLimit, 
-                'tx.*, wp.post_title tx_title');
-        }
+		private function _getTransactionsFromDb(array $offsetAndLimit) {
+			$db = $this->_getDb();
+			$db->join($this->_env->getPostsTableName() . ' wp', 
+				'wp.ID = tx.tx_order_id', 
+				'LEFT');
 
-        private function _prepareTransactionItemForDisplay(array $transactionItem, array $listingContext) {
-            $transactionItem['tx_title_full'] = 
-                $this->_getTransactionFullTitle($transactionItem);
-            $transactionItem['tx_admin_details_link'] = 
-                $this->_getTransactionOrderDetailsLink($transactionItem);
+			$db->orderBy('tx.tx_timestamp_last_updated', 'DESC');
+			$db->orderBy('tx.tx_timestamp_initiated', 'DESC');
 
-            $transactionItem['tx_timestamp_initiated_formatted'] = 
-                $this->_formatTransactionTimestamp($transactionItem['tx_timestamp_initiated']);
-            $transactionItem['tx_timestamp_last_updated_formatted'] = 
-                $this->_formatTransactionTimestamp($transactionItem['tx_timestamp_last_updated']);
-            $transactionItem['tx_amount_formatted'] = 
-                $this->_formatTransactionAmount($transactionItem['tx_amount']) . ' ' . $transactionItem['tx_currency'];
-            $transactionItem['tx_processed_amount_formatted'] = 
-                $this->_formatTransactionAmount($transactionItem['tx_processed_amount']) . ' ' . $transactionItem['tx_currency'];
-            $transactionItem['tx_status_formatted'] = 
-                $this->_getTransactionStatusLabel($transactionItem['tx_status']);
+			return $db->get($this->_env->getPaymentTransactionsTableName() . ' tx', 
+				$offsetAndLimit, 
+				'tx.*, wp.post_title tx_title');
+		}
 
-            /**
-             * Filters a transaction listing item, represented as an array, 
-             *  after the formatted data has been added to it.
-             * The view model is a plain stdClass and contains 
-             *  any data required to correctly render the template.
-             * 
-             * @hook lvdwcmc_get_admin_transansactions_listing_item
-             * 
-             * @param array $tx The view model, initially provided by LivePayments-MP-WC
-             * @param array $args Additional arguments to establish the context of the operation
-             * 
-             * @return array The view model, as returned by the registered filters
-             */
-            $transactionItem = apply_filters('lvdwcmc_get_admin_transansactions_listing_item', 
-                $transactionItem, 
-                $listingContext);
+		private function _prepareTransactionItemForDisplay(array $transactionItem, array $listingContext) {
+			$transactionItem['tx_title_full'] = 
+				$this->_getTransactionFullTitle($transactionItem);
+			$transactionItem['tx_admin_details_link'] = 
+				$this->_getTransactionOrderDetailsLink($transactionItem);
 
-            return $transactionItem;
-        }
+			$transactionItem['tx_timestamp_initiated_formatted'] = 
+				$this->_formatTransactionTimestamp($transactionItem['tx_timestamp_initiated']);
+			$transactionItem['tx_timestamp_last_updated_formatted'] = 
+				$this->_formatTransactionTimestamp($transactionItem['tx_timestamp_last_updated']);
+			$transactionItem['tx_amount_formatted'] = 
+				$this->_formatTransactionAmount($transactionItem['tx_amount']) . ' ' . $transactionItem['tx_currency'];
+			$transactionItem['tx_processed_amount_formatted'] = 
+				$this->_formatTransactionAmount($transactionItem['tx_processed_amount']) . ' ' . $transactionItem['tx_currency'];
+			$transactionItem['tx_status_formatted'] = 
+				$this->_getTransactionStatusLabel($transactionItem['tx_status']);
 
-        private function _getTransactionFullTitle(array $transactionItem) {
-            return '#' . $transactionItem['tx_order_id'] . ' ' . $transactionItem['tx_title'];
-        }
+			/**
+			 * Filters a transaction listing item, represented as an array, 
+			 *  after the formatted data has been added to it.
+			 * The view model is a plain stdClass and contains 
+			 *  any data required to correctly render the template.
+			 * 
+			 * @hook lvdwcmc_get_admin_transansactions_listing_item
+			 * 
+			 * @param array $tx The view model, initially provided by LivePayments-MP-WC
+			 * @param array $args Additional arguments to establish the context of the operation
+			 * 
+			 * @return array The view model, as returned by the registered filters
+			 */
+			$transactionItem = apply_filters('lvdwcmc_get_admin_transansactions_listing_item', 
+				$transactionItem, 
+				$listingContext);
 
-        private function _getTransactionOrderDetailsLink(array $transactionItem) {
-            return get_edit_post_link($transactionItem['tx_order_id']);
-        }
+			return $transactionItem;
+		}
 
-        private function _getTransactionListingLinkPaginationArgs($totalPages, $currentPage) {
-            return array(
-                'base' => add_query_arg('page_num', '%#%'),
-                'format' => '',
-                'prev_text' => __('&laquo;', 'livepayments-mp-wc'),
-                'next_text' => __('&raquo;', 'livepayments-mp-wc'),
-                'total' => $totalPages,
-                'current' => $currentPage
-            );
-        }
+		private function _getTransactionFullTitle(array $transactionItem) {
+			return '#' . $transactionItem['tx_order_id'] . ' ' . $transactionItem['tx_title'];
+		}
 
-        public function getAdminTransactionDetails() {
-            if (!$this->_env->isHttpGet()) {
-                die;
-            }
+		private function _getTransactionOrderDetailsLink(array $transactionItem) {
+			return get_edit_post_link($transactionItem['tx_order_id']);
+		}
 
-            $transactionId = $this->_getTransactionIdFromUrl();
-            if ($transactionId <= 0) {
-                die;
-            }
+		private function _getTransactionListingLinkPaginationArgs($totalPages, $currentPage) {
+			return array(
+				'base' => add_query_arg('page_num', '%#%'),
+				'format' => '',
+				'prev_text' => __('&laquo;', 'livepayments-mp-wc'),
+				'next_text' => __('&raquo;', 'livepayments-mp-wc'),
+				'total' => $totalPages,
+				'current' => $currentPage
+			);
+		}
 
-            $response = lvdwcmc_get_ajax_response(array(
-                'transaction' => null
-            ));
+		public function getAdminTransactionDetails() {
+			if (!$this->_env->isHttpGet()) {
+				die;
+			}
 
-            $transaction = $this->_getTransactionById($transactionId);
-            if ($transaction != null) {
-                $response->transaction = $this->_getDisplayableTransactionDetails($transaction);
-                $response->success = true;
-            }
+			$transactionId = $this->_getTransactionIdFromUrl();
+			if ($transactionId <= 0) {
+				die;
+			}
 
-            return $response;
-        }
+			$response = lvdwcmc_get_ajax_response(array(
+				'transaction' => null
+			));
 
-        private function _getTransactionIdFromUrl() {
-            return isset($_GET['transaction_id']) 
-                ? intval($_GET['transaction_id']) 
-                : 0;
-        }
+			$transaction = $this->_getTransactionById($transactionId);
+			if ($transaction != null) {
+				$response->transaction = $this->_getDisplayableTransactionDetails($transaction);
+				$response->success = true;
+			}
 
-        private function _getTransactionById($transactionId) {
-            return $this->_transactionFactory
-                ->fromTransactionId($transactionId);
-        }
+			return $response;
+		}
 
-        private function _getDisplayableTransactionDetails(MobilpayTransaction $transaction) {
-            return $this->_formatters
-                ->getDisplayableTransactionDetails($transaction);
-        }
+		private function _getTransactionIdFromUrl() {
+			return isset($_GET['transaction_id']) 
+				? intval($_GET['transaction_id']) 
+				: 0;
+		}
 
-        private function _formatTransactionAmount($amount) {
-            return $this->_formatters
-                ->formatTransactionAmount($amount);
-        }
+		private function _getTransactionById($transactionId) {
+			return $this->_transactionFactory
+				->fromTransactionId($transactionId);
+		}
 
-        private function _formatTransactionTimestamp($strTimestamp) {
-            return $this->_formatters
-                ->formatTransactionTimestamp($strTimestamp);
-        }
+		private function _getDisplayableTransactionDetails(MobilpayTransaction $transaction) {
+			return $this->_formatters
+				->getDisplayableTransactionDetails($transaction);
+		}
 
-        private function _getTransactionStatusLabel($status) {
-            return MobilpayTransaction::getStatusLabel($status);
-        }
-    }
+		private function _formatTransactionAmount($amount) {
+			return $this->_formatters
+				->formatTransactionAmount($amount);
+		}
+
+		private function _formatTransactionTimestamp($strTimestamp) {
+			return $this->_formatters
+				->formatTransactionTimestamp($strTimestamp);
+		}
+
+		private function _getTransactionStatusLabel($status) {
+			return MobilpayTransaction::getStatusLabel($status);
+		}
+	}
 }
