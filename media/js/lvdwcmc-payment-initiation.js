@@ -80,7 +80,6 @@
 	}
 
 	function setupPaymentForm() {
-		console.log(_context);
 		if (_context.checkoutAutoRedirectSeconds > 0) {
 			startAutoRedirectCountdown();
 		} else if (_context.checkoutAutoRedirectSeconds == 0) {

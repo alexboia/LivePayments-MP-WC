@@ -184,8 +184,8 @@ namespace LvdWcMc\PluginModules {
 
 		private function _getCheckoutAutoRedirectSecondsFromHttpPost() {
 			return isset($_POST['checkoutAutoRedirectSeconds'])
-				? max(intval($_POST['checkoutAutoRedirectSeconds']), 0)
-				: 0;
+				? max(intval($_POST['checkoutAutoRedirectSeconds']), -1)
+				: -1;
 		}
 
 		private function _isValidEmailAddress($email) {

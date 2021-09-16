@@ -112,7 +112,7 @@
 	}
 
 	function _autoRedirectHasBeenEnabled() {
-		$ctlAutoRedirectSeconds.enableElement();
+		$ctlAutoRedirectSeconds.setElementWriteable();
 		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_INITIAL);
 
 		$ctlAutoRedirectInstant.enableElement();
@@ -120,7 +120,7 @@
 	}
 
 	function _autoRedirectHasBeenDisabled() {
-		$ctlAutoRedirectSeconds.disableElement();
+		$ctlAutoRedirectSeconds.setElementReadOnly();
 		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_DISABLED);
 
 		$ctlAutoRedirectInstant.disableElement();
@@ -137,12 +137,12 @@
 	}
 
 	function _instantAutoRedirectHasBeenEnabled() {
-		$ctlAutoRedirectSeconds.disableElement();
+		$ctlAutoRedirectSeconds.setElementReadOnly();
 		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_INSTANT);
 	}
 
 	function _instantAutoRedirectHasBeenDisabled() {
-		$ctlAutoRedirectSeconds.enableElement();
+		$ctlAutoRedirectSeconds.setElementWriteable();
 		$ctlAutoRedirectSeconds.val(CHECKOUT_AUTOREDIRECT_INITIAL);
 	}
 

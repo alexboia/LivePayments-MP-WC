@@ -29,15 +29,25 @@
  */
 
 (function($) {
-    "use strict";
+	"use strict";
 
-    $.fn.enableElement = function() {
-        this.prop('disabled', false);
-        return this;
-    };
+	$.fn.enableElement = function() {
+		this.prop('disabled', false);
+		return this;
+	};
 
-    $.fn.disableElement = function() {
-        this.prop('disabled', true);
-        return this;
-    };
+	$.fn.disableElement = function() {
+		this.prop('disabled', true);
+		return this;
+	};
+
+	$.fn.setElementReadOnly = function() {
+		this.prop('readonly', true);
+		return this;
+	};
+
+	$.fn.setElementWriteable = function() {
+		this.prop('readonly', false);
+		return this;
+	};
 })(jQuery);

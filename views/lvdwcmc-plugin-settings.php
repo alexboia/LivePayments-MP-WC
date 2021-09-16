@@ -80,7 +80,7 @@
 											id="lvdwcmc-checkout-auto-redirect-seconds"
 											class="input-text regular-input"
 											value="<?php echo esc_attr($data->settings->checkoutAutoRedirectSeconds); ?>"
-											<?php echo $data->settings->checkoutAutoRedirectSeconds <= 0 ? 'disabled="disabled"' : ''; ?> 
+											<?php echo $data->settings->checkoutAutoRedirectSeconds <= 0 ? 'readonly="readonly"' : ''; ?> 
 										/>
 
 										<span class="lvdwcmc-checkout-auto-redirect-instant-container">
