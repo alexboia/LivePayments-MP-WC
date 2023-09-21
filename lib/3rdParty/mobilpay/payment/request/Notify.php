@@ -42,6 +42,7 @@ class Mobilpay_Payment_Request_Notify {
     public $paidByPhone = null;
     public $validationCode = null;
     public $installments = null;
+    public $rrn = null;
 
     /**
      *
@@ -116,6 +117,11 @@ class Mobilpay_Payment_Request_Notify {
         if ($elems->length == 1) {
             $this->issuer = $elems->item(0)->nodeValue;
         }
+        $elems = $elem->getElementsByTagName('rrn');
+		if ($elems->length == 1)
+		{
+			$this->rrn = $elems->item(0)->nodeValue;
+		}
         $elems = $elem->getElementsByTagName('purchase');
         if ($elems->length == 1) {
             $this->purchaseId = $elems->item(0)->nodeValue;
@@ -185,30 +191,6 @@ class Mobilpay_Payment_Request_Notify {
                 $this->discounts[] = $doaEntry;
             }
         }
-
-        //Params
-        $elems = $elem->getElementsByTagName('params');
-        if ($elems->length == 1) {
-            $doaElems = $elems->item(0)->getElementsByTagName('param');
-            $this->params = Array();
-            foreach ($doaElems as $de) {
-                $doaEntry = new stdClass();
-                $name_elems = $de->getElementsByTagName('name');
-                if ($name_elems->length == 1) {
-                    $doaEntry->name = $name_elems->item(0)->nodeValue;
-                }
-                $value_elems = $de->getElementsByTagName('value');
-                if ($value_elems->length == 1) {
-                    $doaEntry->value = $value_elems->item(0)->nodeValue;
-                }
-
-                //$doaEntry->name = $de->attributes->getNamedItem('name')->nodeValue;
-                //$doaEntry->value = $de->attributes->getNamedItem('value')->nodeValue;               
-                $this->params[] = $doaEntry;
-            }
-            $this->params[] = $doaElems; ///ttttt
-        }
-
         $elems = $elem->getElementsByTagName('error');
         if ($elems->length == 1) {
             $xmlErrorElem = $elems->item(0);
@@ -298,6 +280,12 @@ class Mobilpay_Payment_Request_Notify {
             $elem->nodeValue = $this->pan_masked;
             $xmlNotifyElem->appendChild($elem);
         }
+        if (is_null($this->rrn) == FALSE)
+		{
+			$elem = $xmlDoc->createElement('rrn');
+			$elem->nodeValue = $this->rrn;
+			$xmlNotifyElem->appendChild($elem);
+		}
         if (is_null($this->paymentInstrumentId) == FALSE) {
             $elem = $xmlDoc->createElement('payment_instrument_id');
             $elem->nodeValue = $this->paymentInstrumentId;
@@ -365,33 +353,33 @@ class Mobilpay_Payment_Request_Notify {
             $xmlNotifyElem->appendChild($elem);
         }
 
-    	if (is_array($this->params) && sizeof($this->params) > 0) {
-    	    $xmlParams = $xmlDoc->createElement('params');
-    	    foreach ($this->params as $key => $value) {
-        		if (is_array($value)) {
-        		    foreach ($value as $v) {
-            			$xmlParam = $xmlDoc->createElement('param');
-            			$xmlName = $xmlDoc->createElement('name');
-            			$xmlName->nodeValue = trim($key);
-            			$xmlParam->appendChild($xmlName);
-            			$xmlValue = $xmlDoc->createElement('value');
-            			$xmlValue->appendChild($xmlDoc->createCDATASection($v));
-            			$xmlParam->appendChild($xmlValue);
-            			$xmlParams->appendChild($xmlParam);
-        		    }
-        		} else {
-        		    $xmlParam = $xmlDoc->createElement('param');
-        		    $xmlName = $xmlDoc->createElement('name');
-        		    $xmlName->nodeValue = trim($key);
-        		    $xmlParam->appendChild($xmlName);
-        		    $xmlValue = $xmlDoc->createElement('value');
-        		    $xmlValue->appendChild($xmlDoc->createCDATASection($value));
-        		    $xmlParam->appendChild($xmlValue);
-        		    $xmlParams->appendChild($xmlParam);
-        		}
-    	    }
-    	    $xmlNotifyElem->appendChild($xmlParams);
-    	}
+//	if (is_array($this->params) && sizeof($this->params) > 0) {
+//	    $xmlParams = $xmlDoc->createElement('params');
+//	    foreach ($this->params as $key => $value) {
+//		if (is_array($value)) {
+//		    foreach ($value as $v) {
+//			$xmlParam = $xmlDoc->createElement('param');
+//			$xmlName = $xmlDoc->createElement('name');
+//			$xmlName->nodeValue = trim($key);
+//			$xmlParam->appendChild($xmlName);
+//			$xmlValue = $xmlDoc->createElement('value');
+//			$xmlValue->appendChild($xmlDoc->createCDATASection($v));
+//			$xmlParam->appendChild($xmlValue);
+//			$xmlParams->appendChild($xmlParam);
+//		    }
+//		} else {
+//		    $xmlParam = $xmlDoc->createElement('param');
+//		    $xmlName = $xmlDoc->createElement('name');
+//		    $xmlName->nodeValue = trim($key);
+//		    $xmlParam->appendChild($xmlName);
+//		    $xmlValue = $xmlDoc->createElement('value');
+//		    $xmlValue->appendChild($xmlDoc->createCDATASection($value));
+//		    $xmlParam->appendChild($xmlValue);
+//		    $xmlParams->appendChild($xmlParam);
+//		}
+//	    }
+//	    $xmlNotifyElem->appendChild($xmlParams);
+//	}
 
         $elem = $xmlDoc->createElement('error');
         $attr = $xmlDoc->createAttribute('code');
