@@ -33,70 +33,70 @@ use LvdWcMc\Settings;
 use LvdWcMc\MobilpayCreditCardGateway;
 
 function lvd_wcmc_init_autoloader() {
-   require_once LVD_WCMC_LIB_DIR . '/Autoloader.php';
-   \LvdWcMc\Autoloader::init(LVD_WCMC_LIB_DIR, array(
-      'LvdWcMc' => array(
-         'separator' => '\\',
-         'libDir' => LVD_WCMC_LIB_DIR
-      ),
-      'Mobilpay' => array(
-         'separator' => '_',
-         'libDir' => LVD_WCMC_LIB_3RDPARTY_DIR . DIRECTORY_SEPARATOR . 'mobilpay'
-      )
-   ));
+	require_once LVD_WCMC_LIB_DIR . '/Autoloader.php';
+	\LvdWcMc\Autoloader::init(LVD_WCMC_LIB_DIR, array(
+		'LvdWcMc' => array(
+			'separator' => '\\',
+			'libDir' => LVD_WCMC_LIB_DIR
+		),
+		'Mobilpay' => array(
+			'separator' => '_',
+			'libDir' => LVD_WCMC_LIB_3RDPARTY_DIR . DIRECTORY_SEPARATOR . 'mobilpay'
+		)
+	));
 }
 
 function lvdwcmc_get_datetime_format() {
-   $dateTimeFormat = get_option('date_format') . ' ' . get_option('time_format');
-   /**
-    * Filters the format used by LivePayments-MP-WC to format dates
-    * 
-    * @hook lvdwcmc_datetime_format
-    * 
-    * @param string $dateTimeFormat The current date time format, initially provided by LivePayments-MP-WC
-    * @return string The actual & final date time format, as returned by the registered filters
-    */
-   return apply_filters('lvdwcmc_datetime_format', 
-         $dateTimeFormat);
+	$dateTimeFormat = get_option('date_format') . ' ' . get_option('time_format');
+	/**
+	 * Filters the format used by LivePayments-MP-WC to format dates
+	 * 
+	 * @hook lvdwcmc_datetime_format
+	 * 
+	 * @param string $dateTimeFormat The current date time format, initially provided by LivePayments-MP-WC
+	 * @return string The actual & final date time format, as returned by the registered filters
+	 */
+	return apply_filters('lvdwcmc_datetime_format', 
+			$dateTimeFormat);
 }
 
 function lvdwcmc_get_amount_format() {
-   $amountFormat = array(
-      'decimals' => wc_get_price_decimals(), 
-      'decimalSeparator' => wc_get_price_decimal_separator(), 
-      'thousandSeparator' => wc_get_price_thousand_separator()
-   );
+	$amountFormat = array(
+		'decimals' => wc_get_price_decimals(), 
+		'decimalSeparator' => wc_get_price_decimal_separator(), 
+		'thousandSeparator' => wc_get_price_thousand_separator()
+	);
 
-   /** 
-    * Filters the format used by LivePayments-MP-WC to format money amounts
-    * 
-    * @hook lvdwcmc_amount_format
-    * 
-    * @param array $amountFormat The current amount format, initially provided by LivePayments-MP-WC
-    * @return array The actual & final amount format, as returned by the registered filters
-    */
-   return apply_filters('lvdwcmc_amount_format', 
-      $amountFormat);
+	/** 
+	 * Filters the format used by LivePayments-MP-WC to format money amounts
+	 * 
+	 * @hook lvdwcmc_amount_format
+	 * 
+	 * @param array $amountFormat The current amount format, initially provided by LivePayments-MP-WC
+	 * @return array The actual & final amount format, as returned by the registered filters
+	 */
+	return apply_filters('lvdwcmc_amount_format', 
+		$amountFormat);
 }
 
 /**
  * @return \LvdWcMc\MobilpayCreditCardGateway
  */
 function lvdwcmc_get_mobilpay_credit_card_gateway() {
-   static $gatewayInstance = null;
-   if ($gatewayInstance === null) {
-      $gateways = WC()
-            ->payment_gateways()
-            ->payment_gateways;
+	static $gatewayInstance = null;
+	if ($gatewayInstance === null) {
+		$gateways = WC()
+				->payment_gateways()
+				->payment_gateways;
 
-      foreach ($gateways as $g) {
-            if ($g->id == MobilpayCreditCardGateway::GATEWAY_ID) {
-               $gatewayInstance = $g;
-               break;
-            }
-      }
-   }
-   return $gatewayInstance;
+		foreach ($gateways as $g) {
+				if ($g->id == MobilpayCreditCardGateway::GATEWAY_ID) {
+					$gatewayInstance = $g;
+					break;
+				}
+		}
+	}
+	return $gatewayInstance;
 }
 
 /**
@@ -145,7 +145,7 @@ function lvdwcmc_append_error($message, $error) {
  * @return void
  */
 function lvdwcmc_increase_limits($executionTimeMinutes = 10) {
-   if (function_exists('set_time_limit')) {
+	if (function_exists('set_time_limit')) {
 		@set_time_limit($executionTimeMinutes * 60);
 	}
 	if (function_exists('ini_set')) {
@@ -161,7 +161,7 @@ function lvdwcmc_increase_limits($executionTimeMinutes = 10) {
  * @return void
  */
 function lvdwcmc_send_json(\stdClass $data, $die = true) {
-   $data = json_encode($data);
+	$data = json_encode($data);
 	header('Content-Type: application/json');
 	if (extension_loaded('zlib') && function_exists('ini_set')) {
 		@ini_set('zlib.output_compression', false);
@@ -170,24 +170,24 @@ function lvdwcmc_send_json(\stdClass $data, $die = true) {
 			header('Content-Encoding: gzip');
 			$data = gzencode($data, 8, FORCE_GZIP);
 		}
-   }
+	}
 
-   echo $data;
-   if ($die) {
-      exit;
-   }
+	echo $data;
+	if ($die) {
+		exit;
+	}
 }
 
 if (!function_exists('write_log')) {
 	function write_log ($message)  {
-	   if (is_array($message) || is_object($message)) {
+		if (is_array($message) || is_object($message)) {
 			ob_start();
 			var_dump($message);
 			$message = ob_get_clean();
 			error_log($message);
-	   } else {
+		} else {
 			error_log($message);
-	   }
+		}
 	}
 }
 
@@ -195,7 +195,7 @@ if (!function_exists('write_log')) {
  * @return \LvdWcMc\Settings 
  */
 function lvdwcmc_get_settings() {
-   return Settings::getInstance();
+	return Settings::getInstance();
 }
 
 /**
@@ -204,13 +204,13 @@ function lvdwcmc_get_settings() {
  * @return \LvdWcMc\Env The current environment accessor instance
  */
 function lvdwcmc_get_env() {
-   static $env = null;
-   
-   if ($env === null) {
-      $env = new \LvdWcMc\Env();
-   }
+	static $env = null;
+	
+	if ($env === null) {
+		$env = new \LvdWcMc\Env();
+	}
 
-   return $env;
+	return $env;
 }
 
 /**
@@ -219,18 +219,18 @@ function lvdwcmc_get_env() {
  * @return \LvdWcMc\Plugin The current plugin instance
  */
 function lvdwcmc_plugin() {
-   static $plugin = null;
+	static $plugin = null;
 
-   if ($plugin === null) {
+	if ($plugin === null) {
 		$plugin = new \LvdWcMc\Plugin(array(
 			'mediaIncludes' => array(
-            	'refPluginsPath' => LVD_WCMC_MAIN,
-            	'scriptsInFooter' => true
-        	)
-      	));
-   }
+					'refPluginsPath' => LVD_WCMC_MAIN,
+					'scriptsInFooter' => true
+		  	)
+			));
+	}
 
-   return $plugin;
+	return $plugin;
 }
 
 /**
@@ -239,5 +239,5 @@ function lvdwcmc_plugin() {
  * @return void
  */
 function lvd_wcmc_run() {
-   lvdwcmc_plugin()->run();
+	lvdwcmc_plugin()->run();
 }

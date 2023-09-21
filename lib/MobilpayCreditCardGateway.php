@@ -30,6 +30,9 @@
  */
 
 namespace LvdWcMc {
+
+    use OpenSSLAsymmetricKey;
+
 	class MobilpayCreditCardGateway extends \WC_Payment_Gateway {
 		use DataExtensions;
 		use LoggingExtensions;
@@ -939,11 +942,8 @@ namespace LvdWcMc {
 			$result = true;
 			if (function_exists('openssl_pkey_get_public') && function_exists('openssl_free_key')) {
 				$publicKey = openssl_pkey_get_public($fileContents);
-				if ($publicKey !== false && is_resource($publicKey)) {
-					openssl_free_key($publicKey);
-				} else {
-					$result = false;
-				}
+				$result = ($publicKey !== false 
+					&& (is_resource($publicKey) || $publicKey instanceof OpenSSLAsymmetricKey));
 			}
 			return $result;
 		}
@@ -952,11 +952,8 @@ namespace LvdWcMc {
 			$result = true;
 			if (function_exists('openssl_pkey_get_private') && function_exists('openssl_free_key')) {
 				$privateKey = openssl_pkey_get_private($fileContents);
-				if ($privateKey !== false && is_resource($privateKey)) {
-					openssl_free_key($privateKey);
-				} else {
-					$result = false;
-				}
+				$result = ($privateKey !== false 
+					&& (is_resource($privateKey) || $privateKey instanceof OpenSSLAsymmetricKey));
 			}
 			return $result;
 		}
@@ -1392,9 +1389,6 @@ namespace LvdWcMc {
 				: null;
 			$address->email = isset($info['email']) 
 				? $info['email'] 
-				: null;
-			$address->fiscalNumber = isset($info['fiscalNumber']) 
-				? $info['fiscalNumber'] 
 				: null;
 			$address->address = isset($info['address']) 
 				? $info['address'] 

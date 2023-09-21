@@ -30,113 +30,113 @@
  */
 
 namespace LvdWcMc {
-    class ApiServer  {
-        use LoggingExtensions;
-        
-        /**
-         * @var \LvdWcMc\Env Reference to the environment object
-         */
-        private $_env;
+	class ApiServer  {
+		use LoggingExtensions;
+		
+		/**
+		 * @var \LvdWcMc\Env Reference to the environment object
+		 */
+		private $_env;
 
-        /**
-         * @var \LvdWcMc\TransactionReport Reference to the transaction report manager
-         */
-        private $_report;
+		/**
+		 * @var \LvdWcMc\TransactionReport Reference to the transaction report manager
+		 */
+		private $_report;
 
-        /**
-         * @var WC_Logger The logger instance used by this API server
-         */
-        private $_logger = null;
+		/**
+		 * @var WC_Logger The logger instance used by this API server
+		 */
+		private $_logger = null;
 
-        public function __construct() {
-            $this->_env = lvdwcmc_get_env();
-            $this->_report = new TransactionReport();
-        }
+		public function __construct() {
+			$this->_env = lvdwcmc_get_env();
+			$this->_report = new TransactionReport();
+		}
 
-        public function listen() {
-            register_rest_route('livepayments-mp-wc', 
-                '/reports/transctions-status-counts', 
-                array(
-                    'methods' => 'GET',
-                    'callback' => array($this, 'handleRequestTransactionsStatusCounts'),
-                    'permission_callback' => function() {
-                        return $this->_currentUserCanManageWooCommerce();
-                    }
-            ));
+		public function listen() {
+			register_rest_route('livepayments-mp-wc', 
+				'/reports/transctions-status-counts', 
+				array(
+					'methods' => 'GET',
+					'callback' => array($this, 'handleRequestTransactionsStatusCounts'),
+					'permission_callback' => function() {
+						return $this->_currentUserCanManageWooCommerce();
+					}
+			));
 
-            register_rest_route('livepayments-mp-wc', 
-                '/reports/last-transaction-details', 
-                array(
-                    'methods' => 'GET',
-                    'callback' => array($this, 'handleRequestLastTransactionDetails'),
-                    'permission_callback' => function() {
-                        return $this->_currentUserCanManageWooCommerce();
-                    }
-            ));
-        }
+			register_rest_route('livepayments-mp-wc', 
+				'/reports/last-transaction-details', 
+				array(
+					'methods' => 'GET',
+					'callback' => array($this, 'handleRequestLastTransactionDetails'),
+					'permission_callback' => function() {
+						return $this->_currentUserCanManageWooCommerce();
+					}
+			));
+		}
 
-        public function handleRequestTransactionsStatusCounts(\WP_REST_Request $request) {
-            if (!$this->_currentUserCanManageWooCommerce()) {
-                return new \WP_REST_Response(null, 403);
-            }
+		public function handleRequestTransactionsStatusCounts(\WP_REST_Request $request) {
+			if (!$this->_currentUserCanManageWooCommerce()) {
+				return new \WP_REST_Response(null, 403);
+			}
 
-            $data = new \stdClass();
-            $this->logDebug('Begin processing transactions status counts report', 
-                $this->_getLoggingContext());
+			$data = new \stdClass();
+			$this->logDebug('Begin processing transactions status counts report', 
+				$this->_getLoggingContext());
 
-            try {
-                $data->data = $this->_report->getTransactionsStatusCounts();
-                $data->success = true;
-            } catch (\Exception $exc) {
-                $data->data = null;
-                $data->success = false;
-                $this->logException('Error computing transaction status counts report', 
-                    $exc, 
-                    $this->_getLoggingContext());
-            }
+			try {
+				$data->data = $this->_report->getTransactionsStatusCounts();
+				$data->success = true;
+			} catch (\Exception $exc) {
+				$data->data = null;
+				$data->success = false;
+				$this->logException('Error computing transaction status counts report', 
+					$exc, 
+					$this->_getLoggingContext());
+			}
 
-            return new \WP_REST_Response($data, 200);
-        }
+			return new \WP_REST_Response($data, 200);
+		}
 
-        public function handleRequestLastTransactionDetails(\WP_REST_Request $request) {
-            if (!$this->_currentUserCanManageWooCommerce()) {
-                return new \WP_REST_Response(null, 403);
-            }
+		public function handleRequestLastTransactionDetails(\WP_REST_Request $request) {
+			if (!$this->_currentUserCanManageWooCommerce()) {
+				return new \WP_REST_Response(null, 403);
+			}
 
-            $data = new \stdClass();
-            $this->logDebug('Begin processing last transaction details report', 
-                $this->_getLoggingContext());
-            
-            try {
-                $data->data = $this->_report->getLastTransactionDetails();
-                $data->success = true;
-            } catch (\Exception $exc) {
-                $data->data = null;
-                $data->success = false;
-                $this->logException('Error computing last transaction details report', 
-                    $exc, 
-                    $this->_getLoggingContext());
-            }
+			$data = new \stdClass();
+			$this->logDebug('Begin processing last transaction details report', 
+				$this->_getLoggingContext());
+			
+			try {
+				$data->data = $this->_report->getLastTransactionDetails();
+				$data->success = true;
+			} catch (\Exception $exc) {
+				$data->data = null;
+				$data->success = false;
+				$this->logException('Error computing last transaction details report', 
+					$exc, 
+					$this->_getLoggingContext());
+			}
 
-            return new \WP_REST_Response($data, 200);
-        }
+			return new \WP_REST_Response($data, 200);
+		}
 
-        private function _currentUserCanManageWooCommerce() {
-            return current_user_can('manage_woocommerce');
-        }
+		private function _currentUserCanManageWooCommerce() {
+			return current_user_can('manage_woocommerce');
+		}
 
-        public function getLogger() {
-            if ($this->_logger === null) {
-                $this->_logger = wc_get_logger();
-            }
-            return $this->_logger;
-        }
+		public function getLogger() {
+			if ($this->_logger === null) {
+				$this->_logger = wc_get_logger();
+			}
+			return $this->_logger;
+		}
 
-        private function _getLoggingContext() {
-            return array(
-                'source' => MobilpayCreditCardGateway::GATEWAY_ID,
-                'location' => 'api-server'
-            );
-        }
-    }
+		private function _getLoggingContext() {
+			return array(
+				'source' => MobilpayCreditCardGateway::GATEWAY_ID,
+				'location' => 'api-server'
+			);
+		}
+	}
 }

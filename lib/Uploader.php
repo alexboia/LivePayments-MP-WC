@@ -31,6 +31,7 @@
 
 namespace LvdWcMc {
     use MimeReader;
+    use InvalidArgumentException;
 
     class Uploader {
         /**

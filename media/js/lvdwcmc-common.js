@@ -29,57 +29,57 @@
  */
 
 (function($) {
-    "use strict";
+	"use strict";
 
-    function disableWindowScroll() {
-        $('body').addClass('lvdwcmc-stop-scrolling');
-    }
+	function disableWindowScroll() {
+		$('body').addClass('lvdwcmc-stop-scrolling');
+	}
 
-    function enableWindowScroll() {
-        $('body').removeClass('lvdwcmc-stop-scrolling');
-    }
+	function enableWindowScroll() {
+		$('body').removeClass('lvdwcmc-stop-scrolling');
+	}
 
-    function showPleaseWait() {
-        $.blockUI({
-            message: [
-                '<img class="lvdwcmc-please-wait-spinner" src="' + lvdwcmcCommonSettings.pluginMediaImgRootDir + '/lvdwcmc-wait.svg" alt="' + lvdwcmcCommonScriptL10n.lblLoading + '" />',
-                '<p class="lvdwcmc-please-wait-txt">' + lvdwcmcCommonScriptL10n.lblLoading + '</p>'
-            ],
-            css: {
-                border: 'none', 
-                padding: '15px', 
-                backgroundColor: '#000', 
-                opacity: .5, 
-                color: '#fff' 
-            },
+	function showPleaseWait() {
+		$.blockUI({
+			message: [
+				'<img class="lvdwcmc-please-wait-spinner" src="' + lvdwcmcCommonSettings.pluginMediaImgRootDir + '/lvdwcmc-wait.svg" alt="' + lvdwcmcCommonScriptL10n.lblLoading + '" />',
+				'<p class="lvdwcmc-please-wait-txt">' + lvdwcmcCommonScriptL10n.lblLoading + '</p>'
+			],
+			css: {
+				border: 'none', 
+				padding: '15px', 
+				backgroundColor: '#000', 
+				opacity: .5, 
+				color: '#fff' 
+			},
 
-            overlayCSS: {
-                backgroundImage: 'none'
-            },
+			overlayCSS: {
+				backgroundImage: 'none'
+			},
 
-            onBlock: disableWindowScroll
-        });
-    }
+			onBlock: disableWindowScroll
+		});
+	}
 
-    function hidePleaseWait() {
-        $.unblockUI({
-            onUnblock: enableWindowScroll
-        });
-    }
+	function hidePleaseWait() {
+		$.unblockUI({
+			onUnblock: enableWindowScroll
+		});
+	}
 
-    function scrollToTop() {
-        $('body,html').scrollTop(0);
-    }
+	function scrollToTop() {
+		$('body,html').scrollTop(0);
+	}
 
-    if (window.lvdwcmc == undefined) {
-        window.lvdwcmc = {};
-    }
+	if (window.lvdwcmc == undefined) {
+		window.lvdwcmc = {};
+	}
 
-    window.lvdwcmc = $.extend(window.lvdwcmc, {
-        disableWindowScroll: disableWindowScroll,
-        enableWindowScroll: enableWindowScroll,
-        showPleaseWait: showPleaseWait,
-        hidePleaseWait: hidePleaseWait,
-        scrollToTop: scrollToTop
-    });
+	window.lvdwcmc = $.extend(window.lvdwcmc, {
+		disableWindowScroll: disableWindowScroll,
+		enableWindowScroll: enableWindowScroll,
+		showPleaseWait: showPleaseWait,
+		hidePleaseWait: hidePleaseWait,
+		scrollToTop: scrollToTop
+	});
 })(jQuery);

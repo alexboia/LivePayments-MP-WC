@@ -54,7 +54,7 @@ namespace LvdWcMc {
         }
 
         public function __clone() {
-            throw new Exception('Cloning a singleton of type ' . __CLASS__ . ' is not allowed');
+            throw new \Exception('Cloning a singleton of type ' . __CLASS__ . ' is not allowed');
         }
 
         /**
